@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ugit", "ugit\ugit.csproj", "{A8B8E56F-4CAB-41E9-B6E7-CB59523AC64D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4C79B968-D702-4C48-8E8E-416F5CABBE48}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{16FFA3AA-EA24-4255-B49C-D4B88AC9AAC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ugittest", "ugittest\ugittest.csproj", "{2DA6F373-B578-4499-AA72-7B771853A956}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A8B8E56F-4CAB-41E9-B6E7-CB59523AC64D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8B8E56F-4CAB-41E9-B6E7-CB59523AC64D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8B8E56F-4CAB-41E9-B6E7-CB59523AC64D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8B8E56F-4CAB-41E9-B6E7-CB59523AC64D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DA6F373-B578-4499-AA72-7B771853A956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DA6F373-B578-4499-AA72-7B771853A956}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DA6F373-B578-4499-AA72-7B771853A956}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DA6F373-B578-4499-AA72-7B771853A956}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A8B8E56F-4CAB-41E9-B6E7-CB59523AC64D} = {4C79B968-D702-4C48-8E8E-416F5CABBE48}
+		{2DA6F373-B578-4499-AA72-7B771853A956} = {16FFA3AA-EA24-4255-B49C-D4B88AC9AAC1}
+	EndGlobalSection
+EndGlobal
