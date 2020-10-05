@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
+using Nito.Collections;
 
 namespace ugit
 {
@@ -33,7 +34,7 @@ namespace ugit
             foreach (var directoryPath in fileSystem.Directory.EnumerateDirectories(directory))
             {
                 if(IsIgnore(directoryPath)) continue;
-                string @type = "tree";
+                string type = "tree";
                 string oid = WriteTree(directoryPath);
                 string name = fileSystem.Path.GetRelativePath(directory, directoryPath);
                 entries.Add(ValueTuple.Create(name, oid, @type));
@@ -109,7 +110,7 @@ namespace ugit
         public string Commit(string message)
         {
             string commit = $"tree {WriteTree()}\n";
-            string HEAD = data.GetHEAD();
+            string HEAD = data.GetRef("HEAD");
             if (!string.IsNullOrWhiteSpace(HEAD))
             {
                 commit += $"parent {HEAD}\n";
@@ -118,7 +119,7 @@ namespace ugit
             commit += "\n";
             commit += $"{message}\n";
             string oid = data.HashObject(commit.Encode(), "commit");
-            data.SetHEAD(oid);
+            data.UpdateRef("HEAD",oid);
             return oid;
         }
 
@@ -126,7 +127,13 @@ namespace ugit
         {
             var commit = GetCommit(oid);
             ReadTree(commit.Tree);
-            data.SetHEAD(oid);
+            data.UpdateRef("HEAD", oid);
+        }
+
+        public void CreateTag(string name, string oid)
+        {
+            string @ref = fileSystem.Path.Join("refs", "tags", name);
+            data.UpdateRef(@ref, oid);
         }
 
         public Commit GetCommit(string oid)
@@ -162,6 +169,48 @@ namespace ugit
                 Parent = parent,
                 Message =  message,
             };
+        }
+
+        public IEnumerable<string> IterCommitAndParents(IEnumerable<string> oids)
+        {
+            Deque<string> oidsQueue = new Deque<string>(oids);
+            HashSet<string> visited = new HashSet<string>();
+            while (oidsQueue.Count > 0)
+            {
+                string oid = oidsQueue.RemoveFromFront();
+                if (string.IsNullOrWhiteSpace(oid) || visited.Contains(oid)) continue;
+                visited.Add(oid);
+                yield return oid;
+                var commit = GetCommit(oid);
+                oidsQueue.AddToFront(commit.Parent);
+            }
+        }
+        public string GetOid(string name)
+        {
+            name = name == "@" ? "HEAD" : name;
+            string[] refsToTry = new[]
+            {
+                $"{name}",
+                $"refs/{name}",
+                $"refs/tags/{name}",
+                $"refs/heads/{name}"
+            };
+            foreach (var @ref in refsToTry)
+            {
+                if (!string.IsNullOrEmpty(data.GetRef(@ref)))
+                {
+                    return data.GetRef(@ref);
+                }
+            }
+
+            if (name.Length == 40 && name.IsOnlyHex())
+            {
+                return name;
+            }
+
+            Debug.Assert(false, $"Unknown name {name}");
+
+            throw new ArgumentException($"Unknown name {name}");
         }
 
         private bool IsIgnore(string path)

@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ugit
 {
@@ -44,6 +46,35 @@ namespace ugit
             {
                 left[entry.Key] = entry.Value;
             }
+        }
+        
+        public static bool IsOnlyHex(this string str)
+        {
+            return Regex.IsMatch(str, @"\A\b[0-9a-fA-F]+\b\Z");
+        }
+
+        public static IEnumerable<string> Walk(this IFileSystem fileSystem, string directory)
+        {
+            List<string> filePaths =new List<string>();
+            foreach (var filePath in fileSystem.Directory.EnumerateFiles(directory))
+            {
+                filePaths.Add(filePath);
+            }
+            
+            foreach (var directoryPath in fileSystem.Directory.EnumerateDirectories(directory))
+            {
+                var subFilePaths = fileSystem.Walk(directoryPath);
+                filePaths.AddRange(subFilePaths);
+            }
+
+            return filePaths;
+        }
+        
+        public static T Pop<T>(this HashSet<T> set)
+        {
+            var item = set.First();
+            set.Remove(item);
+            return item;
         }
     }
 }

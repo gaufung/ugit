@@ -1,9 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace ugit
 {
@@ -33,21 +32,34 @@ namespace ugit
             _fileSystem.Directory.CreateDirectory(_fileSystem.Path.Join(GitDir, "objects"));
         }
 
-        public void SetHEAD(string oid)
+        public void UpdateRef(string @ref, string oid)
         {
-            string filePath = _fileSystem.Path.Join(GitDir, "HEAD");
-            _fileSystem.File.WriteAllText(filePath, oid);
+            string refPath = _fileSystem.Path.Join(GitDir, @ref);
+            refPath.CreateParentDirectory(_fileSystem);
+            _fileSystem.File.WriteAllText(refPath, oid);
         }
 
-        public string GetHEAD()
+        public string GetRef(string @ref)
         {
-            string filePath = _fileSystem.Path.Join(GitDir, "HEAD");
-            if (_fileSystem.File.Exists(filePath))
+            string refPath = _fileSystem.Path.Join(GitDir, @ref);
+            if (_fileSystem.File.Exists(refPath))
             {
-                return _fileSystem.File.ReadAllBytes(filePath).Decode();
+                return _fileSystem.File.ReadAllBytes(refPath).Decode();
             }
 
             return null;
+        }
+
+        public IEnumerable<ValueTuple<string, string>> IterRefs()
+        {
+            List<string> refs = new List<string>(){"HEAD"};
+            string directory = _fileSystem.Path.Join(GitDir, "refs");
+            foreach (var filePath in _fileSystem.Walk(directory))
+            {
+                refs.Add(_fileSystem.Path.GetRelativePath(GitDir, filePath));
+            }
+
+            return refs.Select(@ref => ValueTuple.Create(@ref, GetRef(@ref)));
         }
 
         public string HashObject(byte[] data, string type="blob")

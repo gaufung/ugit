@@ -49,4 +49,18 @@ dotnet "../ugit.dll" log "9a1931a6af4ca6d26b149f83920accc54532d5fc"
 echo "<----- checkout   ---->"
 dotnet "../ugit.dll" checkout "9a1931a6af4ca6d26b149f83920accc54532d5fc"
 cat ".ugit/HEAD"
+echo ""
 
+echo "<----- create tag   ---->"
+dotnet "../ugit.dll" tag "myTag" "4d9e0706325e7235461a15f63c362dfb0f174455"
+cat ".ugit/refs/tags/myTag"
+echo ""
+
+echo "<----- log by tag   ---->"
+dotnet "../ugit.dll" log "refs/tags/myTag"
+
+echo "<----- log by tag   ---->"
+dotnet "../ugit.dll" log "myTag"
+
+echo "<----- k   ---->"
+dotnet "../ugit.dll" k

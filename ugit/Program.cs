@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using CommandLine;
 
 namespace ugit
@@ -24,7 +26,9 @@ namespace ugit
                 ReadTreeOptions,
                 CommitOptions,
                 LogOptions,
-            CheckOutOptions>(args).MapResult(
+            CheckOutOptions,
+            TagOptions,
+            KOptions>(args).MapResult(
                 (InitOptions o) => Init(o),
                 (HashObjectOptions o) => HashObject(o),
                 (CatFileOptions o) => CatFile(o),
@@ -33,6 +37,8 @@ namespace ugit
                 (CommitOptions o) => Commit(o),
                 (LogOptions o)=>Log(o),
                 (CheckOutOptions o) => CheckOut(o),
+                (TagOptions o) => Tag(o),
+                (KOptions o) => K(o),
                 errors => 1);
             return exitCode;
         }
@@ -53,7 +59,8 @@ namespace ugit
 
         static int CatFile(CatFileOptions o)
         {
-            Console.Write(_data.GetObject(o.Object, null).Decode());
+            string oid = _base.GetOid(o.Object);
+            Console.Write(_data.GetObject(oid, null).Decode());
             return 0;
         }
 
@@ -66,7 +73,8 @@ namespace ugit
 
         static int ReadTree(ReadTreeOptions o)
         {
-            _base.ReadTree(o.Tree);
+            string tree = _base.GetOid(o.Tree);
+            _base.ReadTree(tree);
             return 0;
         }
 
@@ -78,21 +86,54 @@ namespace ugit
 
         static int Log(LogOptions o)
         {
-            string oid = o.Oid ?? _data.GetHEAD();
-            while (!string.IsNullOrWhiteSpace(oid))
+            string oid = _base.GetOid(o.Oid);
+            foreach (var objectId in _base.IterCommitAndParents(new []{oid}))
             {
-                var commit = _base.GetCommit(oid);
+                var commit = _base.GetCommit(objectId);
                 Console.WriteLine($"commit {oid}\n");
                 Console.WriteLine($"{commit.Message}    ");
                 Console.WriteLine("");
-                oid = commit.Parent;
             }
             return 0;
         }
 
         static int CheckOut(CheckOutOptions o)
         {
-            _base.CheckOut(o.Oid);
+            string oid = _base.GetOid(o.Oid);
+            _base.CheckOut(oid);
+            return 0;
+        }
+
+        static int Tag(TagOptions o)
+        {
+            string oid = _base.GetOid(o.Oid);
+            _base.CreateTag(o.Name, oid);
+            return 0;
+        }
+
+        static int K(KOptions k)
+        {
+            string dot = "digraph commits {\n";
+            HashSet<string> oids = new HashSet<string>();
+            foreach (var (refname, @ref) in _data.IterRefs())
+            {
+                dot += $"\"{refname}\" [shape=note]\n";
+                dot += $"\"{refname}\" -> \"{@ref}\"";
+                oids.Add(@ref);
+            }
+
+            foreach (var oid in _base.IterCommitAndParents(oids))
+            {
+                var commit = _base.GetCommit(oid);
+                dot += $"\"{oid}\" [shape=box style=filled label=\"{oid.Substring(0, 10)}\"]\n";
+                if (!string.IsNullOrWhiteSpace(commit.Parent))
+                {
+                    dot += $"\"{oid}\" -> \"{commit.Parent}\"";
+                }
+            }
+
+            dot += "}";
+            Console.WriteLine(dot);
             return 0;
         }
     }

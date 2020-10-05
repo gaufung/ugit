@@ -45,7 +45,7 @@ namespace ugit
     [Verb("log")]
     public class LogOptions
     {
-        [Value(0, Required = false)]
+        [Value(0, Required = false, Default = "@")]
         public string Oid { get; set; }
     }
 
@@ -54,5 +54,21 @@ namespace ugit
     {
         [Value(0, Required = true)]
         public string Oid { get; set; }
+    }
+
+    [Verb("tag")]
+    public class TagOptions
+    {
+        [Value(0, Required = true)]
+        public string Name { get; set; }
+        
+        [Value(1, Required = false, Default = "@")]
+        public string Oid { get; set; }
+    }
+
+    [Verb("k")]
+    public class KOptions
+    {
+        
     }
 }

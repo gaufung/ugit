@@ -7,6 +7,7 @@
 
     <ItemGroup>
       <PackageReference Include="CommandLineParser" Version="2.8.0" />
+      <PackageReference Include="Nito.Collections.Deque" Version="1.0.4" />
       <PackageReference Include="System.IO.Abstractions" Version="12.2.1" />
     </ItemGroup>
 
