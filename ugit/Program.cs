@@ -23,7 +23,8 @@ namespace ugit
                 WriteTreeOptions,
                 ReadTreeOptions,
                 CommitOptions,
-                LogOptions>(args).MapResult(
+                LogOptions,
+            CheckOutOptions>(args).MapResult(
                 (InitOptions o) => Init(o),
                 (HashObjectOptions o) => HashObject(o),
                 (CatFileOptions o) => CatFile(o),
@@ -31,6 +32,7 @@ namespace ugit
                 (ReadTreeOptions o) => ReadTree(o),
                 (CommitOptions o) => Commit(o),
                 (LogOptions o)=>Log(o),
+                (CheckOutOptions o) => CheckOut(o),
                 errors => 1);
             return exitCode;
         }
@@ -85,6 +87,12 @@ namespace ugit
                 Console.WriteLine("");
                 oid = commit.Parent;
             }
+            return 0;
+        }
+
+        static int CheckOut(CheckOutOptions o)
+        {
+            _base.CheckOut(o.Oid);
             return 0;
         }
     }

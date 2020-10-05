@@ -45,3 +45,8 @@ dotnet "../ugit.dll" log
 
 echo "<----- previous log  ---->"
 dotnet "../ugit.dll" log "9a1931a6af4ca6d26b149f83920accc54532d5fc"
+
+echo "<----- checkout   ---->"
+dotnet "../ugit.dll" checkout "9a1931a6af4ca6d26b149f83920accc54532d5fc"
+cat ".ugit/HEAD"
+

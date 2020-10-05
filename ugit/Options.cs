@@ -48,4 +48,11 @@ namespace ugit
         [Value(0, Required = false)]
         public string Oid { get; set; }
     }
+
+    [Verb("checkout")]
+    public class CheckOutOptions
+    {
+        [Value(0, Required = true)]
+        public string Oid { get; set; }
+    }
 }

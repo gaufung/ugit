@@ -122,6 +122,13 @@ namespace ugit
             return oid;
         }
 
+        public void CheckOut(string oid)
+        {
+            var commit = GetCommit(oid);
+            ReadTree(commit.Tree);
+            data.SetHEAD(oid);
+        }
+
         public Commit GetCommit(string oid)
         {
             string commit = data.GetObject(oid, "commit").Decode();
