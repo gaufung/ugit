@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Security.Cryptography;
 using System.Text;
@@ -34,6 +35,14 @@ namespace ugit
             if (!fileSystem.Directory.Exists(folder))
             {
                 fileSystem.Directory.CreateDirectory(folder);
+            }
+        }
+        
+        public static void Update<TKey, TValue>(this IDictionary<TKey, TValue> left, IDictionary<TKey, TValue> right)
+        {
+            foreach (var entry in right)
+            {
+                left[entry.Key] = entry.Value;
             }
         }
     }

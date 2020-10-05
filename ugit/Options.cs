@@ -27,4 +27,11 @@ namespace ugit
     {
         
     }
+
+    [Verb("read-tree")]
+    public class ReadTreeOptions
+    {
+        [Value(0)]
+        public string Tree { get; set; }
+    }
 }
