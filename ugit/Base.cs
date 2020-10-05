@@ -143,6 +143,11 @@ namespace ugit
             data.UpdateRef("HEAD", HEAD, false);
         }
 
+        public void Reset(string oid)
+        {
+            data.UpdateRef("HEAD", RefValue.Create(false,oid));
+        }
+
         public void CreateTag(string name, string oid)
         {
             string @ref = fileSystem.Path.Join("refs", "tags", name);

@@ -84,3 +84,8 @@ dotnet "../ugit.dll" branch
 
 echo "<----- log  ---->"
 dotnet "../ugit.dll" log
+
+echo "<----- reset ---->"
+dotnet "../ugit.dll" reset "4d9e0706325e7235461a15f63c362dfb0f174455"
+echo "<----- log(reset)  ---->"
+dotnet "../ugit.dll" log

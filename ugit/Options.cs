@@ -88,4 +88,18 @@ namespace ugit
     {
         
     }
+
+    [Verb("reset")]
+    public class ResetOptions
+    {
+        [Value(0, Required = true)]
+        public string Commit { get; set; }
+    }
+
+    [Verb("show")]
+    public class ShowOptions
+    {
+        [Value(0, Required = false, Default = "@")]
+        public string Commit { get; set; }
+    }
 }

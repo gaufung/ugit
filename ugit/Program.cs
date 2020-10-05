@@ -30,7 +30,8 @@ namespace ugit
                 TagOptions,
                 KOptions,
                 BranchOptions,
-            StatusOptions>(args).MapResult(
+            StatusOptions,
+            ResetOptions>(args).MapResult(
                 (InitOptions o) => Init(o),
                 (HashObjectOptions o) => HashObject(o),
                 (CatFileOptions o) => CatFile(o),
@@ -43,6 +44,7 @@ namespace ugit
                 (KOptions o) => K(o),
                 (BranchOptions o) => Branch(o),
                 (StatusOptions o) => Status(o),
+                (ResetOptions o) => Reset(o),
                 errors => 1);
             return exitCode;
         }
@@ -88,6 +90,15 @@ namespace ugit
             return 0;
         }
 
+        static void PrintCommit(string oid, Commit commit, IEnumerable<string> refs = null)
+        {
+            string refString = refs == null ? "" : $"({string.Join(", ", refs)})";
+            Console.WriteLine($"commit {oid}{refString}\n");
+            Console.WriteLine(commit.Message + "     ");
+            Console.WriteLine("");
+        }
+        
+
         static int Log(LogOptions o)
         {
             IDictionary<string, List<string>> refs = new Dictionary<string, List<string>>();
@@ -106,14 +117,25 @@ namespace ugit
             foreach (var objectId in _base.IterCommitAndParents(new[] {oid}))
             {
                 var commit = _base.GetCommit(objectId);
-                string refsString = refs.ContainsKey(objectId) ? $"({string.Join(", ", refs[oid])})" : "";
-                Console.WriteLine($"commit {oid}{refsString}\n");
-                Console.WriteLine($"{commit.Message}    ");
-                Console.WriteLine("");
+                PrintCommit(objectId, commit, refs.ContainsKey(objectId)?refs[objectId]:null);
             }
 
             return 0;
         }
+
+        static int Show(ShowOptions o)
+        {
+            string oid = _base.GetOid(o.Commit);
+            if (!string.IsNullOrWhiteSpace(oid))
+            {
+                return 0;
+            }
+
+            var commit = _base.GetCommit(oid);
+            PrintCommit(oid, commit);
+            return 0;
+        }
+        
 
         static int CheckOut(CheckOutOptions o)
         {
@@ -189,6 +211,13 @@ namespace ugit
             {
                 Console.WriteLine($"HEAD detached at {head.Substring(0, 10)}");
             }
+            return 0;
+        }
+
+        static int Reset(ResetOptions o)
+        {
+            string commit = _base.GetOid(o.Commit);
+            _base.Reset(commit);
             return 0;
         }
     }
