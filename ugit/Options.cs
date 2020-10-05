@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CommandLine;
 
 namespace ugit
@@ -53,7 +54,7 @@ namespace ugit
     public class CheckOutOptions
     {
         [Value(0, Required = true)]
-        public string Oid { get; set; }
+        public string Commit { get; set; }
     }
 
     [Verb("tag")]
@@ -68,6 +69,22 @@ namespace ugit
 
     [Verb("k")]
     public class KOptions
+    {
+        
+    }
+
+    [Verb("branch")]
+    public class BranchOptions
+    {
+        [Value(0, Required = false)]
+        public string Name { get; set; }
+
+        [Value(1, Required = false, Default = "@")]
+        public string StartPoint { get; set; }
+    }
+    
+    [Verb("status")]
+    public class StatusOptions
     {
         
     }

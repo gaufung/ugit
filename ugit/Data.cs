@@ -32,25 +32,53 @@ namespace ugit
             _fileSystem.Directory.CreateDirectory(_fileSystem.Path.Join(GitDir, "objects"));
         }
 
-        public void UpdateRef(string @ref, string oid)
+        public void UpdateRef(string @ref, RefValue value, bool deref=true)
         {
+            @ref = GetRefInternal(@ref, deref).Item1;
+
+            string val;
+            if (value.Symbolic)
+            {
+                val = $"ref: {value.Value}";
+            }
+            else
+            {
+                val = value.Value;
+            }
             string refPath = _fileSystem.Path.Join(GitDir, @ref);
             refPath.CreateParentDirectory(_fileSystem);
-            _fileSystem.File.WriteAllText(refPath, oid);
+            _fileSystem.File.WriteAllText(refPath, val);
         }
 
-        public string GetRef(string @ref)
+        public RefValue GetRef(string @ref, bool deref=true)
+        {
+            var (_, result) = GetRefInternal(@ref, deref);
+            return result;
+        }
+
+        private ValueTuple<string, RefValue> GetRefInternal(string @ref, bool deref)
         {
             string refPath = _fileSystem.Path.Join(GitDir, @ref);
+            string value = null;
             if (_fileSystem.File.Exists(refPath))
             {
-                return _fileSystem.File.ReadAllBytes(refPath).Decode();
+                value = _fileSystem.File.ReadAllBytes(refPath).Decode();
             }
 
-            return null;
+            bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");
+            if (symbolic)
+            {
+                value = value.Split(':', 2)[1].Trim();
+                if (deref)
+                {
+                    return GetRefInternal(value, true);
+                }
+            }
+
+            return ValueTuple.Create(@ref, RefValue.Create(symbolic, value));
         }
 
-        public IEnumerable<ValueTuple<string, string>> IterRefs()
+        public IEnumerable<ValueTuple<string, RefValue>> IterRefs(string prefix="", bool deref=true)
         {
             List<string> refs = new List<string>(){"HEAD"};
             string directory = _fileSystem.Path.Join(GitDir, "refs");
@@ -59,7 +87,8 @@ namespace ugit
                 refs.Add(_fileSystem.Path.GetRelativePath(GitDir, filePath));
             }
 
-            return refs.Select(@ref => ValueTuple.Create(@ref, GetRef(@ref)));
+            return refs.Where(@ref => @ref.StartsWith(prefix))
+                .Select(@ref => ValueTuple.Create(@ref, GetRef(@ref, deref)));
         }
 
         public string HashObject(byte[] data, string type="blob")

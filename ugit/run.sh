@@ -9,6 +9,9 @@ cd "test"
 echo "<----- init ---->"
 dotnet "../ugit.dll" init
 
+echo "<----- status ---->"
+doent "../ugit.dll" status
+
 echo "<----- hash object ---->"
 echo "Hello" > hello.txt
 dotnet "../ugit.dll" hash-object hello.txt
@@ -64,3 +67,20 @@ dotnet "../ugit.dll" log "myTag"
 
 echo "<----- k   ---->"
 dotnet "../ugit.dll" k
+
+echo "<----- branch ---->"
+dotnet "../ugit.dll" branch "myBranch" "4d9e0706325e7235461a15f63c362dfb0f174455"
+
+echo "<----- check branch ---->"
+
+dotnet "../ugit.dll" checkout "myBranch"
+
+
+echo "<----- status ---->"
+dotnet "../ugit.dll" status
+
+echo "<----- branch ---->"
+dotnet "../ugit.dll" branch
+
+echo "<----- log  ---->"
+dotnet "../ugit.dll" log

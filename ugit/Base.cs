@@ -19,6 +19,13 @@ namespace ugit
             this.fileSystem = fileSystem;
         }
 
+        public void Init()
+        {
+            data.Init();
+            data.UpdateRef("HEAD", 
+                RefValue.Create(true, fileSystem.Path.Join("refs", "heads", "master")));
+        }
+
         public string WriteTree(string directory = ".")
         {
             List<ValueTuple<string, string, string>> entries = new List<(string, string, string)>();
@@ -110,7 +117,7 @@ namespace ugit
         public string Commit(string message)
         {
             string commit = $"tree {WriteTree()}\n";
-            string HEAD = data.GetRef("HEAD");
+            string HEAD = data.GetRef("HEAD").Value;
             if (!string.IsNullOrWhiteSpace(HEAD))
             {
                 commit += $"parent {HEAD}\n";
@@ -119,23 +126,64 @@ namespace ugit
             commit += "\n";
             commit += $"{message}\n";
             string oid = data.HashObject(commit.Encode(), "commit");
-            data.UpdateRef("HEAD",oid);
+            data.UpdateRef("HEAD",RefValue.Create(false, oid));
             return oid;
         }
 
-        public void CheckOut(string oid)
+        public void CheckOut(string name)
         {
+            string oid = GetOid(name);
             var commit = GetCommit(oid);
             ReadTree(commit.Tree);
-            data.UpdateRef("HEAD", oid);
+
+            RefValue HEAD = IsBranch(name) ? 
+                RefValue.Create(true, fileSystem.Path.Join("refs", "heads", name)) : 
+                RefValue.Create(false, oid);
+            
+            data.UpdateRef("HEAD", HEAD, false);
         }
 
         public void CreateTag(string name, string oid)
         {
             string @ref = fileSystem.Path.Join("refs", "tags", name);
-            data.UpdateRef(@ref, oid);
+            data.UpdateRef(@ref, RefValue.Create(false, oid));
         }
 
+        public void CreateBranch(string name, string oid)
+        {
+            string @ref = fileSystem.Path.Join("refs", "heads", name);
+            data.UpdateRef(@ref, RefValue.Create(false, oid));
+        }
+
+        public IEnumerable<string> IterBranchName()
+        {
+            string branchPrefix = fileSystem.Path.Join("refs", "heads");
+            string head = fileSystem.Path.Join("refs", "heads");
+            foreach (var (refName, _) in data.IterRefs(branchPrefix))
+            {
+                yield return fileSystem.Path.GetRelativePath(head, refName);
+            }
+        }
+
+        private bool IsBranch(string branch)
+        {
+            string @ref = fileSystem.Path.Join("refs", "heads", branch);
+            return !string.IsNullOrWhiteSpace(data.GetRef(@ref).Value);
+        }
+
+        public string GetBranchName()
+        {
+            var HEAD = data.GetRef("HEAD", false);
+            if (!HEAD.Symbolic)
+            {
+                return null;
+            }
+
+            string head = HEAD.Value;
+            Debug.Assert(head.StartsWith("refs/heads/"));
+            return fileSystem.Path.GetRelativePath("refs/heads", head);
+        }
+        
         public Commit GetCommit(string oid)
         {
             string commit = data.GetObject(oid, "commit").Decode();
@@ -197,9 +245,9 @@ namespace ugit
             };
             foreach (var @ref in refsToTry)
             {
-                if (!string.IsNullOrEmpty(data.GetRef(@ref)))
+                if (!string.IsNullOrEmpty(data.GetRef(@ref, false).Value))
                 {
-                    return data.GetRef(@ref);
+                    return data.GetRef(@ref).Value;
                 }
             }
 

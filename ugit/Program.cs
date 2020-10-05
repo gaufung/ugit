@@ -26,26 +26,30 @@ namespace ugit
                 ReadTreeOptions,
                 CommitOptions,
                 LogOptions,
-            CheckOutOptions,
-            TagOptions,
-            KOptions>(args).MapResult(
+                CheckOutOptions,
+                TagOptions,
+                KOptions,
+                BranchOptions,
+            StatusOptions>(args).MapResult(
                 (InitOptions o) => Init(o),
                 (HashObjectOptions o) => HashObject(o),
                 (CatFileOptions o) => CatFile(o),
                 (WriteTreeOptions o) => WriteTree(o),
                 (ReadTreeOptions o) => ReadTree(o),
                 (CommitOptions o) => Commit(o),
-                (LogOptions o)=>Log(o),
+                (LogOptions o) => Log(o),
                 (CheckOutOptions o) => CheckOut(o),
                 (TagOptions o) => Tag(o),
                 (KOptions o) => K(o),
+                (BranchOptions o) => Branch(o),
+                (StatusOptions o) => Status(o),
                 errors => 1);
             return exitCode;
         }
 
         static int Init(InitOptions o)
         {
-            _data.Init();
+            _base.Init();
             Console.WriteLine($"Initialized empty ugit repository in {_data.GitDirPath}");
             return 0;
         }
@@ -86,21 +90,34 @@ namespace ugit
 
         static int Log(LogOptions o)
         {
+            IDictionary<string, List<string>> refs = new Dictionary<string, List<string>>();
+            foreach (var (refName,@ref) in _data.IterRefs())
+            {
+                if (refs.ContainsKey(@ref.Value))
+                {
+                    refs[@ref.Value].Add(refName);
+                }
+                else
+                {
+                    refs[@ref.Value] = new List<string>(){refName};
+                }
+            }
             string oid = _base.GetOid(o.Oid);
-            foreach (var objectId in _base.IterCommitAndParents(new []{oid}))
+            foreach (var objectId in _base.IterCommitAndParents(new[] {oid}))
             {
                 var commit = _base.GetCommit(objectId);
-                Console.WriteLine($"commit {oid}\n");
+                string refsString = refs.ContainsKey(objectId) ? $"({string.Join(", ", refs[oid])})" : "";
+                Console.WriteLine($"commit {oid}{refsString}\n");
                 Console.WriteLine($"{commit.Message}    ");
                 Console.WriteLine("");
             }
+
             return 0;
         }
 
         static int CheckOut(CheckOutOptions o)
         {
-            string oid = _base.GetOid(o.Oid);
-            _base.CheckOut(oid);
+            _base.CheckOut(o.Commit);
             return 0;
         }
 
@@ -111,15 +128,38 @@ namespace ugit
             return 0;
         }
 
+        static int Branch(BranchOptions o)
+        {
+            if (string.IsNullOrWhiteSpace(o.Name))
+            {
+                string current = _base.GetBranchName();
+                foreach (string branch in _base.IterBranchName())
+                {
+                    string prefix = branch == current ? "*" : " ";
+                    Console.WriteLine($"{prefix} {branch}");
+                }
+            }
+            else
+            {
+                string startPoint = _base.GetOid(o.StartPoint);
+                _base.CreateBranch(o.Name, startPoint);
+                Console.WriteLine($"Branch {o.Name}, created at {startPoint.Substring(0, 10)}");
+            }
+            return 0;
+        }
+
         static int K(KOptions k)
         {
             string dot = "digraph commits {\n";
             HashSet<string> oids = new HashSet<string>();
-            foreach (var (refname, @ref) in _data.IterRefs())
+            foreach (var (refname, @ref) in _data.IterRefs("",false))
             {
                 dot += $"\"{refname}\" [shape=note]\n";
                 dot += $"\"{refname}\" -> \"{@ref}\"";
-                oids.Add(@ref);
+                if (!@ref.Symbolic)
+                {
+                    oids.Add(@ref.Value);
+                }
             }
 
             foreach (var oid in _base.IterCommitAndParents(oids))
@@ -134,6 +174,21 @@ namespace ugit
 
             dot += "}";
             Console.WriteLine(dot);
+            return 0;
+        }
+
+        static int Status(StatusOptions o)
+        {
+            string head = _base.GetOid("@");
+            string branch = _base.GetBranchName();
+            if (!string.IsNullOrWhiteSpace(branch))
+            {
+                Console.WriteLine($"On branch {branch}");
+            }
+            else
+            {
+                Console.WriteLine($"HEAD detached at {head.Substring(0, 10)}");
+            }
             return 0;
         }
     }
