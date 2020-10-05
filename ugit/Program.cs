@@ -10,24 +10,28 @@ namespace ugit
         private static Base _base;
 
         private static IFileSystem _fileSystem;
-        
+
         static int Main(string[] args)
         {
             _fileSystem = new FileSystem();
             _data = new Data(_fileSystem);
             _base = new Base(_data, _fileSystem);
             int exitCode = Parser.Default.ParseArguments<
-                    InitOptions,
-            HashObjectOptions,
-            CatFileOptions,
-            WriteTreeOptions,
-            ReadTreeOptions>(args).MapResult(
-                    (InitOptions o) => Init(o),
-                    (HashObjectOptions o) => HashObject(o),
-                    (CatFileOptions o) => CatFile(o),
-                    (WriteTreeOptions o) => WriteTree(o),
-                    (ReadTreeOptions o) => ReadTree(o),
-                    errors => 1);
+                InitOptions,
+                HashObjectOptions,
+                CatFileOptions,
+                WriteTreeOptions,
+                ReadTreeOptions,
+                CommitOptions,
+                LogOptions>(args).MapResult(
+                (InitOptions o) => Init(o),
+                (HashObjectOptions o) => HashObject(o),
+                (CatFileOptions o) => CatFile(o),
+                (WriteTreeOptions o) => WriteTree(o),
+                (ReadTreeOptions o) => ReadTree(o),
+                (CommitOptions o) => Commit(o),
+                (LogOptions o)=>Log(o),
+                errors => 1);
             return exitCode;
         }
 
@@ -61,6 +65,26 @@ namespace ugit
         static int ReadTree(ReadTreeOptions o)
         {
             _base.ReadTree(o.Tree);
+            return 0;
+        }
+
+        static int Commit(CommitOptions o)
+        {
+            Console.WriteLine(_base.Commit(o.Message));
+            return 0;
+        }
+
+        static int Log(LogOptions o)
+        {
+            string oid = o.Oid ?? _data.GetHEAD();
+            while (!string.IsNullOrWhiteSpace(oid))
+            {
+                var commit = _base.GetCommit(oid);
+                Console.WriteLine($"commit {oid}\n");
+                Console.WriteLine($"{commit.Message}    ");
+                Console.WriteLine("");
+                oid = commit.Parent;
+            }
             return 0;
         }
     }

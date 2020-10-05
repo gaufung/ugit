@@ -33,6 +33,23 @@ namespace ugit
             _fileSystem.Directory.CreateDirectory(_fileSystem.Path.Join(GitDir, "objects"));
         }
 
+        public void SetHEAD(string oid)
+        {
+            string filePath = _fileSystem.Path.Join(GitDir, "HEAD");
+            _fileSystem.File.WriteAllText(filePath, oid);
+        }
+
+        public string GetHEAD()
+        {
+            string filePath = _fileSystem.Path.Join(GitDir, "HEAD");
+            if (_fileSystem.File.Exists(filePath))
+            {
+                return _fileSystem.File.ReadAllBytes(filePath).Decode();
+            }
+
+            return null;
+        }
+
         public string HashObject(byte[] data, string type="blob")
         {
             byte[] obj = type.Encode().Concat(new[] {TypeSeparator}).Concat(data).ToArray();
