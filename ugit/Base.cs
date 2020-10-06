@@ -154,6 +154,13 @@ namespace ugit
                 commit += $"parent {HEAD}\n";
             }
 
+            string MERGE_HEAD = data.GetRef("MERGE_HEAD").Value;
+            if (!string.IsNullOrWhiteSpace(MERGE_HEAD))
+            {
+                commit += $"parent {MERGE_HEAD}";
+                data.DeleteRef("MERGE_HEAD", false);
+            }
+
             commit += "\n";
             commit += $"{message}\n";
             string oid = data.HashObject(commit.Encode(), "commit");
@@ -184,8 +191,24 @@ namespace ugit
             string head = data.GetRef("HEAD").Value;
             Commit headCommit = GetCommit(head);
             Commit otherCommit = GetCommit(other);
+            
+            data.UpdateRef("MERGE_HEAD", RefValue.Create(false, other));
             ReadTreeMerge(headCommit.Tree, otherCommit.Tree);
             Console.WriteLine("Merge in working tree");
+        }
+
+        public string GetMergeBase(string oid1, string oid2)
+        {
+            var parents1 = IterCommitAndParents(new[] {oid1}).ToList();
+            foreach (var oid in IterCommitAndParents(new []{oid2}))
+            {
+                if (parents1.Contains(oid))
+                {
+                    return oid;
+                }
+            }
+
+            return null;
         }
         
         public void CreateTag(string name, string oid)
@@ -231,6 +254,7 @@ namespace ugit
         
         public Commit GetCommit(string oid)
         {
+            List<string> parents = new List<string>();
             string commit = data.GetObject(oid, "commit").Decode();
             string tree = null;
             string parent = null;
@@ -245,7 +269,7 @@ namespace ugit
                 }
                 else if (tokens[0] == "parent")
                 {
-                    parent = tokens[1];
+                    parents.Add(tokens[1]);
                 }
                 else
                 {
@@ -259,7 +283,7 @@ namespace ugit
             return new Commit()
             {
                 Tree = tree,
-                Parent = parent,
+                Parents = parents,
                 Message =  message,
             };
         }
@@ -275,7 +299,13 @@ namespace ugit
                 visited.Add(oid);
                 yield return oid;
                 var commit = GetCommit(oid);
-                oidsQueue.AddToFront(commit.Parent);
+                oidsQueue.AddToFront(commit.Parents.FirstOrDefault());
+                if (commit.Parents.Count > 1)
+                {
+                    commit.Parents.TakeLast(commit.Parents.Count -1)
+                        .ToList()
+                        .ForEach(id=>oidsQueue.AddToBack(id));
+                }
             }
         }
         public string GetOid(string name)

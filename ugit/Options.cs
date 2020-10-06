@@ -116,4 +116,13 @@ namespace ugit
         [Value(0)]
         public string Commit { get; set; }
     }
+
+    [Verb("merge-base")]
+    public class MergeBaseOptions
+    {
+        [Value(0)]
+        public string Commit1 { get; set; }
+        [Value(1)]
+        public string Commit2 { get; set; }
+    }
 }

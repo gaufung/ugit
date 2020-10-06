@@ -56,6 +56,16 @@ namespace ugit
             return result;
         }
 
+        public void DeleteRef(string @ref, bool deref = true)
+        {
+            @ref = GetRefInternal(@ref, deref).Item1;
+            string path = _fileSystem.Path.Join(GitDir, @ref);
+            if (_fileSystem.File.Exists(path))
+            {
+                _fileSystem.File.Delete(path);
+            }
+        }
+
         private ValueTuple<string, RefValue> GetRefInternal(string @ref, bool deref)
         {
             string refPath = _fileSystem.Path.Join(GitDir, @ref);
@@ -80,15 +90,24 @@ namespace ugit
 
         public IEnumerable<ValueTuple<string, RefValue>> IterRefs(string prefix="", bool deref=true)
         {
-            List<string> refs = new List<string>(){"HEAD"};
+            List<string> refs = new List<string>(){"HEAD", "MERGE_HEAD"};
             string directory = _fileSystem.Path.Join(GitDir, "refs");
             foreach (var filePath in _fileSystem.Walk(directory))
             {
                 refs.Add(_fileSystem.Path.GetRelativePath(GitDir, filePath));
             }
 
-            return refs.Where(@ref => @ref.StartsWith(prefix))
-                .Select(@ref => ValueTuple.Create(@ref, GetRef(@ref, deref)));
+            foreach (var refName in refs)
+            {
+                if(!refName.StartsWith(prefix))
+                    continue;
+                var @ref = GetRef(refName, deref);
+                if (!string.IsNullOrWhiteSpace(@ref.Value))
+                {
+                    yield return ValueTuple.Create(refName, @ref);
+                }
+                
+            }
         }
 
         public string HashObject(byte[] data, string type="blob")

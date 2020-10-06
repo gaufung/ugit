@@ -38,7 +38,8 @@ namespace ugit
             ResetOptions,
             ShowOptions,
             DiffOptions,
-            MergeOptions>(args).MapResult(
+            MergeOptions,
+            MergeBaseOptions>(args).MapResult(
                 (InitOptions o) => Init(o),
                 (HashObjectOptions o) => HashObject(o),
                 (CatFileOptions o) => CatFile(o),
@@ -55,6 +56,7 @@ namespace ugit
                 (ShowOptions o) => Show(o),
                 (DiffOptions o) => Different(o),
                 (MergeOptions o) => Merge(o),
+                (MergeBaseOptions o) => MergeBase(o),
                 errors => 1);
             return exitCode;
         }
@@ -143,9 +145,9 @@ namespace ugit
 
             var commit = _base.GetCommit(oid);
             string parentTree = null;
-            if (!string.IsNullOrWhiteSpace(commit.Parent))
+            if (commit.Parents!=null && commit.Parents.Count>0 && !string.IsNullOrWhiteSpace(commit.Parents[0]))
             {
-                parentTree = _base.GetCommit(commit.Parent).Tree;
+                parentTree = _base.GetCommit(commit.Parents[0]).Tree;
             }
             PrintCommit(oid, commit);
             var result = _diff.DiffTree(
@@ -214,9 +216,12 @@ namespace ugit
             {
                 var commit = _base.GetCommit(oid);
                 dot += $"\"{oid}\" [shape=box style=filled label=\"{oid.Substring(0, 10)}\"]\n";
-                if (!string.IsNullOrWhiteSpace(commit.Parent))
+                if (commit.Parents != null)
                 {
-                    dot += $"\"{oid}\" -> \"{commit.Parent}\"";
+                    foreach (var parent in commit.Parents )
+                    {
+                        dot += $"\"{oid}\" -> \"{parent}\"";
+                    }
                 }
             }
 
@@ -236,6 +241,12 @@ namespace ugit
             else
             {
                 Console.WriteLine($"HEAD detached at {head.Substring(0, 10)}");
+            }
+
+            string MERGE_HEAD = _data.GetRef("MERGE_HEAD").Value;
+            if (!string.IsNullOrWhiteSpace(MERGE_HEAD))
+            {
+                Console.WriteLine($"Merging with {MERGE_HEAD.Substring(0, 10)}");
             }
 
             Console.WriteLine("\nChanges to be committed:\n");
@@ -259,6 +270,14 @@ namespace ugit
         {
             string commit = _base.GetOid(o.Commit);
             _base.Merge(commit);
+            return 0;
+        }
+
+        static int MergeBase(MergeBaseOptions o)
+        {
+            string commit1 = _base.GetOid(o.Commit1);
+            string commit2 = _base.GetOid(o.Commit2);
+            Console.WriteLine(_base.GetMergeBase(commit1, commit2));
             return 0;
         }
     }
