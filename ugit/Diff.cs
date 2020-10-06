@@ -1,11 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO.Abstractions;
 
 namespace ugit
 {
     public class Diff
     {
-        private static IDictionary<string, string[]> CompareTrees(params IDictionary<string, string>[] trees)
+        private readonly IFileSystem _fileSystem;
+        private readonly Data _data;
+
+        private readonly ICommandProcess _process;
+        public Diff(IFileSystem fileSystem, Data data, ICommandProcess process)
+        {
+            this._fileSystem = fileSystem;
+            this._data = data;
+            this._process = process;
+        }
+        
+        private IDictionary<string, string[]> CompareTrees(params IDictionary<string, string>[] trees)
         {
             IDictionary<string, string[]> output = new Dictionary<string, string[]>();
             for (int i = 0; i < trees.Length; i++)
@@ -27,7 +40,7 @@ namespace ugit
             return output;
         }
 
-        public static string DiffTree(IDictionary<string, string> @from, IDictionary<string, string> to)
+        public string DiffTree(IDictionary<string, string> @from, IDictionary<string, string> to)
         {
             string output = "";
             foreach (var entry in CompareTrees(@from, to))
@@ -37,14 +50,25 @@ namespace ugit
                 string toObject = entry.Value[1];
                 if (fromObject != toObject)
                 {
-                    output = $"changed: {path}\n";
+                    output += DiffBlobs(fromObject, toObject, path);
                 }
             }
 
             return output;
         }
+        
+        private string DiffBlobs(string fromObjectId, string toObjectId, string path = "blob")
+        {
+            string fromFile = _fileSystem.Path.GetTempFileName();
+            _fileSystem.File.WriteAllBytes(fromFile, _data.GetObject(fromObjectId));
+            string toFile = _fileSystem.Path.GetTempFileName();
+            _fileSystem.File.WriteAllBytes(toFile, _data.GetObject(toObjectId));
+            var (_, output, _) = _process.Execute(
+                "diff", $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
+            return output;
+        }
 
-        public static IEnumerable<ValueTuple<string, string>> IterChangedFiles(IDictionary<string, string> @from, IDictionary<string, string> to)
+        public IEnumerable<ValueTuple<string, string>> IterChangedFiles(IDictionary<string, string> @from, IDictionary<string, string> to)
         {
             foreach (var entry in CompareTrees(@from, to))
             {
@@ -71,7 +95,32 @@ namespace ugit
                 }
             }
         }
+
+        public IDictionary<string, string> MergeTree(IDictionary<string, string> headTree, IDictionary<string, string> otherTree)
+        {
+            IDictionary<string, string> tree = new Dictionary<string, string>();
+            foreach (var entry in CompareTrees(headTree, otherTree))
+            {
+                string path = entry.Key;
+                string headObject = entry.Value[0];
+                string otherObject = entry.Value[1];
+                Console.WriteLine($"path: {path}");
+                tree[path] = MergeBlob(headObject, otherObject);
+            }
+
+            return tree;
+        }
         
+        private string MergeBlob(string headObjectId, string otherObjectId)
+        {
+            string headFile = _fileSystem.Path.GetTempFileName();
+            _fileSystem.File.WriteAllBytes(headFile, _data.GetObject(headObjectId));
+            string otherFile = _fileSystem.Path.GetTempFileName();
+            _fileSystem.File.WriteAllBytes(otherFile, _data.GetObject(otherObjectId));
+            var (_, output, _) = _process.Execute(
+                "diff", $"-DHEAD {headFile} {otherFile}");
+            return output;
+        }
         
     }
 }

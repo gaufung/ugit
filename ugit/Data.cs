@@ -104,6 +104,10 @@ namespace ugit
         public byte[] GetObject(string oid, string expected="blob")
         {
             string filePath = _fileSystem.Path.Join(GitDir, "objects", oid);
+            if (!_fileSystem.File.Exists(filePath))
+            {
+                return string.Empty.Encode();
+            }
             var obj = _fileSystem.File.ReadAllBytes(filePath);
             var index = Array.IndexOf(obj, TypeSeparator);
             if (!string.IsNullOrWhiteSpace(expected))

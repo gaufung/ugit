@@ -34,7 +34,7 @@ namespace ugit
         public static void CreateParentDirectory(this string filePath, IFileSystem fileSystem)
         {
             string folder = fileSystem.Path.GetDirectoryName(filePath);
-            if (!fileSystem.Directory.Exists(folder))
+            if (!string.IsNullOrWhiteSpace(folder) && !fileSystem.Directory.Exists(folder))
             {
                 fileSystem.Directory.CreateDirectory(folder);
             }

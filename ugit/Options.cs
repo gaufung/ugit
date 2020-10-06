@@ -109,4 +109,11 @@ namespace ugit
         [Value(0, Required = false, Default = "@")]
         public string Commit { get; set; }
     }
+
+    [Verb("merge")]
+    public class MergeOptions
+    {
+        [Value(0)]
+        public string Commit { get; set; }
+    }
 }

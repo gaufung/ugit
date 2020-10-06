@@ -13,10 +13,13 @@ namespace ugit
 
         private readonly IFileSystem fileSystem;
 
-        public Base(Data data, IFileSystem fileSystem)
+        private readonly Diff diff;
+
+        public Base(Data data, IFileSystem fileSystem, Diff diff)
         {
             this.data = data;
             this.fileSystem = fileSystem;
+            this.diff = diff;
         }
 
         public void Init()
@@ -131,6 +134,17 @@ namespace ugit
             }
         }
 
+        public void ReadTreeMerge(string headTree, string otherTree)
+        {
+            EmptyCurrentDirectory();
+            foreach (var entry in diff.MergeTree(GetTree(headTree), GetTree(otherTree)))
+            {
+                string path = entry.Key;
+                string blob = entry.Value;
+                path.CreateParentDirectory(fileSystem);
+                fileSystem.File.WriteAllText(path, blob);
+            }
+        }
         public string Commit(string message)
         {
             string commit = $"tree {WriteTree()}\n";
@@ -165,6 +179,15 @@ namespace ugit
             data.UpdateRef("HEAD", RefValue.Create(false,oid));
         }
 
+        public void Merge(string other)
+        {
+            string head = data.GetRef("HEAD").Value;
+            Commit headCommit = GetCommit(head);
+            Commit otherCommit = GetCommit(other);
+            ReadTreeMerge(headCommit.Tree, otherCommit.Tree);
+            Console.WriteLine("Merge in working tree");
+        }
+        
         public void CreateTag(string name, string oid)
         {
             string @ref = fileSystem.Path.Join("refs", "tags", name);

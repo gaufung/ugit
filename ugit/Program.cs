@@ -10,14 +10,18 @@ namespace ugit
     {
         private static Data _data;
         private static Base _base;
+        private static Diff _diff;
 
         private static IFileSystem _fileSystem;
 
         static int Main(string[] args)
         {
             _fileSystem = new FileSystem();
+            var commandProcess = new CommandProcess();
             _data = new Data(_fileSystem);
-            _base = new Base(_data, _fileSystem);
+            _diff = new Diff(_fileSystem, _data, commandProcess);
+            _base = new Base(_data, _fileSystem, _diff);
+            
             int exitCode = Parser.Default.ParseArguments<
                 InitOptions,
                 HashObjectOptions,
@@ -33,7 +37,8 @@ namespace ugit
             StatusOptions,
             ResetOptions,
             ShowOptions,
-            DiffOptions>(args).MapResult(
+            DiffOptions,
+            MergeOptions>(args).MapResult(
                 (InitOptions o) => Init(o),
                 (HashObjectOptions o) => HashObject(o),
                 (CatFileOptions o) => CatFile(o),
@@ -49,6 +54,7 @@ namespace ugit
                 (ResetOptions o) => Reset(o),
                 (ShowOptions o) => Show(o),
                 (DiffOptions o) => Different(o),
+                (MergeOptions o) => Merge(o),
                 errors => 1);
             return exitCode;
         }
@@ -142,7 +148,7 @@ namespace ugit
                 parentTree = _base.GetCommit(commit.Parent).Tree;
             }
             PrintCommit(oid, commit);
-            var result = Diff.DiffTree(
+            var result = _diff.DiffTree(
                 _base.GetTree(parentTree), _base.GetTree(commit.Tree));
             Console.WriteLine(result);
             return 0;
@@ -152,7 +158,7 @@ namespace ugit
         {
             string commit = _base.GetOid(o.Commit);
             string tree = _base.GetCommit(commit).Tree;
-            var output = Diff.DiffTree(_base.GetTree(tree), _base.GetWorkingTree());
+            var output = _diff.DiffTree(_base.GetTree(tree), _base.GetWorkingTree());
             Console.WriteLine(output);
             return 0;
         }
@@ -235,7 +241,7 @@ namespace ugit
             Console.WriteLine("\nChanges to be committed:\n");
             // todo (first invoke status when init)
             string headTree = _base.GetCommit(head).Tree;
-            foreach (var (path, action) in Diff.IterChangedFiles(_base.GetTree(headTree), _base.GetWorkingTree()))
+            foreach (var (path, action) in _diff.IterChangedFiles(_base.GetTree(headTree), _base.GetWorkingTree()))
             {
                 Console.WriteLine($"{action}: {path}");
             }
@@ -246,6 +252,13 @@ namespace ugit
         {
             string commit = _base.GetOid(o.Commit);
             _base.Reset(commit);
+            return 0;
+        }
+
+        static int Merge(MergeOptions o)
+        {
+            string commit = _base.GetOid(o.Commit);
+            _base.Merge(commit);
             return 0;
         }
     }
