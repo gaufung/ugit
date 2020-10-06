@@ -142,6 +142,11 @@ namespace ugit
             return result;
         }
 
+        public Dictionary<string, string> GetIndexTree()
+        {
+            return data.GetIndex();
+        }
+
         private void EmptyCurrentDirectory()
         {
             foreach (var filePath in fileSystem.Directory.EnumerateFiles("."))

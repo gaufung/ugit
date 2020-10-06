@@ -160,9 +160,36 @@ namespace ugit
         
         static int Different(DiffOptions o)
         {
-            string commit = _base.GetOid(o.Commit);
-            string tree = _base.GetCommit(commit).Tree;
-            var output = _diff.DiffTree(_base.GetTree(tree), _base.GetWorkingTree());
+            string oid = !string.IsNullOrWhiteSpace(o.Commit) ? _base.GetOid(o.Commit) : null;
+            IDictionary<string, string> treeFrom =new Dictionary<string, string>();
+            IDictionary<string, string> treeTo;
+            if (!string.IsNullOrWhiteSpace(o.Commit))
+            {
+                 treeFrom = _base.GetTree(!string.IsNullOrWhiteSpace(oid)
+                    ? _base.GetCommit(oid).Tree : null);
+            }
+
+            if (o.Cache)
+            {
+                treeTo = _base.GetIndexTree();
+                if (string.IsNullOrWhiteSpace(o.Commit))
+                {
+                    oid = _base.GetOid("@");
+                    treeFrom = _base.GetTree(!string.IsNullOrWhiteSpace(oid)
+                        ? _base.GetCommit(oid).Tree
+                        : null);
+                }
+            }
+            else
+            {
+                treeTo = _base.GetWorkingTree();
+                if (string.IsNullOrWhiteSpace(o.Commit))
+                {
+                    treeFrom = _base.GetIndexTree();
+                }
+            }
+
+            var output = _diff.DiffTree(treeFrom, treeTo);
             Console.WriteLine(output);
             return 0;
         }
@@ -254,7 +281,13 @@ namespace ugit
             Console.WriteLine("\nChanges to be committed:\n");
             // todo (first invoke status when init)
             string headTree = _base.GetCommit(head).Tree;
-            foreach (var (path, action) in _diff.IterChangedFiles(_base.GetTree(headTree), _base.GetWorkingTree()))
+            foreach (var (path, action) in _diff.IterChangedFiles(_base.GetTree(headTree), _base.GetIndexTree()))
+            {
+                Console.WriteLine($"{action}: {path}");
+            }
+
+            Console.WriteLine("\nChanges not stages for commit:\n");
+            foreach (var (path, action) in _diff.IterChangedFiles(_base.GetIndexTree(), _base.GetWorkingTree()))
             {
                 Console.WriteLine($"{action}: {path}");
             }

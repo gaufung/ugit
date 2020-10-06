@@ -109,6 +109,9 @@ namespace ugit
     {
         [Value(0, Required = false, Default = "@")]
         public string Commit { get; set; }
+        
+        [Option("cached")]
+        public bool Cache { get; set; }
     }
 
     [Verb("merge")]
