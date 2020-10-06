@@ -102,4 +102,11 @@ namespace ugit
         [Value(0, Required = false, Default = "@")]
         public string Commit { get; set; }
     }
+
+    [Verb("diff")]
+    public class DiffOptions
+    {
+        [Value(0, Required = false, Default = "@")]
+        public string Commit { get; set; }
+    }
 }

@@ -63,7 +63,7 @@ namespace ugit
             }
         }
 
-        private IDictionary<string, string> GetTree(string oid, string basePath="")
+        public IDictionary<string, string> GetTree(string oid, string basePath="")
         {
             IDictionary<string, string> result = new Dictionary<string, string>();
             foreach (var (type, objectId, name) in IterTreeEntries(oid))
@@ -83,6 +83,23 @@ namespace ugit
                 {
                     Debug.Assert(false, $"unknown tree entry {type}");
                 }
+            }
+
+            return result;
+        }
+
+        public IDictionary<string, string> GetWorkingTree()
+        {
+            var result = new Dictionary<string, string>();
+            foreach (var filePath in fileSystem.Walk("."))
+            {
+                string path = fileSystem.Path.GetRelativePath(".", filePath);
+                if (IsIgnore(path) || !fileSystem.File.Exists(filePath))
+                {
+                    continue;
+                }
+
+                result[path] = data.HashObject(fileSystem.File.ReadAllBytes(path));
             }
 
             return result;

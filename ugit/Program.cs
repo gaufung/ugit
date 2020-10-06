@@ -31,7 +31,9 @@ namespace ugit
                 KOptions,
                 BranchOptions,
             StatusOptions,
-            ResetOptions>(args).MapResult(
+            ResetOptions,
+            ShowOptions,
+            DiffOptions>(args).MapResult(
                 (InitOptions o) => Init(o),
                 (HashObjectOptions o) => HashObject(o),
                 (CatFileOptions o) => CatFile(o),
@@ -45,6 +47,8 @@ namespace ugit
                 (BranchOptions o) => Branch(o),
                 (StatusOptions o) => Status(o),
                 (ResetOptions o) => Reset(o),
+                (ShowOptions o) => Show(o),
+                (DiffOptions o) => Different(o),
                 errors => 1);
             return exitCode;
         }
@@ -126,16 +130,32 @@ namespace ugit
         static int Show(ShowOptions o)
         {
             string oid = _base.GetOid(o.Commit);
-            if (!string.IsNullOrWhiteSpace(oid))
+            if (string.IsNullOrWhiteSpace(oid))
             {
                 return 0;
             }
 
             var commit = _base.GetCommit(oid);
+            string parentTree = null;
+            if (!string.IsNullOrWhiteSpace(commit.Parent))
+            {
+                parentTree = _base.GetCommit(commit.Parent).Tree;
+            }
             PrintCommit(oid, commit);
+            var result = Diff.DiffTree(
+                _base.GetTree(parentTree), _base.GetTree(commit.Tree));
+            Console.WriteLine(result);
             return 0;
         }
         
+        static int Different(DiffOptions o)
+        {
+            string commit = _base.GetOid(o.Commit);
+            string tree = _base.GetCommit(commit).Tree;
+            var output = Diff.DiffTree(_base.GetTree(tree), _base.GetWorkingTree());
+            Console.WriteLine(output);
+            return 0;
+        }
 
         static int CheckOut(CheckOutOptions o)
         {
@@ -210,6 +230,14 @@ namespace ugit
             else
             {
                 Console.WriteLine($"HEAD detached at {head.Substring(0, 10)}");
+            }
+
+            Console.WriteLine("\nChanges to be committed:\n");
+            // todo (first invoke status when init)
+            string headTree = _base.GetCommit(head).Tree;
+            foreach (var (path, action) in Diff.IterChangedFiles(_base.GetTree(headTree), _base.GetWorkingTree()))
+            {
+                Console.WriteLine($"{action}: {path}");
             }
             return 0;
         }

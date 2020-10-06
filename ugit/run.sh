@@ -9,9 +9,6 @@ cd "test"
 echo "<----- init ---->"
 dotnet "../ugit.dll" init
 
-echo "<----- status ---->"
-doent "../ugit.dll" status
-
 echo "<----- hash object ---->"
 echo "Hello" > hello.txt
 dotnet "../ugit.dll" hash-object hello.txt
@@ -89,3 +86,21 @@ echo "<----- reset ---->"
 dotnet "../ugit.dll" reset "4d9e0706325e7235461a15f63c362dfb0f174455"
 echo "<----- log(reset)  ---->"
 dotnet "../ugit.dll" log
+
+
+echo "<----- diff ---->"
+echo "This is ugit" > readme.md
+dotnet "../ugit.dll" diff
+
+dotnet "../ugit.dll" commit -m "This is readme commit"
+
+echo "<----- show ---->"
+
+dotnet "../ugit.dll" show
+
+
+echo "<----- status ---->"
+
+echo "modify" > modify.txt
+
+dotnet "../ugit.dll" status
