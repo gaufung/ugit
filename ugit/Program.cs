@@ -39,7 +39,8 @@ namespace ugit
             ShowOptions,
             DiffOptions,
             MergeOptions,
-            MergeBaseOptions>(args).MapResult(
+            MergeBaseOptions,
+            AddOptions>(args).MapResult(
                 (InitOptions o) => Init(o),
                 (HashObjectOptions o) => HashObject(o),
                 (CatFileOptions o) => CatFile(o),
@@ -57,6 +58,7 @@ namespace ugit
                 (DiffOptions o) => Different(o),
                 (MergeOptions o) => Merge(o),
                 (MergeBaseOptions o) => MergeBase(o),
+                (AddOptions o) => Add(o),
                 errors => 1);
             return exitCode;
         }
@@ -278,6 +280,12 @@ namespace ugit
             string commit1 = _base.GetOid(o.Commit1);
             string commit2 = _base.GetOid(o.Commit2);
             Console.WriteLine(_base.GetMergeBase(commit1, commit2));
+            return 0;
+        }
+
+        static int Add(AddOptions o)
+        {
+            _base.Add(o.Files);
             return 0;
         }
     }

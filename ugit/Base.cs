@@ -25,35 +25,69 @@ namespace ugit
         public void Init()
         {
             data.Init();
-            data.UpdateRef("HEAD", 
+            data.UpdateRef("HEAD",
                 RefValue.Create(true, fileSystem.Path.Join("refs", "heads", "master")));
         }
 
-        public string WriteTree(string directory = ".")
+        public string WriteTree()
+        {
+            IDictionary<string, object> indexAsTree = new Dictionary<string, object>();
+            Dictionary<string, string> index = data.GetIndex();
+            foreach (var entry in index)
+            {
+                string path = entry.Key;
+                string oid = entry.Value;
+                string[] tokens = path.Split(fileSystem.Path.DirectorySeparatorChar);
+                var current = indexAsTree;
+                if (tokens.Length == 1)
+                {
+                    string fileName = tokens[0];
+                    current[fileName] = oid;
+                }
+                else
+                {
+                    string fileName = tokens[^1];
+                    string[] dirPath = tokens.Take(tokens.Length - 1).ToArray();
+                    foreach (var dirName in dirPath)
+                    {
+                        if (!current.ContainsKey(dirName))
+                        {
+                            current[dirName] = new Dictionary<string, object>();
+                            
+                        }
+                        current = current[dirName] as IDictionary<string, object>;
+                    }
+                    current[fileName] = oid;
+                }
+            }
+            return WriteTreeRecursive(indexAsTree);
+        }
+
+        private string WriteTreeRecursive(IDictionary<string, object> treeDict)
         {
             List<ValueTuple<string, string, string>> entries = new List<(string, string, string)>();
-            
-            foreach (var filePath in fileSystem.Directory.EnumerateFiles(directory))
+            foreach (var entry in treeDict)
             {
-                if(IsIgnore(filePath)) continue;
-                string @type = "blob";
-                string oid = data.HashObject(fileSystem.File.ReadAllBytes(filePath));
-                string name = fileSystem.Path.GetRelativePath(directory, filePath);
-                entries.Add(ValueTuple.Create(name, oid, @type));
+                if (entry.Value is  IDictionary<string, object> val)
+                {
+                    string type = "tree";
+                    string oid = WriteTreeRecursive(val);
+                    string name = entry.Key;
+                    entries.Add(ValueTuple.Create(name, oid, type));
+                }
+                else
+                {
+                    string type = "blob";
+                    string oid = entry.Value as string;
+                    string name = entry.Key;
+                    entries.Add(ValueTuple.Create(name, oid, type));
+                }
             }
-            foreach (var directoryPath in fileSystem.Directory.EnumerateDirectories(directory))
-            {
-                if(IsIgnore(directoryPath)) continue;
-                string type = "tree";
-                string oid = WriteTree(directoryPath);
-                string name = fileSystem.Path.GetRelativePath(directory, directoryPath);
-                entries.Add(ValueTuple.Create(name, oid, @type));
-            }
-
             string tree = string.Join("\n", 
                 entries.Select(e => $"{e.Item3} {e.Item2} {e.Item1}"));
             return data.HashObject(tree.Encode(), "tree");
         }
+        
 
         private IEnumerable<ValueTuple<string, string, string>> IterTreeEntries(string oid)
         {
@@ -122,29 +156,43 @@ namespace ugit
             }
         }
 
-        public void ReadTree(string treeOid)
+        public void ReadTree(string treeOid, bool updateWorking=false)
+        {
+            var index = data.GetIndex();
+            index.Clear();
+            index.Update(GetTree(treeOid));
+            if (updateWorking)
+            {
+                CheckoutIndex(index);
+            }
+            data.SetIndex(index);
+        }
+        
+        public void ReadTreeMerge(string headTree, string otherTree, bool updateWorking=false)
+        {
+            var index = data.GetIndex();
+            index.Clear();
+            index.Update(diff.MergeTree(GetTree(headTree), GetTree(otherTree)));
+            if (updateWorking)
+            {
+                CheckoutIndex(index);
+            }
+            data.SetIndex(index);
+        }
+
+        private void CheckoutIndex(Dictionary<string, string> index)
         {
             EmptyCurrentDirectory();
-            foreach (var entry in GetTree(treeOid, "."))
+            foreach (var entry in index)
             {
                 string path = entry.Key;
                 string oid = entry.Value;
                 path.CreateParentDirectory(fileSystem);
-                fileSystem.File.WriteAllBytes(path, data.GetObject(oid));
+                fileSystem.File.WriteAllBytes(path, data.GetObject(oid, "blob"));
             }
         }
 
-        public void ReadTreeMerge(string headTree, string otherTree)
-        {
-            EmptyCurrentDirectory();
-            foreach (var entry in diff.MergeTree(GetTree(headTree), GetTree(otherTree)))
-            {
-                string path = entry.Key;
-                string blob = entry.Value;
-                path.CreateParentDirectory(fileSystem);
-                fileSystem.File.WriteAllText(path, blob);
-            }
-        }
+        
         public string Commit(string message)
         {
             string commit = $"tree {WriteTree()}\n";
@@ -172,7 +220,7 @@ namespace ugit
         {
             string oid = GetOid(name);
             var commit = GetCommit(oid);
-            ReadTree(commit.Tree);
+            ReadTree(commit.Tree, true);
 
             RefValue HEAD = IsBranch(name) ? 
                 RefValue.Create(true, fileSystem.Path.Join("refs", "heads", name)) : 
@@ -190,10 +238,20 @@ namespace ugit
         {
             string head = data.GetRef("HEAD").Value;
             Commit headCommit = GetCommit(head);
+            string mergeBase = GetMergeBase(other, head);
             Commit otherCommit = GetCommit(other);
+
+            if (mergeBase == head)
+            {
+                ReadTree(otherCommit.Tree, true);
+                data.UpdateRef("HEAD", RefValue.Create(false, other));
+                Console.WriteLine("Fast-forward merge, no need to commit");
+                return;
+            }
+            
             
             data.UpdateRef("MERGE_HEAD", RefValue.Create(false, other));
-            ReadTreeMerge(headCommit.Tree, otherCommit.Tree);
+            ReadTreeMerge(headCommit.Tree, otherCommit.Tree, true);
             Console.WriteLine("Merge in working tree");
         }
 
@@ -336,6 +394,42 @@ namespace ugit
             throw new ArgumentException($"Unknown name {name}");
         }
 
+        public void Add(IEnumerable<string> fileNames)
+        {
+            var index = data.GetIndex();
+            foreach (var fileName in fileNames)
+            {
+                if (fileSystem.File.Exists(fileName))
+                {
+                    AddFile(index, fileName);
+                }
+                else if (fileSystem.Directory.Exists(fileName))
+                {
+                    AddDirectory(index, fileName);
+                }
+            }
+            data.SetIndex(index);
+        }
+
+        private void AddFile(Dictionary<string, string> index, string fileName)
+        {
+            var normalFileName = fileSystem.Path.GetRelativePath(".", fileName);
+            string oid = data.HashObject(fileSystem.File.ReadAllBytes(normalFileName));
+            index[normalFileName] = oid;
+        }
+
+        private void AddDirectory(Dictionary<string, string> index, string directory)
+        {
+            foreach (var fileName in fileSystem.Walk(directory))
+            {
+                if (IsIgnore(fileName) || !fileSystem.File.Exists(fileName))
+                {
+                    continue;
+                }
+                AddFile(index, fileName);
+            }
+        }
+        
         private bool IsIgnore(string path)
         {
             return path.Split(fileSystem.Path.DirectorySeparatorChar).Contains(Data.GitDir);

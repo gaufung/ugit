@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ugit
 {
@@ -108,6 +110,24 @@ namespace ugit
                 }
                 
             }
+        }
+
+        public Dictionary<string, string> GetIndex()
+        {
+            string path = _fileSystem.Path.Join(GitDir, "index");
+            if (_fileSystem.File.Exists(path))
+            {
+                var content = _fileSystem.File.ReadAllBytes(path);
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(content);
+            }
+            return new Dictionary<string, string>();
+        }
+
+        public void SetIndex(Dictionary<string, string> index)
+        {
+            string path = _fileSystem.Path.Join(GitDir, "index");
+            string content = JsonSerializer.Serialize(index);
+            _fileSystem.File.WriteAllText(path, content);
         }
 
         public string HashObject(byte[] data, string type="blob")

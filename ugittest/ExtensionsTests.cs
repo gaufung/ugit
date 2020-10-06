@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ugit
@@ -28,5 +30,15 @@ namespace ugit
             string expect = "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33";
             Assert.AreEqual(expect, foo.Encode().Sha1HexDigest());
         }
+
+        [TestMethod]
+        public void TestIndex()
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["hello"] = "world";
+            var str = JsonSerializer.Serialize(dic);
+            Assert.AreEqual("", str);
+        }
+            
     }
 }

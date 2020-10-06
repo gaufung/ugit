@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using CommandLine;
 
@@ -124,5 +125,12 @@ namespace ugit
         public string Commit1 { get; set; }
         [Value(1)]
         public string Commit2 { get; set; }
+    }
+
+    [Verb("add")]
+    public class AddOptions
+    {
+        [Value(0)]
+        public IEnumerable<string> Files { get; set; }
     }
 }

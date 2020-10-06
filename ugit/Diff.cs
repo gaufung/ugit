@@ -105,7 +105,7 @@ namespace ugit
                 string headObject = entry.Value[0];
                 string otherObject = entry.Value[1];
                 Console.WriteLine($"path: {path}");
-                tree[path] = MergeBlob(headObject, otherObject);
+                tree[path] = _data.HashObject(MergeBlob(headObject, otherObject).Encode());
             }
 
             return tree;
