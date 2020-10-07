@@ -6,6 +6,13 @@ namespace Ugit
 {
     class Program
     {
+        static readonly IDataProvider dataProvider;
+
+        static Program()
+        {
+            dataProvider = new DataProvider();
+        }
+
         static int Main(string[] args)
         {
             int exitCode = Parser.Default.ParseArguments<
@@ -17,7 +24,8 @@ namespace Ugit
 
         static int Init(InitOption o)
         {
-            Console.WriteLine("Hello ugit!");
+            dataProvider.Init();
+            Console.WriteLine($"Initialized empty ugit repository in {dataProvider.GitDirFullPath}");
             return 0;
         }
     }
