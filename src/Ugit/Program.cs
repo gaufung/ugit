@@ -11,10 +11,13 @@ namespace Ugit
 
         static readonly IFileSystem fileSystem;
 
+        static readonly IBaseOperator baseOperator;
+
         static Program()
         {
             fileSystem = new FileSystem();
             dataProvider = new DataProvider();
+            baseOperator = new BaseOperator(fileSystem, dataProvider);
         }
 
         static int Main(string[] args)
@@ -22,10 +25,12 @@ namespace Ugit
             int exitCode = Parser.Default.ParseArguments<
                 InitOption,
                 HashObjectOption,
-                CatFileOption>(args).MapResult(
+                CatFileOption,
+                WriteTreeOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
+                (WriteTreeOption o) => WriteTree(o),
                 errors => 1);
             return exitCode;
         }
@@ -51,6 +56,12 @@ namespace Ugit
             {
                 Console.WriteLine(data.Decode());
             }
+            return 0;
+        }
+
+        static int WriteTree(WriteTreeOption _)
+        {
+            baseOperator.WriteTree();
             return 0;
         }
     }
