@@ -32,13 +32,16 @@ namespace Ugit
 
         public string HashObject(byte[] data)
         {
-            throw new NotImplementedException();
+            string oid = data.Sha1HexDigest();
+            string filePath = Path.Join(GitDir, "objects", oid);
+            fileSystem.File.WriteAllBytes(filePath, data);
+            return oid;
         }
 
         public void Init()
         {
             fileSystem.Directory.CreateDirectory(GitDir);
-            fileSystem.Directory.CreateDirectory(fileSystem.Path.Join(GitDir, "objects"));
+            fileSystem.Directory.CreateDirectory(Path.Join(GitDir, "objects"));
         }
     }
 }
