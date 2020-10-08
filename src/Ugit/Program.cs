@@ -21,14 +21,16 @@ namespace Ugit
         {
             int exitCode = Parser.Default.ParseArguments<
                 InitOption,
-                HashObjectOption>(args).MapResult(
+                HashObjectOption,
+                CatFileOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
+                (CatFileOption o) => CatFile(o),
                 errors => 1);
             return exitCode;
         }
 
-        static int Init(InitOption o)
+        static int Init(InitOption _)
         {
             dataProvider.Init();
             Console.WriteLine($"Initialized empty ugit repository in {dataProvider.GitDirFullPath}");
@@ -39,6 +41,16 @@ namespace Ugit
         {
             byte[] data = fileSystem.File.ReadAllBytes(o.File);
             Console.WriteLine(dataProvider.HashObject(data));
+            return 0;
+        }
+
+        static int CatFile(CatFileOption o)
+        {
+            byte[] data = dataProvider.GetObject(o.Object);
+            if(data.Length > 0)
+            {
+                Console.WriteLine(data.Decode());
+            }
             return 0;
         }
     }

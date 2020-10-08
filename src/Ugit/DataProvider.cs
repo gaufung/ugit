@@ -27,7 +27,13 @@ namespace Ugit
 
         public byte[] GetObject(string oid)
         {
-            throw new NotImplementedException();
+            string filePath = Path.Join(GitDir, "objects", oid);
+            if(fileSystem.File.Exists(filePath))
+            {
+                return fileSystem.File.ReadAllBytes(filePath);
+            }
+
+            return Array.Empty<byte>();
         }
 
         public string HashObject(byte[] data)
