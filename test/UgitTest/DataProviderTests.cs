@@ -3,6 +3,7 @@ using Moq;
 using System;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Text;
 
 namespace Ugit
@@ -55,11 +56,11 @@ namespace Ugit
         public void HashObjectTest()
         {
             byte[] data = Encoding.UTF8.GetBytes("Hello World");
-            string filePath = Path.Join(".ugit", "objects", "0a4d55a8d778e5022fab701977c5d840bbc486d0");
+            string filePath = Path.Join(".ugit", "objects", "0a6649a0077da1bf5a8b3b5dd3ea733ea6a81938");
             fileMock.Setup(f => f.WriteAllBytes(filePath, data));
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             var actual = dataProvider.HashObject(data);
-            Assert.AreEqual("0a4d55a8d778e5022fab701977c5d840bbc486d0", actual);
+            Assert.AreEqual("0a6649a0077da1bf5a8b3b5dd3ea733ea6a81938", actual);
         }
 
         [TestMethod]
@@ -78,11 +79,12 @@ namespace Ugit
         {
             string oid = "foo";
             byte[] data = "Hello World".Encode();
+            data = "blob".Encode().Concat(new[] { byte.Parse("0") }).Concat(data).ToArray();
             string filePath = Path.Join(".ugit", "objects", oid);
             fileMock.Setup(f => f.Exists(filePath)).Returns(true);
             fileMock.Setup(f => f.ReadAllBytes(filePath)).Returns(data);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            var expected = data;
+            var expected = "Hello World".Encode();
             CollectionAssert.AreEqual(expected, dataProvider.GetObject(oid));
         }
     }
