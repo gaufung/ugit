@@ -8,8 +8,8 @@
 
         void Init();
 
-        string HashObject(byte[] data);
+        string HashObject(byte[] data, string type="blob");
 
-        byte[] GetObject(string oid);
+        byte[] GetObject(string oid, string expected="blob");
     }
 }

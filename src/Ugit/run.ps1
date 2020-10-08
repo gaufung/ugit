@@ -13,7 +13,7 @@ dotnet ../ugit.dll init
 
 dotnet ../ugit.dll hash-object "hello.txt"
 
-dotnet ../ugit.dll cat-file 640eca3c6afadf19c3fe7c8595075d99a218ee61
+dotnet ../ugit.dll cat-file c7bd5be26845954f7a0e7b4a3fc77340b8d90c3c
 
 Write-Host "Done"
 

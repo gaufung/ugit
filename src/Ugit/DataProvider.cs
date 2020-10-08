@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 
 namespace Ugit
 {
     internal class DataProvider : IDataProvider
     {
-        private static readonly string _gitDir = ".ugit";
+        private readonly string _gitDir = ".ugit";
+
+        private readonly byte _typeSeparator = 0;
 
         private readonly IFileSystem fileSystem;
 
@@ -25,19 +29,30 @@ namespace Ugit
         public string GitDirFullPath => 
             Path.Join(fileSystem.Directory.GetCurrentDirectory(), GitDir);
 
-        public byte[] GetObject(string oid)
+        public byte[] GetObject(string oid, string expected="blob")
         {
             string filePath = Path.Join(GitDir, "objects", oid);
             if(fileSystem.File.Exists(filePath))
             {
-                return fileSystem.File.ReadAllBytes(filePath);
+                var data = fileSystem.File.ReadAllBytes(filePath);
+                var index = Array.IndexOf(data, _typeSeparator);
+                if(!string.IsNullOrWhiteSpace(expected) && index > 0)
+                {
+                    var type = data.Take(index).ToArray().Decode();
+                    Debug.Assert(expected == type, $"expected {expected}, got {type}");
+                    return data.TakeLast(data.Length - index - 1).ToArray();
+                }
             }
 
             return Array.Empty<byte>();
         }
 
-        public string HashObject(byte[] data)
+        public string HashObject(byte[] data, string type="blob")
         {
+            if(!string.IsNullOrWhiteSpace(type))
+            {
+                data = type.Encode().Concat(new byte[] { _typeSeparator }).Concat(data).ToArray();
+            }
             string oid = data.Sha1HexDigest();
             string filePath = Path.Join(GitDir, "objects", oid);
             fileSystem.File.WriteAllBytes(filePath, data);
