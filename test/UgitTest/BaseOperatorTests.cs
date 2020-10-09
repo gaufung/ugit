@@ -29,7 +29,7 @@ namespace Ugit
         public void WriteTreeTest()
         {
             directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(new[] { @".\hello.txt" });
-            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(new[] { @".\sub" });
+            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(new[] { @".\sub", @".\.ugit" });
             directoryMock.Setup(d => d.EnumerateFiles(@".\sub")).Returns(new[]
             {
                 @".\sub\ugit.txt"
