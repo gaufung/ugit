@@ -26,11 +26,13 @@ namespace Ugit
                 InitOption,
                 HashObjectOption,
                 CatFileOption,
-                WriteTreeOption>(args).MapResult(
+                WriteTreeOption,
+                ReadTreeOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
                 (WriteTreeOption o) => WriteTree(o),
+                (ReadTreeOption o) => ReadTree(o),
                 errors => 1);
             return exitCode;
         }
@@ -62,6 +64,12 @@ namespace Ugit
         static int WriteTree(WriteTreeOption _)
         {
             Console.WriteLine(baseOperator.WriteTree());
+            return 0;
+        }
+
+        static int ReadTree(ReadTreeOption o)
+        {
+            baseOperator.ReadTree(o.Tree);
             return 0;
         }
     }

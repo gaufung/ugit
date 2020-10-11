@@ -84,5 +84,44 @@ namespace Ugit
             fileSystemMock.VerifyAll();
             dataProviderMock.VerifyAll();
         }
+
+
+        [TestMethod]
+        public void ReadTreeTest()
+        {
+            string helloFilePath = $".{Path.DirectorySeparatorChar}hello.txt";
+            string subDirectory = $".{Path.DirectorySeparatorChar}sub";
+            string ugitDirectory = $".{Path.DirectorySeparatorChar}.ugit";
+            directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(new[] {helloFilePath});
+            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(new[] { helloFilePath, subDirectory });
+            string treeOid = "foo";
+            string tree = string.Join("\n", new string[]
+            {
+                "blob bar hello.txt",
+                "tree baz sub"
+            });
+
+            string subTree = string.Join("\n", new string[]
+            {
+                "blob zoo ugit.txt"
+            });
+            dataProviderMock.Setup(d => d.GetObject(treeOid, "tree")).Returns(tree.Encode());
+            dataProviderMock.Setup(d => d.GetObject("baz", "tree")).Returns(subTree.Encode());
+
+            byte[] helloData = "Hello World".Encode();
+            byte[] ugitData = "Hello Ugit".Encode();
+            dataProviderMock.Setup(d => d.GetObject("bar", "blob")).Returns(helloData);
+            dataProviderMock.Setup(d => d.GetObject("zoo", "blob")).Returns(ugitData);
+            directoryMock.Setup(d => d.Exists(Path.Join(".", "sub"))).Returns(false);
+            directoryMock.Setup(d => d.CreateDirectory(Path.Join(".", "sub")));
+            fileMock.Setup(s => s.WriteAllBytes(Path.Join(".","hello.txt"), It.IsAny<byte[]>()));
+            fileMock.Setup(s => s.WriteAllBytes(Path.Join(".", "sub", "ugit.txt"), It.IsAny<byte[]>()));
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
+            baseOperator.ReadTree(treeOid);
+            directoryMock.VerifyAll();
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+        }
     }
 }
