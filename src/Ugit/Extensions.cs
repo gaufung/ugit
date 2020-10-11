@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Unicode;
 
 namespace Ugit
 {
@@ -22,6 +24,25 @@ namespace Ugit
         public static string Decode(this byte[] data)
         {
             return Encoding.UTF8.GetString(data);
+        }
+
+        public static IDictionary<TKey, TValue> Update<TKey, TValue>(this IDictionary<TKey, TValue> dic,
+            IDictionary<TKey, TValue> other)
+        {
+            foreach (var entry in other)
+            {
+                dic[entry.Key] = entry.Value;
+            }
+            return dic;
+        }
+
+        public static void CreateParentDirectory(this IFileSystem fileSystem, string filePath)
+        {
+            string parentDirectory = Path.GetDirectoryName(filePath);
+            if(!string.IsNullOrWhiteSpace(parentDirectory) && !fileSystem.Directory.Exists(parentDirectory))
+            {
+                fileSystem.Directory.CreateDirectory(parentDirectory);
+            }
         }
     }
 }

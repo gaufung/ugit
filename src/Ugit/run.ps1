@@ -21,6 +21,8 @@ New-Item "sub" -ItemType Directory -Force
 
 dotnet ../ugit.dll write-tree
 
+dotnet ../ugit.dll read-tree 56d892c161a818fb4163ee233bd5aa1fe99e9f9d
+
 Write-Host "Done"
 
 Set-Location "../"
