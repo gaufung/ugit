@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
@@ -32,16 +33,16 @@ namespace Ugit
         [TestMethod]
         public void WriteTreeTest()
         {
-            directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(new[] { @".\hello.txt" });
-            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(new[] { @".\sub", @".\.ugit" });
-            directoryMock.Setup(d => d.EnumerateFiles(@".\sub")).Returns(new[]
+            directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(new[] { $".{Path.DirectorySeparatorChar}hello.txt" });
+            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(new[] { $".{Path.DirectorySeparatorChar}sub", $".{Path.DirectorySeparatorChar}.ugit" });
+            directoryMock.Setup(d => d.EnumerateFiles($".{Path.DirectorySeparatorChar}sub")).Returns(new[]
             {
-                @".\sub\ugit.txt"
+                $".{Path.DirectorySeparatorChar}sub{Path.DirectorySeparatorChar}ugit.txt"
             });
             byte[] helloData = Encoding.UTF8.GetBytes("Hello World");
             byte[] ugitData = Encoding.UTF8.GetBytes("Hello Ugit");
-            fileMock.Setup(f => f.ReadAllBytes(@".\hello.txt")).Returns(helloData);
-            fileMock.Setup(f => f.ReadAllBytes(@".\sub\ugit.txt")).Returns(ugitData);
+            fileMock.Setup(f => f.ReadAllBytes($".{Path.DirectorySeparatorChar}hello.txt")).Returns(helloData);
+            fileMock.Setup(f => f.ReadAllBytes($".{Path.DirectorySeparatorChar}sub{Path.DirectorySeparatorChar}ugit.txt")).Returns(ugitData);
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             dataProviderMock.Setup(f => f.GitDir).Returns(".ugit");
