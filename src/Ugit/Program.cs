@@ -61,7 +61,7 @@ namespace Ugit
 
         static int WriteTree(WriteTreeOption _)
         {
-            baseOperator.WriteTree();
+            Console.WriteLine(baseOperator.WriteTree());
             return 0;
         }
     }

@@ -2,6 +2,6 @@
 {
     internal interface IBaseOperator
     {
-        void WriteTree(string directory = ".");
+        string WriteTree(string directory = ".");
     }
 }
