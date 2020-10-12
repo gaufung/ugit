@@ -107,5 +107,14 @@ namespace Ugit
         }
 
         private bool IsIgnore(string path) => path.Split(Path.DirectorySeparatorChar).Contains(dataProvider.GitDir);
+
+        public string Commit(string message)
+        {
+            string commit = $"tree {WriteTree()}\n";
+            commit += "\n";
+            commit += $"{message}\n";
+
+            return dataProvider.HashObject(commit.Encode(), "commit");
+        }
     }
 }

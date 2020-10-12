@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -122,6 +123,30 @@ namespace Ugit
             directoryMock.VerifyAll();
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CommitTest()
+        {
+            directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(Array.Empty<string>());
+            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(Array.Empty<string>());
+            string message = "hello world";
+            string commit = $"tree foo\n\n{message}\n";
+
+            dataProviderMock.Setup(f => f.HashObject(It.IsAny<byte[]>(), It.IsAny<string>())).Returns<byte[], string>((data, type) =>
+            {
+                if(data.SequenceEqual(commit.Encode()) && type == "commit")
+                {
+                    return "bar";
+                }
+                return "foo";
+            });
+            fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
+
+            string expected = "bar";
+            Assert.AreEqual(expected, baseOperator.Commit(message));
+
+
         }
     }
 }
