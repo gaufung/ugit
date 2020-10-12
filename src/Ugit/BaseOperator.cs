@@ -114,7 +114,9 @@ namespace Ugit
             commit += "\n";
             commit += $"{message}\n";
 
-            return dataProvider.HashObject(commit.Encode(), "commit");
+            string oid = dataProvider.HashObject(commit.Encode(), "commit");
+            dataProvider.SetHEAD(oid);
+            return oid;
         }
     }
 }

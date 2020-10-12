@@ -64,5 +64,11 @@ namespace Ugit
             fileSystem.Directory.CreateDirectory(GitDir);
             fileSystem.Directory.CreateDirectory(Path.Join(GitDir, "objects"));
         }
+
+        public void SetHEAD(string oid)
+        {
+            string filePath = Path.Join(GitDir, "HEAD");
+            fileSystem.File.WriteAllBytes(filePath, oid.Encode());
+        }
     }
 }

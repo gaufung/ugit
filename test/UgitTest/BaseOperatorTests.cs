@@ -141,12 +141,11 @@ namespace Ugit
                 }
                 return "foo";
             });
+            dataProviderMock.Setup(f => f.SetHEAD("bar"));
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
 
             string expected = "bar";
             Assert.AreEqual(expected, baseOperator.Commit(message));
-
-
         }
     }
 }

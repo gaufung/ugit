@@ -87,5 +87,17 @@ namespace Ugit
             var expected = "Hello World".Encode();
             CollectionAssert.AreEqual(expected, dataProvider.GetObject(oid));
         }
+
+        [TestMethod]
+        public void SetHEADTest()
+        {
+            string filePath = Path.Join(".ugit", "HEAD");
+            string oid = "foo";
+            fileMock.Setup(f => f.WriteAllBytes(filePath, It.IsAny<byte[]>()));
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            dataProvider.SetHEAD(oid);
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+        }
     }
 }
