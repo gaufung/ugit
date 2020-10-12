@@ -1,4 +1,6 @@
-﻿namespace Ugit
+﻿using System.Reflection.PortableExecutable;
+
+namespace Ugit
 {
     internal interface IDataProvider
     {
@@ -11,5 +13,7 @@
         string HashObject(byte[] data, string type="blob");
 
         byte[] GetObject(string oid, string expected="blob");
+
+        void SetHEAD(string oid);
     }
 }
