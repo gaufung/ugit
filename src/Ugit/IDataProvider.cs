@@ -15,5 +15,7 @@ namespace Ugit
         byte[] GetObject(string oid, string expected="blob");
 
         void SetHEAD(string oid);
+
+        string GetHEAD();
     }
 }

@@ -25,6 +25,10 @@ dotnet ../ugit.dll read-tree 56d892c161a818fb4163ee233bd5aa1fe99e9f9d
 
 dotnet ../ugit.dll commit -m "Hello World"
 
+"Hello Next" | Out-File "next.txt"
+
+dotnet ../ugit.dll commit -m "Hello next"
+
 Write-Host "Done"
 
 Set-Location "../"

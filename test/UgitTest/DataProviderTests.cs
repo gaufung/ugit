@@ -99,5 +99,29 @@ namespace Ugit
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }
+
+        [TestMethod]
+        public void GetHEADNullTest()
+        {
+            string filePath = Path.Join(".ugit", "HEAD");
+            fileMock.Setup(f => f.Exists(filePath)).Returns(false);
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            Assert.IsNull(dataProvider.GetHEAD());
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetHEADTest()
+        {
+            string filePath = Path.Join(".ugit", "HEAD");
+            fileMock.Setup(f => f.Exists(filePath)).Returns(true);
+            string head = "Hello World";
+            fileMock.Setup(f => f.ReadAllBytes(filePath)).Returns(head.Encode());
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            Assert.AreEqual(head, dataProvider.GetHEAD());
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+        }
     }
 }
