@@ -131,7 +131,7 @@ namespace Ugit
             directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(Array.Empty<string>());
             directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(Array.Empty<string>());
             string message = "hello world";
-            string commit = $"tree foo\n\n{message}\n";
+            string commit = $"tree foo\nparent baz\n\n{message}\n";
 
             dataProviderMock.Setup(f => f.HashObject(It.IsAny<byte[]>(), It.IsAny<string>())).Returns<byte[], string>((data, type) =>
             {
@@ -141,6 +141,7 @@ namespace Ugit
                 }
                 return "foo";
             });
+            dataProviderMock.Setup(f => f.GetHEAD()).Returns("baz");
             dataProviderMock.Setup(f => f.SetHEAD("bar"));
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
 

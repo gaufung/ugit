@@ -111,6 +111,12 @@ namespace Ugit
         public string Commit(string message)
         {
             string commit = $"tree {WriteTree()}\n";
+            string HEAD = dataProvider.GetHEAD();
+            if(!string.IsNullOrWhiteSpace(HEAD))
+            {
+                commit += $"parent {HEAD}\n";
+            }
+
             commit += "\n";
             commit += $"{message}\n";
 

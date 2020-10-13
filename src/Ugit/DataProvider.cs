@@ -70,5 +70,15 @@ namespace Ugit
             string filePath = Path.Join(GitDir, "HEAD");
             fileSystem.File.WriteAllBytes(filePath, oid.Encode());
         }
+
+        public string GetHEAD()
+        {
+            string filePath = Path.Join(GitDir, "HEAD");
+            if(fileSystem.File.Exists(filePath))
+            {
+                return fileSystem.File.ReadAllBytes(filePath).Decode();
+            }
+            return null;
+        }
     }
 }
