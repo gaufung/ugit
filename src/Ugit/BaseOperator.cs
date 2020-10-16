@@ -124,5 +124,38 @@ namespace Ugit
             dataProvider.SetHEAD(oid);
             return oid;
         }
+
+        public Commit GetCommit(string oid)
+        {
+            var commit = dataProvider.GetObject(oid, "commit").Decode();
+            string[] lines = commit.Split("\n");
+            string tree=null, parent=null;
+            int index;
+            for (index = 0; index < lines.Length; index++)
+            {
+                string line = lines[index];
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+                string[] tokens = line.Split(' ');
+                if (tokens[0].Equals("tree"))
+                {
+                    tree = tokens[1];
+                }
+                if (tokens[0].Equals("parent"))
+                {
+                    parent = tokens[1];
+                }
+            }
+
+            string message = string.Join("\n", lines.TakeLast(lines.Length - index - 1));
+            return new Commit
+            {
+                Tree = tree,
+                Parent = parent,
+                Message = message
+            };
+        }
     }
 }

@@ -7,5 +7,7 @@
         void ReadTree(string treeOid);
 
         string Commit(string message);
+
+        Commit GetCommit(string oid);
     }
 }

@@ -148,5 +148,25 @@ namespace Ugit
             string expected = "bar";
             Assert.AreEqual(expected, baseOperator.Commit(message));
         }
+
+
+        [TestMethod]
+        public void GetCommitTest()
+        {
+            string commitMessage = string.Join("\n", new string[]
+            {
+                "tree foo",
+                "parent bar",
+                "",
+                "Hello world",
+                "This is from ugit",
+            });
+            string oid = "this-oid";
+            dataProviderMock.Setup(f => f.GetObject(oid, "commit")).Returns(commitMessage.Encode());
+            var commit = baseOperator.GetCommit(oid);
+            Assert.AreEqual("foo", commit.Tree);
+            Assert.AreEqual("bar", commit.Parent);
+            Assert.AreEqual("Hello world\nThis is from ugit", commit.Message);
+        }
     }
 }
