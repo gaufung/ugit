@@ -28,14 +28,16 @@ namespace Ugit
                 CatFileOption,
                 WriteTreeOption,
                 ReadTreeOption,
-                CommitOption>(args).MapResult(
+                CommitOption,
+                LogOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
                 (WriteTreeOption o) => WriteTree(o),
                 (ReadTreeOption o) => ReadTree(o),
                 (CommitOption o) => Commit(o),
-                errors => 1);
+                (LogOption o) => Log(o),
+                errors => 1) ;
             return exitCode;
         }
 
@@ -78,6 +80,20 @@ namespace Ugit
         static int Commit(CommitOption o)
         {
             Console.WriteLine(baseOperator.Commit(o.Message));
+            return 0;
+        }
+
+        static int Log(LogOption o)
+        {
+            string oid = dataProvider.GetHEAD();
+            while(!string.IsNullOrEmpty(oid))
+            {
+                var commit = baseOperator.GetCommit(oid);
+                Console.WriteLine($"commit {oid}");
+                Console.WriteLine($"{commit.Message}    ");
+                Console.WriteLine("");
+                oid = commit.Parent;
+            }
             return 0;
         }
     }

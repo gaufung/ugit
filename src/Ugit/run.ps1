@@ -29,6 +29,8 @@ dotnet ../ugit.dll commit -m "Hello World"
 
 dotnet ../ugit.dll commit -m "Hello next"
 
+dotnet ../ugit.dll log
+
 Write-Host "Done"
 
 Set-Location "../"
