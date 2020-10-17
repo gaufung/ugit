@@ -85,7 +85,7 @@ namespace Ugit
 
         static int Log(LogOption o)
         {
-            string oid = dataProvider.GetHEAD();
+            string oid = o.Oid ?? dataProvider.GetHEAD();
             while(!string.IsNullOrEmpty(oid))
             {
                 var commit = baseOperator.GetCommit(oid);
