@@ -34,7 +34,8 @@ namespace Ugit
                 CommitOption,
                 LogOption,
                 CheckoutOption,
-                TagOption>(args).MapResult(
+                TagOption,
+                KOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -44,8 +45,18 @@ namespace Ugit
                 (LogOption o) => Log(o),
                 (CheckoutOption o) => Checkout(o),
                 (TagOption o) => CreateTag(o),
+                (KOption o) => K(o),
                 errors => 1) ;
             return exitCode;
+        }
+
+        private static int K(KOption o)
+        {
+            foreach (var (refName, @ref) in dataProvider.IterRefs())
+            {
+                Console.WriteLine($"{refName} {@ref}");
+            }
+            return 0;
         }
 
         private static int CreateTag(TagOption o)

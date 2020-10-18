@@ -1,8 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NuGet.Frameworks;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 
 namespace Ugit
 {
@@ -86,6 +88,47 @@ namespace Ugit
             string filePath = Path.Join("hello.txt");
             Mock<IFileSystem> fileSystemMock = new Mock<IFileSystem>();
             fileSystemMock.Object.CreateParentDirectory(filePath);
+            fileSystemMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void IsOnlyHexTest()
+        {
+            string str = null;
+            Assert.IsFalse(str.IsOnlyHex());
+            str = "0a4d55a8d778e5022fab701977c5d840bbc486d0";
+            Assert.IsTrue(str.IsOnlyHex());
+        }
+
+        [TestMethod]
+        public void FileSystemWalkTest()
+        {
+            Mock<IDirectory> directoryMock = new Mock<IDirectory>();
+            string directory = ".ugit";
+            directoryMock.Setup(d => d.EnumerateFiles(".ugit")).Returns(new string[]
+            {
+                Path.Join(".ugit", "hello.txt")
+            });
+
+            directoryMock.Setup(d => d.EnumerateDirectories(".ugit")).Returns(new string[] 
+            {
+                Path.Join(".ugit", "sub")
+            });
+
+            directoryMock.Setup(d => d.EnumerateFiles(Path.Join(".ugit", "sub"))).Returns(new string[]
+            {
+                Path.Join(".ugit", "sub", "ugit.txt")
+            });
+
+            Mock<IFileSystem> fileSystemMock = new Mock<IFileSystem>();
+            fileSystemMock.Setup(s => s.Directory).Returns(directoryMock.Object);
+            string[] filePaths = fileSystemMock.Object.Walk(directory).ToArray();
+            CollectionAssert.AreEqual(new string[]
+            {
+                Path.Join(".ugit", "hello.txt"),
+                Path.Join(".ugit", "sub", "ugit.txt")
+            }, filePaths);
+            directoryMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }
     }

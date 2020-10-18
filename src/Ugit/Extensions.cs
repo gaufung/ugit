@@ -52,5 +52,21 @@ namespace Ugit
                 return false;
             return Regex.IsMatch(str, @"\A\b[0-9a-fA-F]+\b\Z");
         }
+
+        public static IEnumerable<string> Walk(this IFileSystem fileSystem, string directory)
+        {
+            foreach (var filePath in fileSystem.Directory.EnumerateFiles(directory))
+            {
+                yield return filePath;
+            }
+
+            foreach (var directoryPath in fileSystem.Directory.EnumerateDirectories(directory))
+            {
+                foreach (var filepath in fileSystem.Walk(directoryPath))
+                {
+                    yield return filepath;
+                }
+            }
+        }
     }
 }

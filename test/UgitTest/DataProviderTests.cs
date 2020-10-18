@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Collections;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -124,6 +125,37 @@ namespace Ugit
             Assert.AreEqual(head, dataProvider.GetRef("HEAD"));
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void IterRefsTest()
+        {
+            string headPath = Path.Join(".ugit", "HEAD");
+            fileMock.Setup(f => f.Exists(headPath)).Returns(true);
+            fileMock.Setup(f => f.ReadAllBytes(headPath)).Returns("foo".Encode());
+
+            string tagPath = Path.Join(".ugit", "refs", "tags", "v1.0");
+            fileMock.Setup(f => f.Exists(tagPath)).Returns(true);
+            fileMock.Setup(f => f.ReadAllBytes(tagPath)).Returns("bar".Encode());
+
+            direcotryMock.Setup(d => d.EnumerateFiles(Path.Join(".ugit", "refs"))).Returns(Array.Empty<string>());
+            direcotryMock.Setup(d => d.EnumerateDirectories(Path.Join(".ugit", "refs"))).Returns(new string[]
+            {
+                Path.Join(".ugit", "refs", "tags")
+            });
+
+            direcotryMock.Setup(d => d.EnumerateFiles(Path.Join(".ugit", "refs", "tags"))).Returns(new string[]
+            {
+                Path.Join(".ugit", "refs", "tags", "v1.0")
+            });
+            fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            (string, string)[] refs = dataProvider.IterRefs().ToArray();
+            CollectionAssert.AreEqual(new (string, string)[]
+            {
+                ValueTuple.Create("HEAD", "foo"),
+                ValueTuple.Create(Path.Join("refs", "tags", "v1.0"), "bar")
+            }, refs);
         }
     }
 }

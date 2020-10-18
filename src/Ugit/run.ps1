@@ -39,6 +39,8 @@ dotnet ../ugit.dll checkout 5ef1ea5b6f1342f6d79d9109216598af8cf04621
 
 dotnet ../ugit.dll checkout refs/tags/v1.0
 
+dotnet ../ugit.dll k
+
 Set-Location "../"
 
 Write-Host "Done"

@@ -1,4 +1,5 @@
-﻿using System.Reflection.PortableExecutable;
+﻿using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
 
 namespace Ugit
 {
@@ -17,5 +18,7 @@ namespace Ugit
         void UpdateRef(string @ref, string oid);
 
         string GetRef(string @ref);
+
+        IEnumerable<(string, string)> IterRefs();
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
@@ -80,6 +82,17 @@ namespace Ugit
                 return fileSystem.File.ReadAllBytes(filePath).Decode();
             }
             return null;
+        }
+
+        public IEnumerable<(string, string)> IterRefs()
+        {
+            yield return ("HEAD", GetRef("HEAD"));
+            string refDirectory = Path.Join(GitDir, "refs");
+            foreach (var filePath in fileSystem.Walk(refDirectory))
+            {
+                string refName = Path.GetRelativePath(GitDir, filePath);
+                yield return (refName, GetRef(refName));
+            }
         }
     }
 }
