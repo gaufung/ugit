@@ -65,9 +65,10 @@ namespace Ugit
             fileSystem.Directory.CreateDirectory(Path.Join(GitDir, "objects"));
         }
 
-        public void SetRef(string @ref, string oid)
+        public void UpdateRef(string @ref, string oid)
         {
             string filePath = Path.Join(GitDir, @ref);
+            fileSystem.CreateParentDirectory(filePath);
             fileSystem.File.WriteAllBytes(filePath, oid.Encode());
         }
 
