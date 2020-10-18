@@ -173,7 +173,27 @@ namespace Ugit
 
         public string GetOid(string name)
         {
-            return dataProvider.GetRef(name) ?? name;
+            string[] refsToTry = new string[]
+            {
+                Path.Join(name),
+                Path.Join("refs", name),
+                Path.Join("refs", "tags", name),
+                Path.Join("refs", "heads", name)
+            };
+            foreach (var @ref in refsToTry)
+            {
+                if(!string.IsNullOrEmpty(dataProvider.GetRef(@ref)))
+                {
+                    return dataProvider.GetRef(@ref);
+                }
+            }
+
+            if(name.IsOnlyHex() && name.Length == 40)
+            {
+                return name;
+            }
+
+            return null;
         }
     }
 }

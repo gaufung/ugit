@@ -4,6 +4,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Ugit
 {
@@ -43,6 +44,13 @@ namespace Ugit
             {
                 fileSystem.Directory.CreateDirectory(parentDirectory);
             }
+        }
+
+        public static bool IsOnlyHex(this string str)
+        {
+            if(string.IsNullOrEmpty(str))
+                return false;
+            return Regex.IsMatch(str, @"\A\b[0-9a-fA-F]+\b\Z");
         }
     }
 }

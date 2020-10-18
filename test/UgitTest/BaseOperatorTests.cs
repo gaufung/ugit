@@ -201,12 +201,28 @@ namespace Ugit
         public void GetOidTest()
         {
             string name = "foo";
-            dataProviderMock.Setup(d => d.GetRef(name)).Returns((string)null);
-            Assert.AreEqual("foo", baseOperator.GetOid(name));
+            dataProviderMock.Setup(d => d.GetRef(name)).Returns("bar");
+            Assert.AreEqual("bar", baseOperator.GetOid(name));
+        }
 
-            name = "bar";
-            dataProviderMock.Setup(d => d.GetRef(name)).Returns("baz");
-            Assert.AreEqual("baz", baseOperator.GetOid(name));
+        [TestMethod]
+        public void GetOidIllegalTest()
+        {
+            string name = "foo";
+            dataProviderMock.Setup(d => d.GetRef(name)).Returns((string)null);
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "tags", name))).Returns((string)null);
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "heads", name))).Returns((string)null);
+            Assert.IsNull(baseOperator.GetOid(name));
+        }
+
+        [TestMethod]
+        public void TestOidCommitId()
+        {
+            string commitId = "Hello World".Encode().Sha1HexDigest();
+            dataProviderMock.Setup(d => d.GetRef(commitId)).Returns((string)null);
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "tags", commitId))).Returns((string)null);
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "heads", commitId))).Returns((string)null);
+            Assert.AreEqual(commitId, baseOperator.GetOid(commitId));
         }
     }
 }
