@@ -141,8 +141,8 @@ namespace Ugit
                 }
                 return "foo";
             });
-            dataProviderMock.Setup(f => f.GetHEAD()).Returns("baz");
-            dataProviderMock.Setup(f => f.SetHEAD("bar"));
+            dataProviderMock.Setup(f => f.GetRef("HEAD")).Returns("baz");
+            dataProviderMock.Setup(f => f.SetRef("HEAD", "bar"));
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
 
             string expected = "bar";
@@ -187,7 +187,7 @@ namespace Ugit
             directoryMock.Setup(d => d.Exists(".")).Returns(true);
             fileMock.Setup(f => f.WriteAllBytes(Path.Join(".", "hello.txt"), null));
             dataProviderMock.Setup(d => d.GetObject("bar", "blob")).Returns((byte[])null);
-            dataProviderMock.Setup(d => d.SetHEAD(oid));
+            dataProviderMock.Setup(d => d.SetRef("HEAD", oid));
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             baseOperator.Checkout(oid);

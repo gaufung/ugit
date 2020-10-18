@@ -47,7 +47,7 @@ namespace Ugit
 
         private static int CreateTag(TagOption o)
         {
-            string oid = o.Oid ?? dataProvider.GetHEAD();
+            string oid = o.Oid ?? dataProvider.GetRef("HEAD");
             baseOperator.CreateTag(o.Name, oid);
             return 0;
         }
@@ -102,7 +102,7 @@ namespace Ugit
 
         static int Log(LogOption o)
         {
-            string oid = o.Oid ?? dataProvider.GetHEAD();
+            string oid = o.Oid ?? dataProvider.GetRef("HEAD");
             while(!string.IsNullOrEmpty(oid))
             {
                 var commit = baseOperator.GetCommit(oid);
