@@ -30,7 +30,8 @@ namespace Ugit
                 ReadTreeOption,
                 CommitOption,
                 LogOption,
-                CheckoutOption>(args).MapResult(
+                CheckoutOption,
+                TagOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -39,8 +40,16 @@ namespace Ugit
                 (CommitOption o) => Commit(o),
                 (LogOption o) => Log(o),
                 (CheckoutOption o) => Checkout(o),
+                (TagOption o) => CreateTag(o),
                 errors => 1) ;
             return exitCode;
+        }
+
+        private static int CreateTag(TagOption o)
+        {
+            string oid = o.Oid ?? dataProvider.GetHEAD();
+            baseOperator.CreateTag(o.Name, oid);
+            return 0;
         }
 
         private static int Checkout(CheckoutOption o)

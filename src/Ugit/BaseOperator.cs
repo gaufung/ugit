@@ -164,5 +164,10 @@ namespace Ugit
             ReadTree(commit.Tree);
             dataProvider.SetHEAD(oid);
         }
+
+        public void CreateTag(string name, string oid)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
