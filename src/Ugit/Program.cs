@@ -53,22 +53,27 @@ namespace Ugit
 
         private static int K(KOption o)
         {
+            string dot = "digraph commits {\n";
             var oids = new HashSet<string>();
             foreach (var (refName, @ref) in dataProvider.IterRefs())
             {
-                Console.WriteLine($"{refName} {@ref}");
+                dot += $"\"{refName}\" [shape=note]\n";
+                dot += $"\"{refName}\" -> \"{@ref}\"\n";
                 oids.Add(@ref);
             }
 
             foreach (var oid in baseOperator.IterCommitsAndParents(oids))
             {
                 var commit = baseOperator.GetCommit(oid);
-                Console.WriteLine(oid);
+                dot += $"\"{oid}\" [shape=box style=filled label=\"{oid.Substring(0, 10)}\"]\n";
                 if (!string.IsNullOrWhiteSpace(commit.Parent))
                 {
-                    Console.WriteLine($"Parent {commit.Parent}");
+                    dot += $"\"{oid}\" -> \"{commit.Parent}\"\n";
                 }
             }
+
+            dot += "}";
+            Console.WriteLine(dot);
 
             return 0;
         }
