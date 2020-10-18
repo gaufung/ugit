@@ -53,6 +53,13 @@ namespace Ugit
             return Regex.IsMatch(str, @"\A\b[0-9a-fA-F]+\b\Z");
         }
 
+        public static T Pop<T>(this ISet<T> set)
+        {
+            var val = set.First();
+            set.Remove(val);
+            return val;
+        }
+
         public static IEnumerable<string> Walk(this IFileSystem fileSystem, string directory)
         {
             foreach (var filePath in fileSystem.Directory.EnumerateFiles(directory))

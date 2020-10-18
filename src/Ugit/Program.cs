@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using Ugit.Options;
 
@@ -52,10 +53,23 @@ namespace Ugit
 
         private static int K(KOption o)
         {
+            var oids = new HashSet<string>();
             foreach (var (refName, @ref) in dataProvider.IterRefs())
             {
                 Console.WriteLine($"{refName} {@ref}");
+                oids.Add(@ref);
             }
+
+            foreach (var oid in baseOperator.IterCommitsAndParents(oids))
+            {
+                var commit = baseOperator.GetCommit(oid);
+                Console.WriteLine(oid);
+                if (!string.IsNullOrWhiteSpace(commit.Parent))
+                {
+                    Console.WriteLine($"Parent {commit.Parent}");
+                }
+            }
+
             return 0;
         }
 

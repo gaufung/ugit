@@ -1,4 +1,5 @@
-﻿namespace Ugit
+﻿using System.Collections.Generic;
+namespace Ugit
 {
     internal interface IBaseOperator
     {
@@ -15,5 +16,7 @@
         void CreateTag(string name, string oid);
 
         string GetOid(string name);
+
+        IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids);
     }
 }

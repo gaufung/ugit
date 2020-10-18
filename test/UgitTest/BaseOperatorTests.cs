@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NuGet.Frameworks;
 using System;
 using System.IO;
 using System.IO.Abstractions;
@@ -223,6 +224,31 @@ namespace Ugit
             dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "tags", commitId))).Returns((string)null);
             dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "heads", commitId))).Returns((string)null);
             Assert.AreEqual(commitId, baseOperator.GetOid(commitId));
+        }
+
+        [TestMethod]
+        public void IterCommitsAndParentsTest()
+        {
+            string oid = "foo";
+            string messageFoo = string.Join("\n", new string[]
+            {
+                "tree foo",
+                "parent baz",
+                "\n",
+                "this is second commit"
+            });
+
+            string messageBaz = string.Join("\n", new string[]
+            {
+                "tree baz",
+                "\n",
+                "this is first commit"
+            });
+
+            dataProviderMock.Setup(d => d.GetObject("foo", "commit")).Returns(messageFoo.Encode());
+            dataProviderMock.Setup(d => d.GetObject("baz", "commit")).Returns(messageBaz.Encode());
+            var commits = baseOperator.IterCommitsAndParents(new string[] { oid }).ToArray();
+            CollectionAssert.AreEqual(new string[] { "foo", "baz" }, commits);
         }
     }
 }

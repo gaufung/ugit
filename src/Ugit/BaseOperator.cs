@@ -196,5 +196,22 @@ namespace Ugit
 
             return null;
         }
+
+        public IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids)
+        {
+            HashSet<string> oidSet = new HashSet<string>(oids, StringComparer.OrdinalIgnoreCase);
+            HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            while(oidSet.Count > 0)
+            {
+                string oid = oidSet.Pop();
+                if (string.IsNullOrWhiteSpace(oid) || visited.Contains(oid)) continue;
+                visited.Add(oid);
+                yield return oid;
+
+                var commit = GetCommit(oid);
+                oidSet.Add(commit.Parent);
+            }
+        }
     }
 }
