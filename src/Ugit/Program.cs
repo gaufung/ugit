@@ -29,7 +29,8 @@ namespace Ugit
                 WriteTreeOption,
                 ReadTreeOption,
                 CommitOption,
-                LogOption>(args).MapResult(
+                LogOption,
+                CheckoutOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -37,8 +38,15 @@ namespace Ugit
                 (ReadTreeOption o) => ReadTree(o),
                 (CommitOption o) => Commit(o),
                 (LogOption o) => Log(o),
+                (CheckoutOption o) => Checkout(o),
                 errors => 1) ;
             return exitCode;
+        }
+
+        private static int Checkout(CheckoutOption o)
+        {
+            baseOperator.Checkout(o.Oid);
+            return 0;
         }
 
         static int Init(InitOption _)

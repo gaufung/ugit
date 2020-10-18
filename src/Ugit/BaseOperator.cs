@@ -157,5 +157,12 @@ namespace Ugit
                 Message = message
             };
         }
+
+        public void Checkout(string oid)
+        {
+            var commit = GetCommit(oid);
+            ReadTree(commit.Tree);
+            dataProvider.SetHEAD(oid);
+        }
     }
 }
