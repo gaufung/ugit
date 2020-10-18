@@ -65,15 +65,15 @@ namespace Ugit
             fileSystem.Directory.CreateDirectory(Path.Join(GitDir, "objects"));
         }
 
-        public void SetHEAD(string oid)
+        public void SetRef(string @ref, string oid)
         {
-            string filePath = Path.Join(GitDir, "HEAD");
+            string filePath = Path.Join(GitDir, @ref);
             fileSystem.File.WriteAllBytes(filePath, oid.Encode());
         }
 
-        public string GetHEAD()
+        public string GetRef(string @ref)
         {
-            string filePath = Path.Join(GitDir, "HEAD");
+            string filePath = Path.Join(GitDir, @ref);
             if(fileSystem.File.Exists(filePath))
             {
                 return fileSystem.File.ReadAllBytes(filePath).Decode();

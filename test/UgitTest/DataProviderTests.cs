@@ -95,7 +95,7 @@ namespace Ugit
             string oid = "foo";
             fileMock.Setup(f => f.WriteAllBytes(filePath, It.IsAny<byte[]>()));
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            dataProvider.SetHEAD(oid);
+            dataProvider.SetRef("HEAD", oid);
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }
@@ -106,7 +106,7 @@ namespace Ugit
             string filePath = Path.Join(".ugit", "HEAD");
             fileMock.Setup(f => f.Exists(filePath)).Returns(false);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            Assert.IsNull(dataProvider.GetHEAD());
+            Assert.IsNull(dataProvider.GetRef("HEAD"));
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }
@@ -119,7 +119,7 @@ namespace Ugit
             string head = "Hello World";
             fileMock.Setup(f => f.ReadAllBytes(filePath)).Returns(head.Encode());
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            Assert.AreEqual(head, dataProvider.GetHEAD());
+            Assert.AreEqual(head, dataProvider.GetRef("HEAD"));
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }

@@ -111,7 +111,7 @@ namespace Ugit
         public string Commit(string message)
         {
             string commit = $"tree {WriteTree()}\n";
-            string HEAD = dataProvider.GetHEAD();
+            string HEAD = dataProvider.GetRef("HEAD");
             if(!string.IsNullOrWhiteSpace(HEAD))
             {
                 commit += $"parent {HEAD}\n";
@@ -121,7 +121,7 @@ namespace Ugit
             commit += $"{message}\n";
 
             string oid = dataProvider.HashObject(commit.Encode(), "commit");
-            dataProvider.SetHEAD(oid);
+            dataProvider.SetRef("HEAD", oid);
             return oid;
         }
 
@@ -162,7 +162,7 @@ namespace Ugit
         {
             var commit = GetCommit(oid);
             ReadTree(commit.Tree);
-            dataProvider.SetHEAD(oid);
+            dataProvider.SetRef("HEAD", oid);
         }
 
         public void CreateTag(string name, string oid)
