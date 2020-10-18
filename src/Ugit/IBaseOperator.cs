@@ -11,5 +11,7 @@
         Commit GetCommit(string oid);
 
         void Checkout(string oid);
+
+        void CreateTag(string name, string oid);
     }
 }
