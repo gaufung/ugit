@@ -13,11 +13,14 @@ namespace Ugit
 
         static readonly IBaseOperator baseOperator;
 
+        static readonly Func<string, string> OidConverter;
+
         static Program()
         {
             fileSystem = new FileSystem();
             dataProvider = new DataProvider();
             baseOperator = new BaseOperator(fileSystem, dataProvider);
+            OidConverter = baseOperator.GetOid;
         }
 
         static int Main(string[] args)
@@ -47,14 +50,14 @@ namespace Ugit
 
         private static int CreateTag(TagOption o)
         {
-            string oid = o.Oid ?? dataProvider.GetRef("HEAD");
+            string oid = OidConverter(o.Oid) ?? dataProvider.GetRef("HEAD");
             baseOperator.CreateTag(o.Name, oid);
             return 0;
         }
 
         private static int Checkout(CheckoutOption o)
         {
-            baseOperator.Checkout(o.Oid);
+            baseOperator.Checkout(OidConverter(o.Oid));
             return 0;
         }
 
@@ -74,7 +77,7 @@ namespace Ugit
 
         static int CatFile(CatFileOption o)
         {
-            byte[] data = dataProvider.GetObject(o.Object);
+            byte[] data = dataProvider.GetObject(OidConverter(o.Object));
             if(data.Length > 0)
             {
                 Console.WriteLine(data.Decode());
@@ -90,7 +93,7 @@ namespace Ugit
 
         static int ReadTree(ReadTreeOption o)
         {
-            baseOperator.ReadTree(o.Tree);
+            baseOperator.ReadTree(OidConverter(o.Tree));
             return 0;
         }
 
@@ -102,7 +105,7 @@ namespace Ugit
 
         static int Log(LogOption o)
         {
-            string oid = o.Oid ?? dataProvider.GetRef("HEAD");
+            string oid = OidConverter(o.Oid) ?? dataProvider.GetRef("HEAD");
             while(!string.IsNullOrEmpty(oid))
             {
                 var commit = baseOperator.GetCommit(oid);

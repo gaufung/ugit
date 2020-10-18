@@ -196,5 +196,17 @@ namespace Ugit
             fileSystemMock.VerifyAll();
             dataProviderMock.VerifyAll();
         }
+
+        [TestMethod]
+        public void GetOidTest()
+        {
+            string name = "foo";
+            dataProviderMock.Setup(d => d.GetRef(name)).Returns((string)null);
+            Assert.AreEqual("foo", baseOperator.GetOid(name));
+
+            name = "bar";
+            dataProviderMock.Setup(d => d.GetRef(name)).Returns("baz");
+            Assert.AreEqual("baz", baseOperator.GetOid(name));
+        }
     }
 }
