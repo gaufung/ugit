@@ -170,5 +170,10 @@ namespace Ugit
             string @ref = Path.Join("refs", "tags", name);
             dataProvider.UpdateRef(@ref, oid);
         }
+
+        public string GetOid(string name)
+        {
+            return dataProvider.GetRef(name) ?? name;
+        }
     }
 }

@@ -13,5 +13,7 @@
         void Checkout(string oid);
 
         void CreateTag(string name, string oid);
+
+        string GetOid(string name);
     }
 }
