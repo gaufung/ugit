@@ -8,7 +8,7 @@ namespace Ugit.Options
         [Value(0)]
         public string Name { get; set; }
 
-        [Value(1, Required = false)]
+        [Value(1, Required = false, Default = "@")]
         public string Oid { get; set; }
     }
 }

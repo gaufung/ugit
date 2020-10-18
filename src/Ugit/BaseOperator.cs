@@ -173,6 +173,7 @@ namespace Ugit
 
         public string GetOid(string name)
         {
+            name = name == "@" ? "HEAD" : name;
             string[] refsToTry = new string[]
             {
                 Path.Join(name),
