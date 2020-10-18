@@ -89,13 +89,15 @@ namespace Ugit
         }
 
         [TestMethod]
-        public void SetHEADTest()
+        public void UpdateHEADTest()
         {
             string filePath = Path.Join(".ugit", "HEAD");
             string oid = "foo";
+            direcotryMock.Setup(d => d.Exists(".ugit")).Returns(true);
             fileMock.Setup(f => f.WriteAllBytes(filePath, It.IsAny<byte[]>()));
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            dataProvider.SetRef("HEAD", oid);
+            fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
+            dataProvider.UpdateRef("HEAD", oid);
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }

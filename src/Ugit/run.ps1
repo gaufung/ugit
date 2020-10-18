@@ -31,8 +31,11 @@ dotnet ../ugit.dll commit -m "Hello next"
 
 dotnet ../ugit.dll log
 
-Write-Host "Done"
+dotnet ../ugit.dll tag v1.0
+
 
 dotnet ../ugit.dll checkout 5ef1ea5b6f1342f6d79d9109216598af8cf04621
 
 Set-Location "../"
+
+Write-Host "Done"

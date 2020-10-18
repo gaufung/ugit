@@ -121,7 +121,7 @@ namespace Ugit
             commit += $"{message}\n";
 
             string oid = dataProvider.HashObject(commit.Encode(), "commit");
-            dataProvider.SetRef("HEAD", oid);
+            dataProvider.UpdateRef("HEAD", oid);
             return oid;
         }
 
@@ -162,12 +162,13 @@ namespace Ugit
         {
             var commit = GetCommit(oid);
             ReadTree(commit.Tree);
-            dataProvider.SetRef("HEAD", oid);
+            dataProvider.UpdateRef("HEAD", oid);
         }
 
         public void CreateTag(string name, string oid)
         {
-            throw new NotImplementedException();
+            string @ref = Path.Join("refs", "tags", name);
+            dataProvider.UpdateRef(@ref, oid);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Ugit
 
         byte[] GetObject(string oid, string expected="blob");
 
-        void SetRef(string @ref, string oid);
+        void UpdateRef(string @ref, string oid);
 
         string GetRef(string @ref);
     }
