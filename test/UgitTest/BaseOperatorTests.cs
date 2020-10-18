@@ -168,5 +168,33 @@ namespace Ugit
             Assert.AreEqual("bar", commit.Parent);
             Assert.AreEqual("Hello world\nThis is from ugit", commit.Message);
         }
+
+        [TestMethod]
+        public void CheckoutTest()
+        {
+            string commitMessage = string.Join("\n", new string[]
+            {
+                "tree foo",
+                "",
+                "Hello world",
+            });
+            string oid = "this-oid";
+            dataProviderMock.Setup(f => f.GetObject(oid, "commit")).Returns(commitMessage.Encode());
+            directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(Array.Empty<string>());
+            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(Array.Empty<string>());
+            string entry = "blob bar hello.txt";
+            dataProviderMock.Setup(f => f.GetObject("foo", "tree")).Returns(entry.Encode());
+            directoryMock.Setup(d => d.Exists(".")).Returns(true);
+            fileMock.Setup(f => f.WriteAllBytes(Path.Join(".", "hello.txt"), null));
+            dataProviderMock.Setup(d => d.GetObject("bar", "blob")).Returns((byte[])null);
+            dataProviderMock.Setup(d => d.SetHEAD(oid));
+            fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            baseOperator.Checkout(oid);
+            directoryMock.VerifyAll();
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+            dataProviderMock.VerifyAll();
+        }
     }
 }

@@ -9,5 +9,7 @@
         string Commit(string message);
 
         Commit GetCommit(string oid);
+
+        void Checkout(string oid);
     }
 }
