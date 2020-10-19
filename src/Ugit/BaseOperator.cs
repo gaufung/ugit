@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using Nito.Collections;
 
 namespace Ugit
 {
@@ -199,18 +200,18 @@ namespace Ugit
 
         public IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids)
         {
-            HashSet<string> oidSet = new HashSet<string>(oids, StringComparer.OrdinalIgnoreCase);
+            Deque<string> oidQueue = new Deque<string>(oids);
             HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            while(oidSet.Count > 0)
+            while(oidQueue.Count > 0)
             {
-                string oid = oidSet.Pop();
+                string oid = oidQueue.RemoveFromFront();
                 if (string.IsNullOrWhiteSpace(oid) || visited.Contains(oid)) continue;
                 visited.Add(oid);
                 yield return oid;
 
                 var commit = GetCommit(oid);
-                oidSet.Add(commit.Parent);
+                oidQueue.AddToFront(commit.Parent);
             }
         }
     }
