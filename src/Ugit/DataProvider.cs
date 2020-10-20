@@ -77,11 +77,22 @@ namespace Ugit
         public string GetRef(string @ref)
         {
             string filePath = Path.Join(GitDir, @ref);
+            string value = null;
             if(fileSystem.File.Exists(filePath))
             {
-                return fileSystem.File.ReadAllBytes(filePath).Decode();
+                value = fileSystem.File.ReadAllBytes(filePath).Decode();
             }
-            return null;
+
+            if(!(string.IsNullOrEmpty(value)) && value.StartsWith("ref:"))
+            {
+                string[] tokens = value.Split(":");
+                if(tokens.Length == 2)
+                {
+                    return GetRef(tokens[1]);
+                }
+            }
+
+            return value;
         }
 
         public IEnumerable<(string, string)> IterRefs()

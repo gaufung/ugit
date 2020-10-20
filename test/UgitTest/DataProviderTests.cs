@@ -90,7 +90,7 @@ namespace Ugit
         }
 
         [TestMethod]
-        public void UpdateHEADTest()
+        public void UpdateRefTest()
         {
             string filePath = Path.Join(".ugit", "HEAD");
             string oid = "foo";
@@ -104,7 +104,7 @@ namespace Ugit
         }
 
         [TestMethod]
-        public void GetHEADNullTest()
+        public void GetRefNullTest()
         {
             string filePath = Path.Join(".ugit", "HEAD");
             fileMock.Setup(f => f.Exists(filePath)).Returns(false);
@@ -115,7 +115,7 @@ namespace Ugit
         }
 
         [TestMethod]
-        public void GetHEADTest()
+        public void GetRefTest()
         {
             string filePath = Path.Join(".ugit", "HEAD");
             fileMock.Setup(f => f.Exists(filePath)).Returns(true);
@@ -125,6 +125,25 @@ namespace Ugit
             Assert.AreEqual(head, dataProvider.GetRef("HEAD"));
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GeRefDerefTest()
+        {
+            string headFilePath = Path.Join(".ugit", "HEAD");
+            fileMock.Setup(f => f.Exists(headFilePath)).Returns(true);
+            string head = "ref:master";
+            fileMock.Setup(f => f.ReadAllBytes(headFilePath)).Returns(head.Encode());
+            string masterFilePath = Path.Join(".ugit", "master");
+            fileMock.Setup(f => f.Exists(masterFilePath)).Returns(true);
+            string master = "foo";
+            fileMock.Setup(f => f.ReadAllBytes(masterFilePath)).Returns(master.Encode());
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            Assert.AreEqual("foo", dataProvider.GetRef("HEAD"));
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+
+
         }
 
         [TestMethod]
