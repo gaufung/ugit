@@ -250,5 +250,15 @@ namespace Ugit
             var commits = baseOperator.IterCommitsAndParents(new string[] { oid }).ToArray();
             CollectionAssert.AreEqual(new string[] { "foo", "baz" }, commits);
         }
+
+        [TestMethod]
+        public void CreateBranchTest()
+        {
+            string name = "master";
+            string @ref = Path.Join("refs", "heads", "master");
+            dataProviderMock.Setup(d => d.UpdateRef(@ref, "foo"));
+            baseOperator.CreateBranch(name, "foo");
+            dataProviderMock.VerifyAll();
+        }
     }
 }

@@ -41,6 +41,8 @@ dotnet ../ugit.dll checkout refs/tags/v1.0
 
 dotnet ../ugit.dll k
 
+dotnet ../ugit.dll branch master
+
 Set-Location "../"
 
 Write-Host "Done"

@@ -214,5 +214,11 @@ namespace Ugit
                 oidQueue.AddToFront(commit.Parent);
             }
         }
+
+        public void CreateBranch(string name, string oid)
+        {
+            string @ref = Path.Join("refs", "heads", name);
+            dataProvider.UpdateRef(@ref, oid);
+        }
     }
 }

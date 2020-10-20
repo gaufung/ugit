@@ -18,5 +18,7 @@ namespace Ugit
         string GetOid(string name);
 
         IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids);
+
+        void CreateBranch(string name, string oid);
     }
 }

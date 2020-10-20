@@ -36,7 +36,8 @@ namespace Ugit
                 LogOption,
                 CheckoutOption,
                 TagOption,
-                KOption>(args).MapResult(
+                KOption,
+                BranchOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -47,6 +48,7 @@ namespace Ugit
                 (CheckoutOption o) => Checkout(o),
                 (TagOption o) => CreateTag(o),
                 (KOption o) => K(o),
+                (BranchOption o) => Branch(o),
                 errors => 1) ;
             return exitCode;
         }
@@ -144,6 +146,14 @@ namespace Ugit
                 Console.WriteLine("");
                 oid = commit.Parent;
             }
+            return 0;
+        }
+
+        static int Branch(BranchOption o)
+        {
+            string startPoint = OidConverter(o.StartPoint);
+            baseOperator.CreateBranch(o.Name, startPoint);
+            Console.WriteLine($"Branch {o.Name} create at {startPoint.Substring(0, 10)}");
             return 0;
         }
     }
