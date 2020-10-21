@@ -53,15 +53,15 @@ namespace Ugit
             return exitCode;
         }
 
-        private static int K(KOption o)
+        private static int K(KOption _)
         {
             string dot = "digraph commits {\n";
             var oids = new HashSet<string>();
             foreach (var (refName, @ref) in dataProvider.IterRefs())
             {
                 dot += $"\"{refName}\" [shape=note]\n";
-                dot += $"\"{refName}\" -> \"{@ref}\"\n";
-                oids.Add(@ref);
+                dot += $"\"{refName}\" -> \"{@ref.Value}\"\n";
+                oids.Add(@ref.Value);
             }
 
             foreach (var oid in baseOperator.IterCommitsAndParents(oids))

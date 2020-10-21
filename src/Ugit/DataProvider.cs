@@ -67,14 +67,15 @@ namespace Ugit
             fileSystem.Directory.CreateDirectory(Path.Join(GitDir, "objects"));
         }
 
-        public void UpdateRef(string @ref, string oid)
+        public void UpdateRef(string @ref, RefValue value)
         {
+            Debug.Assert(!value.Symbolic, "symbolic should not be true");
             string filePath = Path.Join(GitDir, @ref);
             fileSystem.CreateParentDirectory(filePath);
-            fileSystem.File.WriteAllBytes(filePath, oid.Encode());
+            fileSystem.File.WriteAllBytes(filePath, value.Value.Encode());
         }
 
-        public string GetRef(string @ref)
+        public RefValue GetRef(string @ref)
         {
             string filePath = Path.Join(GitDir, @ref);
             string value = null;
@@ -92,10 +93,10 @@ namespace Ugit
                 }
             }
 
-            return value;
+            return RefValue.Create(false, value);
         }
 
-        public IEnumerable<(string, string)> IterRefs()
+        public IEnumerable<(string, RefValue)> IterRefs()
         {
             yield return ("HEAD", GetRef("HEAD"));
             string refDirectory = Path.Join(GitDir, "refs");

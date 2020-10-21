@@ -112,7 +112,7 @@ namespace Ugit
         public string Commit(string message)
         {
             string commit = $"tree {WriteTree()}\n";
-            string HEAD = dataProvider.GetRef("HEAD");
+            string HEAD = dataProvider.GetRef("HEAD").Value;
             if(!string.IsNullOrWhiteSpace(HEAD))
             {
                 commit += $"parent {HEAD}\n";
@@ -122,7 +122,7 @@ namespace Ugit
             commit += $"{message}\n";
 
             string oid = dataProvider.HashObject(commit.Encode(), "commit");
-            dataProvider.UpdateRef("HEAD", oid);
+            dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
             return oid;
         }
 
@@ -163,13 +163,13 @@ namespace Ugit
         {
             var commit = GetCommit(oid);
             ReadTree(commit.Tree);
-            dataProvider.UpdateRef("HEAD", oid);
+            dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
         }
 
         public void CreateTag(string name, string oid)
         {
             string @ref = Path.Join("refs", "tags", name);
-            dataProvider.UpdateRef(@ref, oid);
+            dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
         }
 
         public string GetOid(string name)
@@ -184,9 +184,9 @@ namespace Ugit
             };
             foreach (var @ref in refsToTry)
             {
-                if(!string.IsNullOrEmpty(dataProvider.GetRef(@ref)))
+                if(!string.IsNullOrEmpty(dataProvider.GetRef(@ref).Value))
                 {
-                    return dataProvider.GetRef(@ref);
+                    return dataProvider.GetRef(@ref).Value;
                 }
             }
 
@@ -218,7 +218,7 @@ namespace Ugit
         public void CreateBranch(string name, string oid)
         {
             string @ref = Path.Join("refs", "heads", name);
-            dataProvider.UpdateRef(@ref, oid);
+            dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
         }
     }
 }

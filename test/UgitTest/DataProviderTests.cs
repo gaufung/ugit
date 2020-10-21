@@ -98,7 +98,7 @@ namespace Ugit
             fileMock.Setup(f => f.WriteAllBytes(filePath, It.IsAny<byte[]>()));
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
-            dataProvider.UpdateRef("HEAD", oid);
+            dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }
@@ -109,7 +109,7 @@ namespace Ugit
             string filePath = Path.Join(".ugit", "HEAD");
             fileMock.Setup(f => f.Exists(filePath)).Returns(false);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            Assert.IsNull(dataProvider.GetRef("HEAD"));
+            Assert.IsNull(dataProvider.GetRef("HEAD").Value);
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }
@@ -122,7 +122,7 @@ namespace Ugit
             string head = "Hello World";
             fileMock.Setup(f => f.ReadAllBytes(filePath)).Returns(head.Encode());
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            Assert.AreEqual(head, dataProvider.GetRef("HEAD"));
+            Assert.AreEqual(head, dataProvider.GetRef("HEAD").Value);
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
         }
@@ -139,7 +139,7 @@ namespace Ugit
             string master = "foo";
             fileMock.Setup(f => f.ReadAllBytes(masterFilePath)).Returns(master.Encode());
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            Assert.AreEqual("foo", dataProvider.GetRef("HEAD"));
+            Assert.AreEqual("foo", dataProvider.GetRef("HEAD").Value);
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
 
@@ -169,11 +169,11 @@ namespace Ugit
             });
             fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            (string, string)[] refs = dataProvider.IterRefs().ToArray();
-            CollectionAssert.AreEqual(new (string, string)[]
+            (string, RefValue)[] refs = dataProvider.IterRefs().ToArray();
+            CollectionAssert.AreEqual(new (string, RefValue)[]
             {
-                ValueTuple.Create("HEAD", "foo"),
-                ValueTuple.Create(Path.Join("refs", "tags", "v1.0"), "bar")
+                ValueTuple.Create("HEAD", RefValue.Create(false, "foo")),
+                ValueTuple.Create(Path.Join("refs", "tags", "v1.0"), RefValue.Create(false, "bar"))
             }, refs);
         }
     }

@@ -15,10 +15,10 @@ namespace Ugit
 
         byte[] GetObject(string oid, string expected="blob");
 
-        void UpdateRef(string @ref, string oid);
+        void UpdateRef(string @ref, RefValue value);
 
-        string GetRef(string @ref);
+        RefValue GetRef(string @ref);
 
-        IEnumerable<(string, string)> IterRefs();
+        IEnumerable<(string, RefValue)> IterRefs();
     }
 }
