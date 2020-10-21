@@ -20,5 +20,7 @@ namespace Ugit
         IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids);
 
         void CreateBranch(string name, string oid);
+
+        void Init();
     }
 }

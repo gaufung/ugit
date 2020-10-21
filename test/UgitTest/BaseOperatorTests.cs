@@ -292,5 +292,15 @@ namespace Ugit
             baseOperator.CreateBranch(name, "foo");
             dataProviderMock.VerifyAll();
         }
+
+        [TestMethod]
+        public void InitTest()
+        {
+            dataProviderMock.Setup(d => d.Init());
+            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", "master")), true));
+            baseOperator.Init();
+            dataProviderMock.VerifyAll();
+
+        }
     }
 }

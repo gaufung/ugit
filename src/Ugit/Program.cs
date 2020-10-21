@@ -98,7 +98,7 @@ namespace Ugit
 
         static int Init(InitOption _)
         {
-            dataProvider.Init();
+            baseOperator.Init();
             Console.WriteLine($"Initialized empty ugit repository in {dataProvider.GitDirFullPath}");
             return 0;
         }

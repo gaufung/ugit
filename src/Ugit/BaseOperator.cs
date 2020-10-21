@@ -239,5 +239,11 @@ namespace Ugit
             string path = Path.Join("refs", "heads", branch);
             return !string.IsNullOrWhiteSpace(dataProvider.GetRef(path).Value);
         }
+
+        public void Init()
+        {
+            dataProvider.Init();
+            dataProvider.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", "master")));
+        }
     }
 }
