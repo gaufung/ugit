@@ -77,23 +77,7 @@ namespace Ugit
 
         public RefValue GetRef(string @ref)
         {
-            string filePath = Path.Join(GitDir, @ref);
-            string value = null;
-            if(fileSystem.File.Exists(filePath))
-            {
-                value = fileSystem.File.ReadAllBytes(filePath).Decode();
-            }
-
-            if(!(string.IsNullOrEmpty(value)) && value.StartsWith("ref:"))
-            {
-                string[] tokens = value.Split(":");
-                if(tokens.Length == 2)
-                {
-                    return GetRef(tokens[1]);
-                }
-            }
-
-            return RefValue.Create(false, value);
+            return GetRefInternal(@ref).Item2;
         }
 
         public IEnumerable<(string, RefValue)> IterRefs()
@@ -105,6 +89,25 @@ namespace Ugit
                 string refName = Path.GetRelativePath(GitDir, filePath);
                 yield return (refName, GetRef(refName));
             }
+        }
+
+        private (string, RefValue) GetRefInternal(string @ref)
+        {
+            var refPath = Path.Join(GitDir, @ref);
+            string value = null;
+            if (fileSystem.File.Exists(refPath))
+            {
+                value = fileSystem.File.ReadAllBytes(refPath).Decode();
+            }
+
+            bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");
+            if(symbolic)
+            {
+                value = value.Split(":")[1].Trim();
+                return GetRefInternal(value);
+            }
+
+            return ValueTuple.Create(@ref, RefValue.Create(false, value));
         }
     }
 }
