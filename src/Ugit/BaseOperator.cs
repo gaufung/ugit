@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using CommandLine.Text;
 using Nito.Collections;
 
 namespace Ugit
@@ -159,11 +160,23 @@ namespace Ugit
             };
         }
 
-        public void Checkout(string oid)
+        public void Checkout(string name)
         {
+            string oid = GetOid(name);
             var commit = GetCommit(oid);
             ReadTree(commit.Tree);
-            dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
+
+            RefValue HEAD;
+            if(IsBranch(name))
+            {
+                HEAD = RefValue.Create(true, Path.Join("refs", "heads", name));
+            }
+            else
+            {
+                HEAD = RefValue.Create(false, oid);
+            }
+
+            dataProvider.UpdateRef("HEAD", HEAD);
         }
 
         public void CreateTag(string name, string oid)
@@ -219,6 +232,12 @@ namespace Ugit
         {
             string @ref = Path.Join("refs", "heads", name);
             dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
+        }
+
+        private bool IsBranch(string branch)
+        {
+            string path = Path.Join("refs", "heads", branch);
+            return !string.IsNullOrWhiteSpace(dataProvider.GetRef(path).Value);
         }
     }
 }

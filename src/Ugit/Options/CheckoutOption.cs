@@ -7,6 +7,6 @@ namespace Ugit.Options
     internal class CheckoutOption
     {
         [Value(0)]
-        public string Oid { get; set; }
+        public string Commit { get; set; }
     }
 }

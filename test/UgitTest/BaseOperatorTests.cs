@@ -171,7 +171,7 @@ namespace Ugit
         }
 
         [TestMethod]
-        public void CheckoutTest()
+        public void CheckoutFalseRefValueTest()
         {
             string commitMessage = string.Join("\n", new string[]
             {
@@ -179,7 +179,7 @@ namespace Ugit
                 "",
                 "Hello world",
             });
-            string oid = "this-oid";
+            string oid = "Hello world".Encode().Sha1HexDigest();
             dataProviderMock.Setup(f => f.GetObject(oid, "commit")).Returns(commitMessage.Encode());
             directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(Array.Empty<string>());
             directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(Array.Empty<string>());
@@ -192,6 +192,37 @@ namespace Ugit
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             baseOperator.Checkout(oid);
+            directoryMock.VerifyAll();
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+            dataProviderMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void CheckoutTrueRefValueTest()
+        {
+            string commitMessage = string.Join("\n", new string[]
+            {
+                "tree foo",
+                "",
+                "Hello world",
+            });
+            string name = "master";
+            string oid = "Hello world".Encode().Sha1HexDigest();
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs","heads",name), false)).Returns(RefValue.Create(false, oid));
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "heads", name), true)).Returns(RefValue.Create(false, oid));
+            dataProviderMock.Setup(f => f.GetObject(oid, "commit")).Returns(commitMessage.Encode());
+            directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(Array.Empty<string>());
+            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(Array.Empty<string>());
+            string entry = "blob bar hello.txt";
+            dataProviderMock.Setup(f => f.GetObject("foo", "tree")).Returns(entry.Encode());
+            directoryMock.Setup(d => d.Exists(".")).Returns(true);
+            fileMock.Setup(f => f.WriteAllBytes(Path.Join(".", "hello.txt"), null));
+            dataProviderMock.Setup(d => d.GetObject("bar", "blob")).Returns((byte[])null);
+            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", name)), true));
+            fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            baseOperator.Checkout(name);
             directoryMock.VerifyAll();
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();

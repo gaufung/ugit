@@ -92,7 +92,7 @@ namespace Ugit
 
         private static int Checkout(CheckoutOption o)
         {
-            baseOperator.Checkout(OidConverter(o.Oid));
+            baseOperator.Checkout(o.Commit);
             return 0;
         }
 
