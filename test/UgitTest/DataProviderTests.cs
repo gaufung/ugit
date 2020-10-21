@@ -104,6 +104,20 @@ namespace Ugit
         }
 
         [TestMethod]
+        public void UpdateRefTrueTest()
+        {
+            string filePath = Path.Join(".ugit", "HEAD");
+            string @ref = Path.Join(".ugit", "heads", "master");
+            direcotryMock.Setup(d => d.Exists(".ugit")).Returns(true);
+            fileMock.Setup(f => f.WriteAllBytes(filePath, It.IsAny<byte[]>()));
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
+            dataProvider.UpdateRef("HEAD", RefValue.Create(true, @ref));
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+        }
+
+        [TestMethod]
         public void GetRefNullTest()
         {
             string filePath = Path.Join(".ugit", "HEAD");

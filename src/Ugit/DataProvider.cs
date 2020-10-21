@@ -66,11 +66,21 @@ namespace Ugit
 
         public void UpdateRef(string @ref, RefValue value, bool deref=true)
         {
-            Debug.Assert(!value.Symbolic, "symbolic should not be true");
             @ref = GetRefInternal(@ref, deref).Item1;
+            Debug.Assert(!string.IsNullOrEmpty(value.Value));
+            string val;
+            if (value.Symbolic)
+            {
+                val = $"ref: {value.Value}";
+            }
+            else
+            {
+                val = value.Value;
+            }
+
             string filePath = Path.Join(GitDir, @ref);
             fileSystem.CreateParentDirectory(filePath);
-            fileSystem.File.WriteAllBytes(filePath, value.Value.Encode());
+            fileSystem.File.WriteAllBytes(filePath, val.Encode());
         }
 
         public RefValue GetRef(string @ref, bool deref=true)
