@@ -37,7 +37,8 @@ namespace Ugit
                 CheckoutOption,
                 TagOption,
                 KOption,
-                BranchOption>(args).MapResult(
+                BranchOption,
+                StatusOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -49,8 +50,25 @@ namespace Ugit
                 (TagOption o) => CreateTag(o),
                 (KOption o) => K(o),
                 (BranchOption o) => Branch(o),
+                (StatusOption o) => Status(o),
                 errors => 1) ;
             return exitCode;
+        }
+
+        private static int Status(StatusOption _)
+        {
+            string head = baseOperator.GetOid("@");
+            string branch = baseOperator.GetBranchName();
+            if(string.IsNullOrEmpty(branch))
+            {
+                Console.WriteLine($"HEAD detached at {head.Substring(0, 10)}");
+            }
+            else
+            {
+                Console.WriteLine($"On branch {branch}");
+            }
+
+            return 0;
         }
 
         private static int K(KOption _)

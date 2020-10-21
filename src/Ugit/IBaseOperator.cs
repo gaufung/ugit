@@ -22,5 +22,7 @@ namespace Ugit
         void CreateBranch(string name, string oid);
 
         void Init();
+
+        string GetBranchName();
     }
 }

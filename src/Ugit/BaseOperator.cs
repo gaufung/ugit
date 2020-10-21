@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -244,6 +245,19 @@ namespace Ugit
         {
             dataProvider.Init();
             dataProvider.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", "master")));
+        }
+
+        public string GetBranchName()
+        {
+            var HEAD = dataProvider.GetRef("HEAD", false);
+            if(!HEAD.Symbolic)
+            {
+                return null;
+            }
+
+            var head = HEAD.Value;
+            Debug.Assert(head.StartsWith(Path.Join("refs", "heads")));
+            return Path.GetRelativePath(Path.Join("refs", "heads"), head);
         }
     }
 }

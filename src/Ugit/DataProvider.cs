@@ -107,7 +107,6 @@ namespace Ugit
             {
                 value = fileSystem.File.ReadAllBytes(refPath).Decode();
             }
-
             bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");
             if(symbolic)
             {
@@ -118,7 +117,7 @@ namespace Ugit
                 }
             }
 
-            return ValueTuple.Create(@ref, RefValue.Create(false, value));
+            return ValueTuple.Create(@ref, RefValue.Create(symbolic, value));
         }
     }
 }

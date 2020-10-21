@@ -9,6 +9,8 @@ Set-Location "test"
 
 dotnet ../ugit.dll init
 
+dotnet ../ugit.dll status
+
 "Hello World" | Out-File "hello.txt" -Encoding UTF8
 
 dotnet ../ugit.dll hash-object "hello.txt"
@@ -24,6 +26,8 @@ dotnet ../ugit.dll write-tree
 dotnet ../ugit.dll read-tree 56d892c161a818fb4163ee233bd5aa1fe99e9f9d
 
 dotnet ../ugit.dll commit -m "Hello World"
+
+dotnet ../ugit.dll status
 
 "Hello Next" | Out-File "next.txt"
 
