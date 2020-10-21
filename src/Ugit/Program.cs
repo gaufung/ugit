@@ -57,11 +57,14 @@ namespace Ugit
         {
             string dot = "digraph commits {\n";
             var oids = new HashSet<string>();
-            foreach (var (refName, @ref) in dataProvider.IterRefs())
+            foreach (var (refName, @ref) in dataProvider.IterRefs(false))
             {
                 dot += $"\"{refName}\" [shape=note]\n";
                 dot += $"\"{refName}\" -> \"{@ref.Value}\"\n";
-                oids.Add(@ref.Value);
+                if (!@ref.Symbolic)
+                {
+                    oids.Add(@ref.Value);
+                }
             }
 
             foreach (var oid in baseOperator.IterCommitsAndParents(oids))

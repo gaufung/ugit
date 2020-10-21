@@ -142,8 +142,8 @@ namespace Ugit
                 }
                 return "foo";
             });
-            dataProviderMock.Setup(f => f.GetRef("HEAD")).Returns(RefValue.Create(false, "baz"));
-            dataProviderMock.Setup(f => f.UpdateRef("HEAD", RefValue.Create(false, "bar")));
+            dataProviderMock.Setup(f => f.GetRef("HEAD", true)).Returns(RefValue.Create(false, "baz"));
+            dataProviderMock.Setup(f => f.UpdateRef("HEAD", RefValue.Create(false, "bar"), true));
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
 
             string expected = "bar";
@@ -188,7 +188,7 @@ namespace Ugit
             directoryMock.Setup(d => d.Exists(".")).Returns(true);
             fileMock.Setup(f => f.WriteAllBytes(Path.Join(".", "hello.txt"), null));
             dataProviderMock.Setup(d => d.GetObject("bar", "blob")).Returns((byte[])null);
-            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(false, oid)));
+            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(false, oid), true));
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             baseOperator.Checkout(oid);
@@ -202,7 +202,8 @@ namespace Ugit
         public void GetOidTest()
         {
             string name = "foo";
-            dataProviderMock.Setup(d => d.GetRef(name)).Returns(RefValue.Create(false, "bar"));
+            dataProviderMock.Setup(d => d.GetRef(name, false)).Returns(RefValue.Create(false, "bar"));
+            dataProviderMock.Setup(d => d.GetRef(name, true)).Returns(RefValue.Create(false, "bar"));
             Assert.AreEqual("bar", baseOperator.GetOid(name));
         }
 
@@ -210,9 +211,9 @@ namespace Ugit
         public void GetOidIllegalTest()
         {
             string name = "foo";
-            dataProviderMock.Setup(d => d.GetRef(name)).Returns(RefValue.Create(false, null));
-            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "tags", name))).Returns(RefValue.Create(false, null));
-            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "heads", name))).Returns(RefValue.Create(false, null));
+            dataProviderMock.Setup(d => d.GetRef(name, true)).Returns(RefValue.Create(false, null));
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "tags", name), true)).Returns(RefValue.Create(false, null));
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "heads", name), true)).Returns(RefValue.Create(false, null));
             Assert.IsNull(baseOperator.GetOid(name));
         }
 
@@ -220,9 +221,9 @@ namespace Ugit
         public void TestOidCommitId()
         {
             string commitId = "Hello World".Encode().Sha1HexDigest();
-            dataProviderMock.Setup(d => d.GetRef(commitId)).Returns(RefValue.Create(false, null));
-            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "tags", commitId))).Returns(RefValue.Create(false, null));
-            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "heads", commitId))).Returns((RefValue.Create(false, null)));
+            dataProviderMock.Setup(d => d.GetRef(commitId, true)).Returns(RefValue.Create(false, null));
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "tags", commitId), true)).Returns(RefValue.Create(false, null));
+            dataProviderMock.Setup(d => d.GetRef(Path.Join("refs", "heads", commitId), true)).Returns((RefValue.Create(false, null)));
             Assert.AreEqual(commitId, baseOperator.GetOid(commitId));
         }
 
@@ -256,7 +257,7 @@ namespace Ugit
         {
             string name = "master";
             string @ref = Path.Join("refs", "heads", "master");
-            dataProviderMock.Setup(d => d.UpdateRef(@ref, RefValue.Create(false, "foo")));
+            dataProviderMock.Setup(d => d.UpdateRef(@ref, RefValue.Create(false, "foo"), true));
             baseOperator.CreateBranch(name, "foo");
             dataProviderMock.VerifyAll();
         }

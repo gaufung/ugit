@@ -184,7 +184,7 @@ namespace Ugit
             };
             foreach (var @ref in refsToTry)
             {
-                if(!string.IsNullOrEmpty(dataProvider.GetRef(@ref).Value))
+                if(!string.IsNullOrEmpty(dataProvider.GetRef(@ref, false).Value))
                 {
                     return dataProvider.GetRef(@ref).Value;
                 }

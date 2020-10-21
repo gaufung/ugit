@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
@@ -10,8 +9,6 @@ namespace Ugit
 {
     internal class DataProvider : IDataProvider
     {
-        private readonly string _gitDir = ".ugit";
-
         private readonly byte _typeSeparator = 0;
 
         private readonly IFileSystem fileSystem;
@@ -26,7 +23,7 @@ namespace Ugit
             this.fileSystem = fileSystem;
         }
 
-        public string GitDir => _gitDir;
+        public string GitDir { get; } = ".ugit";
 
         public string GitDirFullPath => 
             Path.Join(fileSystem.Directory.GetCurrentDirectory(), GitDir);
@@ -67,31 +64,32 @@ namespace Ugit
             fileSystem.Directory.CreateDirectory(Path.Join(GitDir, "objects"));
         }
 
-        public void UpdateRef(string @ref, RefValue value)
+        public void UpdateRef(string @ref, RefValue value, bool deref=true)
         {
             Debug.Assert(!value.Symbolic, "symbolic should not be true");
+            @ref = GetRefInternal(@ref, deref).Item1;
             string filePath = Path.Join(GitDir, @ref);
             fileSystem.CreateParentDirectory(filePath);
             fileSystem.File.WriteAllBytes(filePath, value.Value.Encode());
         }
 
-        public RefValue GetRef(string @ref)
+        public RefValue GetRef(string @ref, bool deref=true)
         {
-            return GetRefInternal(@ref).Item2;
+            return GetRefInternal(@ref, deref).Item2;
         }
 
-        public IEnumerable<(string, RefValue)> IterRefs()
+        public IEnumerable<(string, RefValue)> IterRefs(bool deref=true)
         {
             yield return ("HEAD", GetRef("HEAD"));
             string refDirectory = Path.Join(GitDir, "refs");
             foreach (var filePath in fileSystem.Walk(refDirectory))
             {
                 string refName = Path.GetRelativePath(GitDir, filePath);
-                yield return (refName, GetRef(refName));
+                yield return (refName, GetRef(refName, deref));
             }
         }
 
-        private (string, RefValue) GetRefInternal(string @ref)
+        private (string, RefValue) GetRefInternal(string @ref, bool deref)
         {
             var refPath = Path.Join(GitDir, @ref);
             string value = null;
@@ -104,7 +102,10 @@ namespace Ugit
             if(symbolic)
             {
                 value = value.Split(":")[1].Trim();
-                return GetRefInternal(value);
+                if(deref)
+                {
+                    return GetRefInternal(value, true);
+                }
             }
 
             return ValueTuple.Create(@ref, RefValue.Create(false, value));
