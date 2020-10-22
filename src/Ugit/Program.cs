@@ -75,7 +75,7 @@ namespace Ugit
         {
             string dot = "digraph commits {\n";
             var oids = new HashSet<string>();
-            foreach (var (refName, @ref) in dataProvider.IterRefs(false))
+            foreach (var (refName, @ref) in dataProvider.IterRefs("", false))
             {
                 dot += $"\"{refName}\" [shape=note]\n";
                 dot += $"\"{refName}\" -> \"{@ref.Value}\"\n";
@@ -173,8 +173,21 @@ namespace Ugit
         static int Branch(BranchOption o)
         {
             string startPoint = OidConverter(o.StartPoint);
-            baseOperator.CreateBranch(o.Name, startPoint);
-            Console.WriteLine($"Branch {o.Name} create at {startPoint.Substring(0, 10)}");
+
+            if (string.IsNullOrEmpty(o.Name))
+            {
+                string current = baseOperator.GetBranchName();
+                foreach (var branch in baseOperator.IterBranchNames())
+                {
+                    string prefix = branch == current ? "*" : "";
+                    Console.WriteLine($"{prefix}{branch}");
+                }
+            }
+            else
+            {
+                baseOperator.CreateBranch(o.Name, startPoint);
+                Console.WriteLine($"Branch {o.Name} create at {startPoint.Substring(0, 10)}");
+            }
             return 0;
         }
     }

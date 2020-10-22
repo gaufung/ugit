@@ -24,5 +24,7 @@ namespace Ugit
         void Init();
 
         string GetBranchName();
+
+        IEnumerable<string> IterBranchNames();
     }
 }

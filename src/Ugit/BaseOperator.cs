@@ -259,5 +259,13 @@ namespace Ugit
             Debug.Assert(head.StartsWith(Path.Join("refs", "heads")));
             return Path.GetRelativePath(Path.Join("refs", "heads"), head);
         }
+
+        public IEnumerable<string> IterBranchNames()
+        {
+            foreach (var (refName, _) in dataProvider.IterRefs(Path.Join("refs", "heads")))
+            {
+                yield return Path.GetRelativePath(Path.Join("refs", "heads"), refName);
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace Ugit.Options
     [Verb("branch")]
     internal class BranchOption
     {
-        [Value(0, Required = true)]
+        [Value(0, Required = false)]
         public string Name { get; set; }
 
         [Value(1, Required = false, Default = "@")]

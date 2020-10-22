@@ -19,6 +19,6 @@ namespace Ugit
 
         RefValue GetRef(string @ref, bool deref=true);
 
-        IEnumerable<(string, RefValue)> IterRefs(bool deref=true);
+        IEnumerable<(string, RefValue)> IterRefs(string prefix = "", bool deref=true);
     }
 }

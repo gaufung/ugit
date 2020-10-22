@@ -45,7 +45,9 @@ dotnet ../ugit.dll checkout refs/tags/v1.0
 
 dotnet ../ugit.dll k
 
-dotnet ../ugit.dll branch master
+dotnet ../ugit.dll branch dev
+
+dotnet ../ugit.dll branch
 
 Set-Location "../"
 

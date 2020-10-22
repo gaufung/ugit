@@ -88,14 +88,18 @@ namespace Ugit
             return GetRefInternal(@ref, deref).Item2;
         }
 
-        public IEnumerable<(string, RefValue)> IterRefs(bool deref=true)
+        public IEnumerable<(string, RefValue)> IterRefs(string prefix="", bool deref=true)
         {
-            yield return ("HEAD", GetRef("HEAD"));
+            if ("HEAD".StartsWith(prefix))
+            {
+                yield return ("HEAD", GetRef("HEAD"));
+            }
             string refDirectory = Path.Join(GitDir, "refs");
             foreach (var filePath in fileSystem.Walk(refDirectory))
             {
                 string refName = Path.GetRelativePath(GitDir, filePath);
-                yield return (refName, GetRef(refName, deref));
+                if (refName.StartsWith(prefix))
+                    yield return (refName, GetRef(refName, deref));
             }
         }
 

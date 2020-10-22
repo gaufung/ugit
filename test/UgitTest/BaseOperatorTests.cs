@@ -300,7 +300,24 @@ namespace Ugit
             dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", "master")), true));
             baseOperator.Init();
             dataProviderMock.VerifyAll();
+        }
 
+        [TestMethod]
+        public void IterBranchNamesTest()
+        {
+            dataProviderMock.Setup(d => d.IterRefs(Path.Join("refs", "heads"), true)).Returns(new (string, RefValue)[]
+            {
+                (Path.Join("refs", "heads", "master"), RefValue.Create(false, "foo")),
+                (Path.Join("refs", "heads", "dev"), RefValue.Create(false, "bar")),
+                (Path.Join("refs", "heads", "test"), RefValue.Create(false, "baz"))
+            });
+            string[] expected = new string[]
+            {
+                "master",
+                "dev",
+                "test"
+            };
+            CollectionAssert.AreEqual(expected, baseOperator.IterBranchNames().ToArray());
         }
     }
 }
