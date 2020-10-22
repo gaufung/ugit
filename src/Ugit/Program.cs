@@ -159,14 +159,29 @@ namespace Ugit
         static int Log(LogOption o)
         {
             string oid = OidConverter(o.Oid);
-            while(!string.IsNullOrEmpty(oid))
+
+            IDictionary<string, IList<string>> refs = new Dictionary<string, IList<string>>();
+            foreach (var (refname, @ref) in dataProvider.IterRefs())
+            {
+                if(refs.ContainsKey(@ref.Value))
+                {
+                    refs[@ref.Value].Add(refname);
+                }
+                else
+                {
+                    refs[@ref.Value] = new List<string>() { refname };
+                }
+            }
+
+            foreach (var objectId in baseOperator.IterCommitsAndParents(new string[] { oid }))
             {
                 var commit = baseOperator.GetCommit(oid);
-                Console.WriteLine($"commit {oid}");
-                Console.WriteLine($"{commit.Message}    ");
+                string refStr = refs.ContainsKey(objectId) ? $"({string.Join(',', refs[objectId])})" : "";
+                Console.WriteLine($"commit {objectId}{refStr}\n");
+                Console.WriteLine(commit.Message + "    ");
                 Console.WriteLine("");
-                oid = commit.Parent;
             }
+
             return 0;
         }
 
