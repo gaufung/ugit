@@ -38,7 +38,8 @@ namespace Ugit
                 TagOption,
                 KOption,
                 BranchOption,
-                StatusOption>(args).MapResult(
+                StatusOption,
+                ResetOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -51,8 +52,16 @@ namespace Ugit
                 (KOption o) => K(o),
                 (BranchOption o) => Branch(o),
                 (StatusOption o) => Status(o),
-                errors => 1) ;
+                (ResetOption o) => Reset(o),
+                errors => 1); 
             return exitCode;
+        }
+
+        private static int Reset(ResetOption o)
+        {
+            string oid = OidConverter(o.Commit);
+            baseOperator.Reset(oid);
+            return 0;
         }
 
         private static int Status(StatusOption _)

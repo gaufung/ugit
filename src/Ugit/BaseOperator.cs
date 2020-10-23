@@ -267,5 +267,10 @@ namespace Ugit
                 yield return Path.GetRelativePath(Path.Join("refs", "heads"), refName);
             }
         }
+
+        public void Reset(string oid)
+        {
+            dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
+        }
     }
 }

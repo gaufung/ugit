@@ -319,5 +319,13 @@ namespace Ugit
             };
             CollectionAssert.AreEqual(expected, baseOperator.IterBranchNames().ToArray());
         }
+
+        [TestMethod]
+        public void ResetTest()
+        {
+            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(false, "foo"), true));
+            baseOperator.Reset("foo");
+            dataProviderMock.VerifyAll();
+        }
     }
 }
