@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Ugit
 {
@@ -12,10 +13,13 @@ namespace Ugit
 
         private IDiff diff;
 
+        private Mock<IDataProvider> dataproviderMock;
+
         [TestInitialize]
         public void Init()
         {
-            diff = new Diff();
+            dataproviderMock = new Mock<IDataProvider>();
+            diff = new Diff(dataproviderMock.Object);
         }
 
         [TestMethod]
@@ -64,8 +68,10 @@ namespace Ugit
 
             string exepcted = string.Join("\n", new string[]
             {
-                "changed: hello.txt",
-                "changed: ugit.txt",
+                "--- a/hello.txt",
+                "+++ b/hello.txt",
+                "--- a/ugit.txt",
+                "+++ b/ugit.txt",
             });
             Assert.AreEqual(exepcted, diff.DiffTree(fromTree, toTree));
         }

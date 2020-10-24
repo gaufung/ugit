@@ -11,27 +11,29 @@ dotnet ../ugit.dll init
 
 dotnet ../ugit.dll status
 
-"Hello World" | Out-File "hello.txt" -Encoding UTF8
+Copy-Item "../data/hello.txt" "./"
 
 dotnet ../ugit.dll hash-object "hello.txt"
 
-dotnet ../ugit.dll cat-file c7bd5be26845954f7a0e7b4a3fc77340b8d90c3c
+dotnet ../ugit.dll cat-file 0a6649a0077da1bf5a8b3b5dd3ea733ea6a81938
+
+
 
 New-Item "sub" -ItemType Directory -Force
 
-"Hello Ugit" | Out-File "sub/ugit.txt"
+Copy-Item "../data/sub/ugit.txt" "./sub/"
 
 dotnet ../ugit.dll write-tree
 
-dotnet ../ugit.dll read-tree 56d892c161a818fb4163ee233bd5aa1fe99e9f9d
+dotnet ../ugit.dll read-tree 62b3608c7fe2f7dfe03c86b70b02946ac9042550
 
-dotnet ../ugit.dll commit -m "Hello World"
+dotnet ../ugit.dll commit -m "Hello first"
 
 dotnet ../ugit.dll status
 
-"Hello Next" | Out-File "next.txt"
+Copy-Item "../data/next.txt" "./"
 
-dotnet ../ugit.dll commit -m "Hello next"
+dotnet ../ugit.dll commit -m "Hello second"
 
 dotnet ../ugit.dll log
 
@@ -39,7 +41,7 @@ dotnet ../ugit.dll tag v1.0
 
 dotnet ../ugit.dll log refs/tags/v1.0
 
-dotnet ../ugit.dll checkout 5ef1ea5b6f1342f6d79d9109216598af8cf04621
+dotnet ../ugit.dll checkout fcf448a43cb07899ad1db21ba3b3e31a0386b2ef
 
 dotnet ../ugit.dll checkout refs/tags/v1.0
 
@@ -49,7 +51,7 @@ dotnet ../ugit.dll branch dev
 
 dotnet ../ugit.dll branch
 
-dotnet ../ugit.dll reset 5ef1ea5b6f1342f6d79d9109216598af8cf04621
+dotnet ../ugit.dll reset fcf448a43cb07899ad1db21ba3b3e31a0386b2ef
 
 dotnet ../ugit.dll show
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DiffPlex.DiffBuilder.Model;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -74,6 +75,30 @@ namespace Ugit
                     yield return filepath;
                 }
             }
+        }
+
+        public static string Show(this DiffPaneModel diffPaneModel, string path)
+        {
+            IList<string> lines = new List<string>();
+            lines.Add($"--- a/{path}");
+            lines.Add($"+++ b/{path}");
+            foreach (var line in diffPaneModel.Lines)
+            {
+                if(line.Type == ChangeType.Deleted)
+                {
+                    lines.Add("-" + line.Text);
+                }
+                else if(line.Type == ChangeType.Inserted)
+                {
+                    lines.Add("+" + line.Text);
+                }
+                else
+                {
+                    lines.Add(" " + line.Text);
+                }
+            }
+
+            return string.Join("\n", lines);
         }
     }
 }

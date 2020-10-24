@@ -1,11 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using DiffPlex.DiffBuilder;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Ugit
 {
     internal class Diff : IDiff
     {
+        private readonly IDataProvider dataProvider;
+
+        public Diff(IDataProvider dataProvider)
+        {
+            this.dataProvider = dataProvider;
+        }
+
         public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params IDictionary<string, string>[] trees)
         {
             IDictionary<string, string[]> entries = new Dictionary<string, string[]>();
@@ -31,13 +38,21 @@ namespace Ugit
 
         }
 
+        public string DiffBlob(string fromOid, string toOid, string path)
+        {
+            string fromText = dataProvider.GetObject(fromOid).Decode();
+            string toText = dataProvider.GetObject(toOid).Decode();
+            var model = InlineDiffBuilder.Diff(fromText, toText);
+            return model.Show(path);
+        }
+
         public string DiffTree(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
         {
             return string.Join(
-                "\n", 
+                "\n",
                 CompareTrees(fromTree, toTree)
                 .Where(t => t.Item2.First() != t.Item2.Last())
-                .Select(t => $"changed: {t.Item1}")
+                .Select(t => DiffBlob(t.Item2.First(), t.Item2.Last(), t.Item1))
                 );
         }
     }
