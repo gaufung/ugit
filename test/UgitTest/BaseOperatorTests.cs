@@ -327,5 +327,23 @@ namespace Ugit
             baseOperator.Reset("foo");
             dataProviderMock.VerifyAll();
         }
+
+        [TestMethod]
+        public void GetWorkingTreeTest()
+        {
+            directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(new string[]
+            {
+                Path.Join(".", "foo.txt")
+            });
+
+            fileMock.Setup(f => f.Exists("foo.txt")).Returns(true);
+            fileMock.Setup(f => f.ReadAllBytes("foo.txt")).Returns("Hello World".Encode());
+            dataProviderMock.Setup(d => d.HashObject(It.IsAny<Byte[]>(), It.IsAny<string>())).Returns("bar");
+            fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            var actual = baseOperator.GetWorkingTree();
+            Assert.IsTrue(actual.ContainsKey("foo.txt"));
+            Assert.AreEqual("bar", actual["foo.txt"]);
+        }
     }
 }

@@ -272,5 +272,22 @@ namespace Ugit
         {
             dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
         }
+
+        public IDictionary<string, string> GetWorkingTree()
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            foreach (var filePath in fileSystem.Walk("."))
+            {
+                string path = Path.GetRelativePath(".", filePath);
+                if (IsIgnore(path))
+                {
+                    continue;
+                }
+
+                result[path] = dataProvider.HashObject(fileSystem.File.ReadAllBytes(path));
+            }
+
+            return result;
+        }
     }
 }

@@ -30,5 +30,7 @@ namespace Ugit
         void Reset(string oid);
 
         IDictionary<string, string> GetTree(string treeOid, string basePath = "");
+
+        IDictionary<string, string> GetWorkingTree();
     }
 }

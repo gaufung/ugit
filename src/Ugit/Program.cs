@@ -43,7 +43,8 @@ namespace Ugit
                 BranchOption,
                 StatusOption,
                 ResetOption,
-                ShowOption>(args).MapResult(
+                ShowOption,
+                DiffOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -58,8 +59,18 @@ namespace Ugit
                 (StatusOption o) => Status(o),
                 (ResetOption o) => Reset(o),
                 (ShowOption o) => Show(o),
+                (DiffOption o) => Different(o),
                 errors => 1); 
             return exitCode;
+        }
+
+        private static int Different(DiffOption o)
+        {
+            var commit = OidConverter(o.Commit);
+            var tree = baseOperator.GetCommit(commit).Tree;
+            var result = diff.DiffTree(baseOperator.GetTree(tree), baseOperator.GetWorkingTree());
+            Console.WriteLine(result);
+            return 0;
         }
 
         private static int Show(ShowOption o)

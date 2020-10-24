@@ -55,6 +55,8 @@ dotnet ../ugit.dll reset fcf448a43cb07899ad1db21ba3b3e31a0386b2ef
 
 dotnet ../ugit.dll show
 
+dotnet ../ugit.dll diff
+
 Set-Location "../"
 
 Write-Host "Done"
