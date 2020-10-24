@@ -39,7 +39,8 @@ namespace Ugit
                 KOption,
                 BranchOption,
                 StatusOption,
-                ResetOption>(args).MapResult(
+                ResetOption,
+                ShowOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -53,8 +54,30 @@ namespace Ugit
                 (BranchOption o) => Branch(o),
                 (StatusOption o) => Status(o),
                 (ResetOption o) => Reset(o),
+                (ShowOption o) => Show(o),
                 errors => 1); 
             return exitCode;
+        }
+
+        private static int Show(ShowOption o)
+        {
+            string oid = OidConverter(o.Oid);
+            if(string.IsNullOrEmpty(oid))
+            {
+                return 0;
+            }
+
+            var commit = baseOperator.GetCommit(oid);
+            PrintCommit(oid, commit);
+            return 0;
+        }
+
+        private static void PrintCommit(string oid, Commit commit, IEnumerable<string> @ref=null)
+        {
+            string refStr = @ref != null ? $"({string.Join(',', @ref)})" : "";
+            Console.WriteLine($"commit {oid}{refStr}\n");
+            Console.WriteLine($"{commit.Message}     ");
+            Console.WriteLine("");
         }
 
         private static int Reset(ResetOption o)
@@ -184,11 +207,8 @@ namespace Ugit
 
             foreach (var objectId in baseOperator.IterCommitsAndParents(new string[] { oid }))
             {
-                var commit = baseOperator.GetCommit(oid);
-                string refStr = refs.ContainsKey(objectId) ? $"({string.Join(',', refs[objectId])})" : "";
-                Console.WriteLine($"commit {objectId}{refStr}\n");
-                Console.WriteLine(commit.Message + "    ");
-                Console.WriteLine("");
+                var commit = baseOperator.GetCommit(objectId);
+                PrintCommit(objectId, commit, refs.ContainsKey(objectId) ? refs[objectId]: null);
             }
 
             return 0;

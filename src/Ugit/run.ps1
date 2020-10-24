@@ -51,6 +51,8 @@ dotnet ../ugit.dll branch
 
 dotnet ../ugit.dll reset 5ef1ea5b6f1342f6d79d9109216598af8cf04621
 
+dotnet ../ugit.dll show
+
 Set-Location "../"
 
 Write-Host "Done"
