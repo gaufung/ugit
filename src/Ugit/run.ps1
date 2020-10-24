@@ -9,9 +9,9 @@ Set-Location "test"
 
 dotnet ../ugit.dll init
 
-dotnet ../ugit.dll status
-
 Copy-Item "../data/hello.txt" "./"
+
+dotnet ../ugit.dll status
 
 dotnet ../ugit.dll hash-object "hello.txt"
 

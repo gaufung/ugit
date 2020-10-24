@@ -55,5 +55,33 @@ namespace Ugit
                 .Select(t => DiffBlob(t.Item2.First(), t.Item2.Last(), t.Item1))
                 );
         }
+
+        public IEnumerable<(string, string)> IterChangedFiles(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
+        {
+            foreach(var entry in CompareTrees(fromTree, toTree))
+            {
+                string path = entry.Item1;
+                string fromOid = entry.Item2.First();
+                string toOid = entry.Item2.Last();
+                if(fromOid!=toOid)
+                {
+                    string action;
+                    if (string.IsNullOrEmpty(fromOid))
+                    {
+                        action = "new file";
+                    }
+                    else if (string.IsNullOrEmpty(toOid))
+                    {
+                        action = "deleted";
+                    }
+                    else
+                    {
+                        action = "modified";
+                    }
+
+                    yield return (path, action);
+                }
+            }
+        }
     }
 }

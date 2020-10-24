@@ -75,5 +75,30 @@ namespace Ugit
             });
             Assert.AreEqual(exepcted, diff.DiffTree(fromTree, toTree));
         }
+
+        [TestMethod]
+        public void IterChangedFilesTest()
+        {
+            Dictionary<string, string> fromTree = new Dictionary<string, string>
+            {
+                { "hello.txt", "foo" },
+                { "world.txt", "bar" },
+                { "ugit.txt", "baz" },
+            };
+            Dictionary<string, string> toTree = new Dictionary<string, string>
+            {
+                { "hello.txt", "foo1" },
+                { "world.txt", "bar" },
+                { "helloWorld.txt", "foobar" },
+            };
+
+            (string, string)[] actual = diff.IterChangedFiles(fromTree, toTree).ToArray();
+            CollectionAssert.AreEqual(new (string, string)[]
+            {
+                ("hello.txt", "modified"),
+                ("ugit.txt", "deleted"),
+                ("helloWorld.txt", "new file"),
+            }, actual);
+        }
     }
 }
