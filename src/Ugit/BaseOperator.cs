@@ -289,5 +289,10 @@ namespace Ugit
 
             return result;
         }
+
+        public void Merge(string other)
+        {
+            
+        }
     }
 }

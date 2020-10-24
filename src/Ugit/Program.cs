@@ -44,7 +44,8 @@ namespace Ugit
                 StatusOption,
                 ResetOption,
                 ShowOption,
-                DiffOption>(args).MapResult(
+                DiffOption,
+                MergeOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -60,8 +61,15 @@ namespace Ugit
                 (ResetOption o) => Reset(o),
                 (ShowOption o) => Show(o),
                 (DiffOption o) => Different(o),
+                (MergeOption o) => Merge(o),
                 errors => 1); 
             return exitCode;
+        }
+
+        private static int Merge(MergeOption o)
+        {
+            baseOperator.Merge(o.Commit);
+            return 0;
         }
 
         private static int Different(DiffOption o)

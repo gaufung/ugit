@@ -32,5 +32,7 @@ namespace Ugit
         IDictionary<string, string> GetTree(string treeOid, string basePath = "");
 
         IDictionary<string, string> GetWorkingTree();
+
+        void Merge(string other);
     }
 }
