@@ -28,5 +28,7 @@ namespace Ugit
         IEnumerable<string> IterBranchNames();
 
         void Reset(string oid);
+
+        IDictionary<string, string> GetTree(string treeOid, string basePath = "");
     }
 }

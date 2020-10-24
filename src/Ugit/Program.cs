@@ -14,6 +14,8 @@ namespace Ugit
 
         static readonly IBaseOperator baseOperator;
 
+        static readonly IDiff diff;
+
         static readonly Func<string, string> OidConverter;
 
         static Program()
@@ -21,6 +23,7 @@ namespace Ugit
             fileSystem = new FileSystem();
             dataProvider = new DataProvider();
             baseOperator = new BaseOperator(fileSystem, dataProvider);
+            diff = new Diff();
             OidConverter = baseOperator.GetOid;
         }
 
@@ -68,7 +71,16 @@ namespace Ugit
             }
 
             var commit = baseOperator.GetCommit(oid);
+
+            string parentTree = null;
+            if (!string.IsNullOrEmpty(commit.Parent))
+            {
+                parentTree = baseOperator.GetCommit(commit.Parent).Tree;
+            }
+
             PrintCommit(oid, commit);
+            var result = diff.DiffTree(baseOperator.GetTree(parentTree), baseOperator.GetTree(commit.Tree));
+            Console.WriteLine(result);
             return 0;
         }
 

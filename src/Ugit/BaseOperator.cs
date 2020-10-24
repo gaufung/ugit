@@ -59,7 +59,7 @@ namespace Ugit
             }
         }
 
-        private IDictionary<string, string> GetTree(string treeOid, string basePath = "")
+        public IDictionary<string, string> GetTree(string treeOid, string basePath = "")
         {
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var (type, oid, name) in IterTreeEntry(treeOid))
