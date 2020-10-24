@@ -92,9 +92,9 @@ namespace Ugit
             var commit = baseOperator.GetCommit(oid);
 
             string parentTree = null;
-            if (!string.IsNullOrEmpty(commit.Parent))
+            if (commit.Parents.Count > 0)
             {
-                parentTree = baseOperator.GetCommit(commit.Parent).Tree;
+                parentTree = baseOperator.GetCommit(commit.Parents[0]).Tree;
             }
 
             PrintCommit(oid, commit);
@@ -159,9 +159,9 @@ namespace Ugit
             {
                 var commit = baseOperator.GetCommit(oid);
                 dot += $"\"{oid}\" [shape=box style=filled label=\"{oid.Substring(0, 10)}\"]\n";
-                if (!string.IsNullOrWhiteSpace(commit.Parent))
+                foreach (var parent in commit.Parents)
                 {
-                    dot += $"\"{oid}\" -> \"{commit.Parent}\"\n";
+                    dot += $"\"{oid}\" -> \"{parent}\"\n";
                 }
             }
 

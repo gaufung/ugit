@@ -135,6 +135,7 @@ namespace Ugit
 
         public Commit GetCommit(string oid)
         {
+            var parents = new List<string>();
             var commit = dataProvider.GetObject(oid, "commit").Decode();
             string[] lines = commit.Split("\n");
             string tree=null, parent=null;
@@ -153,7 +154,7 @@ namespace Ugit
                 }
                 if (tokens[0].Equals("parent"))
                 {
-                    parent = tokens[1];
+                    parents.Add(tokens[1]);
                 }
             }
 
@@ -161,7 +162,7 @@ namespace Ugit
             return new Commit
             {
                 Tree = tree,
-                Parent = parent,
+                Parents = parents,
                 Message = message
             };
         }
@@ -230,7 +231,13 @@ namespace Ugit
                 yield return oid;
 
                 var commit = GetCommit(oid);
-                oidQueue.AddToFront(commit.Parent);
+                oidQueue.AddToFront(commit.Parents.FirstOrDefault());
+                if (commit.Parents.Count > 1)
+                {
+                    commit.Parents.TakeLast(commit.Parents.Count - 1)
+                        .ToList()
+                        .ForEach(id => oidQueue.AddToBack(id));
+                }
             }
         }
 

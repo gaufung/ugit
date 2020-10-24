@@ -171,7 +171,7 @@ namespace Ugit
             dataProviderMock.Setup(f => f.GetObject(oid, "commit")).Returns(commitMessage.Encode());
             var commit = baseOperator.GetCommit(oid);
             Assert.AreEqual("foo", commit.Tree);
-            Assert.AreEqual("bar", commit.Parent);
+            Assert.AreEqual("bar", commit.Parents[0]);
             Assert.AreEqual("Hello world\nThis is from ugit", commit.Message);
         }
 
