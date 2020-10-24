@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Nito.Collections;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using CommandLine.Text;
-using Nito.Collections;
 
 namespace Ugit
 {
@@ -15,10 +14,13 @@ namespace Ugit
 
         private readonly IDataProvider dataProvider;
 
-        public BaseOperator(IFileSystem fileSystem, IDataProvider dataprovider)
+        private readonly IDiff diff;
+
+        public BaseOperator(IFileSystem fileSystem, IDataProvider dataprovider, IDiff diff)
         {
             this.fileSystem = fileSystem;
             this.dataProvider = dataprovider;
+            this.diff = diff;
         }
 
         public string WriteTree(string directory = ".")
@@ -55,7 +57,10 @@ namespace Ugit
             foreach (string entry in tree.Decode().Split("\n"))
             {
                 string[] tokens = entry.Split(' ');
-                yield return (tokens[0], tokens[1], tokens[2]);
+                if(tokens.Length >= 3)
+                {
+                    yield return (tokens[0], tokens[1], tokens[2]);
+                }
             }
         }
 
@@ -177,7 +182,7 @@ namespace Ugit
                 HEAD = RefValue.Create(false, oid);
             }
 
-            dataProvider.UpdateRef("HEAD", HEAD);
+            dataProvider.UpdateRef("HEAD", HEAD, false);
         }
 
         public void CreateTag(string name, string oid)
@@ -292,7 +297,23 @@ namespace Ugit
 
         public void Merge(string other)
         {
-            
+            string head = dataProvider.GetRef("HEAD").Value;
+            var headCommit = GetCommit(head);
+            var otherCommit = GetCommit(other);
+            ReadTreeMerged(headCommit.Tree, otherCommit.Tree);
+            Console.WriteLine("Merged in working tree");
+        }
+
+        private void ReadTreeMerged(string headOid, string otherOid)
+        {
+            EmptyCurrentDirectory();
+            foreach (var entry in diff.MergeTree(GetTree(headOid), GetTree(otherOid)))
+            {
+                string path = entry.Key;
+                string blob = entry.Value;
+                this.fileSystem.CreateParentDirectory(path);
+                fileSystem.File.WriteAllBytes(path, blob.Encode());
+            }
         }
     }
 }

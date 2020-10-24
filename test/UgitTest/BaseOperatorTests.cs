@@ -2,6 +2,8 @@
 using Moq;
 using NuGet.Frameworks;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -20,6 +22,8 @@ namespace Ugit
 
         private Mock<IFile> fileMock;
 
+        private Mock<IDiff> diffMock;
+
         private IBaseOperator baseOperator;
 
         [TestInitialize]
@@ -29,7 +33,8 @@ namespace Ugit
             dataProviderMock = new Mock<IDataProvider>();
             directoryMock = new Mock<IDirectory>();
             fileMock = new Mock<IFile>();
-            baseOperator = new BaseOperator(fileSystemMock.Object, dataProviderMock.Object);
+            diffMock = new Mock<IDiff>();
+            baseOperator = new BaseOperator(fileSystemMock.Object, dataProviderMock.Object, diffMock.Object);
         }
 
         [TestMethod]
@@ -188,7 +193,7 @@ namespace Ugit
             directoryMock.Setup(d => d.Exists(".")).Returns(true);
             fileMock.Setup(f => f.WriteAllBytes(Path.Join(".", "hello.txt"), null));
             dataProviderMock.Setup(d => d.GetObject("bar", "blob")).Returns((byte[])null);
-            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(false, oid), true));
+            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(false, oid), false));
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             baseOperator.Checkout(oid);
@@ -219,7 +224,7 @@ namespace Ugit
             directoryMock.Setup(d => d.Exists(".")).Returns(true);
             fileMock.Setup(f => f.WriteAllBytes(Path.Join(".", "hello.txt"), null));
             dataProviderMock.Setup(d => d.GetObject("bar", "blob")).Returns((byte[])null);
-            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", name)), true));
+            dataProviderMock.Setup(d => d.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", name)), false));
             fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             baseOperator.Checkout(name);
@@ -344,6 +349,39 @@ namespace Ugit
             var actual = baseOperator.GetWorkingTree();
             Assert.IsTrue(actual.ContainsKey("foo.txt"));
             Assert.AreEqual("bar", actual["foo.txt"]);
+        }
+
+        [TestMethod]
+        public void MergeTest()
+        {
+            dataProviderMock.Setup(d => d.GetRef("HEAD", true)).Returns(RefValue.Create(false, "foo"));
+            dataProviderMock.Setup(d => d.GetObject("foo", "commit")).Returns(string.Join("\n", new string[]
+            {
+                "tree foo1",
+                "parent foo2",
+                "",
+                "this is for foo"
+            }).Encode());
+
+            string other = "bar";
+            dataProviderMock.Setup(d => d.GetObject("bar", "commit")).Returns(string.Join("\n", new string[]
+            {
+                "tree bar1",
+                "parent bar2",
+                "",
+                "this is for bar"
+            }).Encode());
+            directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(Array.Empty<string>());
+            directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(Array.Empty<string>());
+            diffMock.Setup(d => d.MergeTree(It.IsAny<Dictionary<string, string>>(), It.IsAny<Dictionary<string, string>>())).Returns(new Dictionary<string, string>() { { "foo.txt", "this is foo"} });
+            fileMock.Setup(f => f.WriteAllBytes("foo.txt", It.IsAny<byte[]>()));
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            fileSystemMock.Setup(f => f.Directory).Returns(directoryMock.Object);
+            baseOperator.Merge(other);
+            directoryMock.VerifyAll();
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+            diffMock.VerifyAll();
         }
     }
 }

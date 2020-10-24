@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,11 +16,20 @@ namespace Ugit
 
         private Mock<IDataProvider> dataproviderMock;
 
+        private Mock<IDiffProxy> diffProxyMock;
+
+        private Mock<IFileSystem> fileSystemMock;
+
+        private Mock<IFile> fileMock;
+
         [TestInitialize]
         public void Init()
         {
             dataproviderMock = new Mock<IDataProvider>();
-            diff = new Diff(dataproviderMock.Object);
+            diffProxyMock = new Mock<IDiffProxy>();
+            fileSystemMock = new Mock<IFileSystem>();
+            fileMock = new Mock<IFile>();
+            diff = new Diff(dataproviderMock.Object, diffProxyMock.Object, fileSystemMock.Object);
         }
 
         [TestMethod]
@@ -65,15 +75,25 @@ namespace Ugit
                 { "hello.txt", "foo1" },
                 { "world.txt", "bar" },
             };
-
-            string exepcted = string.Join("\n", new string[]
+            fileMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
+            diffProxyMock.Setup(d => d.Execute("diff", It.IsAny<string>())).Returns<string, string>( (_, args) => 
             {
-                "--- a/hello.txt",
-                "+++ b/hello.txt",
-                "--- a/ugit.txt",
-                "+++ b/ugit.txt",
+                if (args.Contains("hello.txt"))
+                {
+                    return (0, "foo", "");
+                }
+
+                if(args.Contains("ugit.txt"))
+                {
+                    return (0, "bar", "");
+                }
+
+                return (-1, "", "");
+
             });
-            Assert.AreEqual(exepcted, diff.DiffTree(fromTree, toTree));
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            string actual = diff.DiffTree(fromTree, toTree);
+            Assert.AreEqual("foo\nbar", actual);
         }
 
         [TestMethod]
@@ -99,6 +119,27 @@ namespace Ugit
                 ("ugit.txt", "deleted"),
                 ("helloWorld.txt", "new file"),
             }, actual);
+        }
+
+        [TestMethod]
+        public void MergeTreeTest()
+        {
+            Dictionary<string, string> headTree = new Dictionary<string, string>
+            {
+                { "hello.txt", "foo" },
+            };
+            Dictionary<string, string> otherTree = new Dictionary<string, string>
+            {
+                { "hello.txt", "foo1" },
+            };
+
+            dataproviderMock.Setup(d => d.GetObject("foo", "blob")).Returns("hello".Encode());
+            dataproviderMock.Setup(d => d.GetObject("foo1", "blob")).Returns("Hello".Encode());
+            fileMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
+            diffProxyMock.Setup(d => d.Execute(It.IsAny<string>(), It.IsAny<string>())).Returns((0, "Hello", ""));
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            var acutal = diff.MergeTree(headTree, otherTree);
+            Assert.AreEqual("Hello", acutal["hello.txt"]);
         }
     }
 }

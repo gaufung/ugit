@@ -1,5 +1,6 @@
-﻿using DiffPlex.DiffBuilder;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 
 namespace Ugit
@@ -8,9 +9,15 @@ namespace Ugit
     {
         private readonly IDataProvider dataProvider;
 
-        public Diff(IDataProvider dataProvider)
+        private readonly IDiffProxy diffProxy;
+
+        private readonly IFileSystem fileSystem;
+
+        public Diff(IDataProvider dataProvider, IDiffProxy diffProxy, IFileSystem fileSystem)
         {
             this.dataProvider = dataProvider;
+            this.diffProxy = diffProxy;
+            this.fileSystem = fileSystem;
         }
 
         public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params IDictionary<string, string>[] trees)
@@ -40,10 +47,14 @@ namespace Ugit
 
         public string DiffBlob(string fromOid, string toOid, string path)
         {
-            string fromText = dataProvider.GetObject(fromOid).Decode();
-            string toText = dataProvider.GetObject(toOid).Decode();
-            var model = InlineDiffBuilder.Diff(fromText, toText);
-            return model.Show(path);
+            string fromFile = Path.GetTempFileName();
+            fileSystem.File.WriteAllBytes(fromFile, dataProvider.GetObject(fromOid));
+            string toFile = Path.GetTempFileName();
+            fileSystem.File.WriteAllBytes(toFile, dataProvider.GetObject(toOid));
+            var (_, output, _) = diffProxy.Execute("diff",
+                $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
+            return output;
+
         }
 
         public string DiffTree(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
@@ -82,6 +93,30 @@ namespace Ugit
                     yield return (path, action);
                 }
             }
+        }
+
+        public string MergeBlob(string headOid, string otherOid)
+        {
+            string headFile = Path.GetTempFileName();
+            fileSystem.File.WriteAllBytes(headFile, dataProvider.GetObject(headOid));
+            string otherFile = Path.GetTempFileName();
+            fileSystem.File.WriteAllBytes(otherFile, dataProvider.GetObject(otherOid));
+            string arguments = string.Join(" ", new string[] { "-DHEAD", headFile, otherFile });
+            var (_, output, _) = diffProxy.Execute("diff", arguments);
+            return output;
+        }
+
+        public IDictionary<string, string> MergeTree(IDictionary<string, string> headTree, IDictionary<string, string> otherTree)
+        {
+            var tree = new Dictionary<string, string>();
+            foreach (var entry in CompareTrees(headTree, otherTree))
+            {
+                string path = entry.Item1;
+                string headOid = entry.Item2.First();
+                string otherOid = entry.Item2.Last();
+                tree[path] = MergeBlob(headOid, otherOid);
+            }
+            return tree;
         }
     }
 }

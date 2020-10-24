@@ -11,5 +11,9 @@ namespace Ugit
         string DiffBlob(string fromOid, string toOid, string path);
 
         IEnumerable<(string, string)> IterChangedFiles(IDictionary<string, string> fromTree, IDictionary<string, string> toTree);
+
+        IDictionary<string, string> MergeTree(IDictionary<string, string> headTree, IDictionary<string, string> otherTree);
+
+        string MergeBlob(string headOid, string otherOid);
     }
 }

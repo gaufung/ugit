@@ -22,8 +22,8 @@ namespace Ugit
         {
             fileSystem = new FileSystem();
             dataProvider = new DataProvider();
-            baseOperator = new BaseOperator(fileSystem, dataProvider);
-            diff = new Diff(dataProvider);
+            diff = new Diff(dataProvider, new DefaultDiffProxy(), fileSystem);
+            baseOperator = new BaseOperator(fileSystem, dataProvider, diff);
             OidConverter = baseOperator.GetOid;
         }
 
