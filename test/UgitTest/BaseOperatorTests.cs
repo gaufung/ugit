@@ -384,5 +384,29 @@ namespace Ugit
             fileSystemMock.VerifyAll();
             diffMock.VerifyAll();
         }
+
+        [TestMethod]
+        public void GetMergeBaseTest()
+        {
+            dataProviderMock.Setup(d => d.GetObject("foo", "commit")).Returns(string.Join("\n", new[]
+            {
+                "tree foo",
+                "parent foobar",
+                "",
+                "this is for foo"
+            }).Encode());
+
+            dataProviderMock.Setup(d => d.GetObject("bar", "commit")).Returns(string.Join("\n", new[]
+            {
+                "tree bar",
+                "parent foobar",
+                "",
+                "this is for bar"
+            }).Encode());
+
+            string acutal = baseOperator.GetMergeBase("foo", "bar");
+            Assert.AreEqual("foobar", acutal);
+            dataProviderMock.VerifyAll();
+        }
     }
 }

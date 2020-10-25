@@ -331,5 +331,16 @@ namespace Ugit
                 fileSystem.File.WriteAllBytes(path, blob.Encode());
             }
         }
+
+        public string GetMergeBase(string oid1, string oid2)
+        {
+            IEnumerable<string> parents = IterCommitsAndParents(new [] { oid1 });
+            foreach (var oid in IterCommitsAndParents(new[] { oid2 }))
+            {
+                if (parents.Contains(oid))
+                    return oid;
+            }
+            return null;
+        }
     }
 }

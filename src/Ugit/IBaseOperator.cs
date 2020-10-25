@@ -34,5 +34,7 @@ namespace Ugit
         IDictionary<string, string> GetWorkingTree();
 
         void Merge(string other);
+
+        string GetMergeBase(string oid1, string oid2);
     }
 }
