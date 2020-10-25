@@ -131,6 +131,12 @@ namespace Ugit
                 Console.WriteLine($"On branch {branch}");
             }
 
+            string mergeHead = dataProvider.GetRef("MERGE_HEAD").Value;
+            if(!string.IsNullOrEmpty(mergeHead))
+            {
+                Console.WriteLine($"Merging with {mergeHead.Substring(0, 10)}");
+            }
+
             Console.WriteLine("\nChanges to be committed:\n");
             string headTree = baseOperator.GetCommit(head).Tree;
             foreach (var (path, action) in diff.IterChangedFiles(baseOperator.GetTree(headTree), baseOperator.GetWorkingTree()))

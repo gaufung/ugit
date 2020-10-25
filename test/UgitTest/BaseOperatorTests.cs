@@ -371,6 +371,7 @@ namespace Ugit
                 "",
                 "this is for bar"
             }).Encode());
+            dataProviderMock.Setup(d => d.UpdateRef("MERGE_HEAD", RefValue.Create(false, "bar"), true));
             directoryMock.Setup(d => d.EnumerateDirectories(".")).Returns(Array.Empty<string>());
             directoryMock.Setup(d => d.EnumerateFiles(".")).Returns(Array.Empty<string>());
             diffMock.Setup(d => d.MergeTree(It.IsAny<Dictionary<string, string>>(), It.IsAny<Dictionary<string, string>>())).Returns(new Dictionary<string, string>() { { "foo.txt", "this is foo"} });

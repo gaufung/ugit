@@ -125,6 +125,13 @@ namespace Ugit
                 commit += $"parent {HEAD}\n";
             }
 
+            string mergeHead = dataProvider.GetRef("MERGE_HEAD").Value;
+            if(!string.IsNullOrEmpty(mergeHead))
+            {
+                commit += $"parent {mergeHead}\n";
+                dataProvider.DeleteRef("MERGE_HEAD", false);
+            }
+
             commit += "\n";
             commit += $"{message}\n";
 
@@ -307,8 +314,10 @@ namespace Ugit
             string head = dataProvider.GetRef("HEAD").Value;
             var headCommit = GetCommit(head);
             var otherCommit = GetCommit(other);
+
+            dataProvider.UpdateRef("MERGE_HEAD", RefValue.Create(false, other));
             ReadTreeMerged(headCommit.Tree, otherCommit.Tree);
-            Console.WriteLine("Merged in working tree");
+            Console.WriteLine("Merged in working tree\nPlease commit");
         }
 
         private void ReadTreeMerged(string headOid, string otherOid)
