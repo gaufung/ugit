@@ -92,14 +92,30 @@ namespace Ugit
         {
             if ("HEAD".StartsWith(prefix))
             {
-                yield return ("HEAD", GetRef("HEAD"));
+                if(!string.IsNullOrEmpty(GetRef("HEAD", deref).Value))
+                {
+                    yield return ("HEAD", GetRef("HEAD", deref));
+                }
+            }
+            if ("MERGE_HEAD".StartsWith(prefix))
+            {
+                if (!string.IsNullOrEmpty(GetRef("MERGE_HEAD", deref).Value))
+                {
+                    yield return ("MERGE_HEAD", GetRef("MERGE_HEAD", deref));
+                }
             }
             string refDirectory = Path.Join(GitDir, "refs");
             foreach (var filePath in fileSystem.Walk(refDirectory))
             {
                 string refName = Path.GetRelativePath(GitDir, filePath);
                 if (refName.StartsWith(prefix))
-                    yield return (refName, GetRef(refName, deref));
+                {
+                    var @ref = GetRef(refName, deref);
+                    if (!string.IsNullOrEmpty(@ref.Value))
+                    {
+                        yield return (refName, @ref);
+                    }
+                }
             }
         }
 
