@@ -1,4 +1,4 @@
-![Build](https://github.com/gaufung/ugit/workflows/.github/workflows/dotnet-core.yml/badge.svg)
+![.Net Core Build](https://github.com/gaufung/ugit/workflows/.NET%20Core/badge.svg)
 
 
 
