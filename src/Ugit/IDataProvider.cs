@@ -22,5 +22,9 @@ namespace Ugit
         IEnumerable<(string, RefValue)> IterRefs(string prefix = "", bool deref=true);
 
         void DeleteRef(string @ref, bool deref = true);
+
+        Dictionary<string, string> GetIndex();
+
+        void SetIndex(Dictionary<string, string> index);
     }
 }

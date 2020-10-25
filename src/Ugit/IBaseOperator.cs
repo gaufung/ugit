@@ -3,9 +3,9 @@ namespace Ugit
 {
     internal interface IBaseOperator
     {
-        string WriteTree(string directory = ".");
+        string WriteTree();
 
-        void ReadTree(string treeOid);
+        void ReadTree(string treeOid, bool updateWorking = false);
 
         string Commit(string message);
 
@@ -36,5 +36,10 @@ namespace Ugit
         void Merge(string other);
 
         string GetMergeBase(string oid1, string oid2);
+
+        void Add(IEnumerable<string> fileNames);
+
+        Dictionary<string, string> GetIndexTree();
+
     }
 }

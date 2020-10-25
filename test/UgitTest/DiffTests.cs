@@ -135,11 +135,12 @@ namespace Ugit
 
             dataproviderMock.Setup(d => d.GetObject("foo", "blob")).Returns("hello".Encode());
             dataproviderMock.Setup(d => d.GetObject("foo1", "blob")).Returns("Hello".Encode());
+            dataproviderMock.Setup(d => d.HashObject(It.IsAny<byte[]>(), "blob")).Returns("foo");
             fileMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
             diffProxyMock.Setup(d => d.Execute(It.IsAny<string>(), It.IsAny<string>())).Returns((0, "Hello", ""));
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             var acutal = diff.MergeTree(headTree, otherTree);
-            Assert.AreEqual("Hello", acutal["hello.txt"]);
+            Assert.AreEqual("foo", acutal["hello.txt"]);
         }
     }
 }

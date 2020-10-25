@@ -23,28 +23,62 @@ namespace Ugit
             this.diff = diff;
         }
 
-        public string WriteTree(string directory = ".")
+        public string WriteTree()
+        {
+            IDictionary<string, object> indexAsTree = new Dictionary<string, object>();
+            Dictionary<string, string> index = dataProvider.GetIndex();
+            foreach (var entry in index)
+            {
+                string path = entry.Key;
+                string oid = entry.Value;
+                string[] tokens = path.Split(Path.DirectorySeparatorChar);
+                var current = indexAsTree;
+                if (tokens.Length == 1)
+                {
+                    string fileName = tokens[0];
+                    current[fileName] = oid;
+                }
+                else
+                {
+                    string fileName = tokens[^1];
+                    string[] dirPath = tokens.Take(tokens.Length - 1).ToArray();
+                    foreach (var dirName in dirPath)
+                    {
+                        if (!current.ContainsKey(dirName))
+                        {
+                            current[dirName] = new Dictionary<string, object>();
+
+                        }
+                        current = current[dirName] as IDictionary<string, object>;
+                    }
+                    current[fileName] = oid;
+                }
+            }
+            dataProvider.SetIndex(index);
+            return WriteTreeRecursive(indexAsTree);
+        }
+
+        private string WriteTreeRecursive(IDictionary<string, object> treeDict)
         {
             List<(string, string, string)> entries = new List<(string, string, string)>();
-            foreach (var filePath in fileSystem.Directory.EnumerateFiles(directory))
+            foreach (var entry in treeDict)
             {
-                if (IsIgnore(filePath)) continue;
-                byte[] data = fileSystem.File.ReadAllBytes(filePath);
-                string name = Path.GetRelativePath(directory, filePath);
-                string oid = dataProvider.HashObject(data);
-                string type = "blob";
-                entries.Add((name, oid, type));
+                if (entry.Value is IDictionary<string, object> val)
+                {
+                    string type = "tree";
+                    string oid = WriteTreeRecursive(val);
+                    string name = entry.Key;
+                    entries.Add((name, oid, type));
+                }
+                else
+                {
+                    string type = "blob";
+                    string oid = entry.Value as string;
+                    string name = entry.Key;
+                    entries.Add((name, oid, type));
+                }
             }
-            foreach (var directoryPath in fileSystem.Directory.EnumerateDirectories(directory))
-            {
-                if (IsIgnore(directoryPath)) continue;
-                string oid = WriteTree(directoryPath);
-                string name = Path.GetRelativePath(directory, directoryPath);
-                string type = "tree";
-                entries.Add((name, oid, type));
-            }
-            // type oid name
-            string tree = string.Join("\n", 
+            string tree = string.Join("\n",
                 entries.Select(e => $"{e.Item3} {e.Item2} {e.Item1}"));
             return dataProvider.HashObject(tree.Encode(), "tree");
         }
@@ -101,16 +135,27 @@ namespace Ugit
             }
         }
 
-        public void ReadTree(string treeOid)
+        public void ReadTree(string treeOid,bool updateWorking=false)
+        {
+            var index = dataProvider.GetIndex();
+            index.Clear();
+            index.Update(GetTree(treeOid));
+            if (updateWorking)
+            {
+                CheckoutIndex(index);
+            }
+            dataProvider.SetIndex(index);
+        }
+
+        private void CheckoutIndex(Dictionary<string, string> index)
         {
             EmptyCurrentDirectory();
-            foreach (var entry in GetTree(treeOid, "."))
+            foreach (var entry in index)
             {
                 string path = entry.Key;
                 string oid = entry.Value;
                 fileSystem.CreateParentDirectory(path);
-                byte[] data = dataProvider.GetObject(oid);
-                fileSystem.File.WriteAllBytes(path, data);
+                fileSystem.File.WriteAllBytes(path, dataProvider.GetObject(oid, "blob"));
             }
         }
 
@@ -178,7 +223,7 @@ namespace Ugit
         {
             string oid = GetOid(name);
             var commit = GetCommit(oid);
-            ReadTree(commit.Tree);
+            ReadTree(commit.Tree, true);
 
             RefValue HEAD;
             if(IsBranch(name))
@@ -318,27 +363,27 @@ namespace Ugit
 
             if (mergeBase == head)
             {
-                ReadTree(otherCommit.Tree);
+                ReadTree(otherCommit.Tree, true);
                 dataProvider.UpdateRef("HEAD", RefValue.Create(false, other));
                 Console.WriteLine("Fast-forwad, no need to commit");
                 return;
             }
 
             dataProvider.UpdateRef("MERGE_HEAD", RefValue.Create(false, other));
-            ReadTreeMerged(headCommit.Tree, otherCommit.Tree);
+            ReadTreeMerged(headCommit.Tree, otherCommit.Tree, true);
             Console.WriteLine("Merged in working tree\nPlease commit");
         }
 
-        private void ReadTreeMerged(string headOid, string otherOid)
+        private void ReadTreeMerged(string headTree, string otherTree, bool updateWorking = false)
         {
-            EmptyCurrentDirectory();
-            foreach (var entry in diff.MergeTree(GetTree(headOid), GetTree(otherOid)))
+            var index = dataProvider.GetIndex();
+            index.Clear();
+            index.Update(diff.MergeTree(GetTree(headTree), GetTree(otherTree)));
+            if (updateWorking)
             {
-                string path = entry.Key;
-                string blob = entry.Value;
-                this.fileSystem.CreateParentDirectory(path);
-                fileSystem.File.WriteAllBytes(path, blob.Encode());
+                CheckoutIndex(index);
             }
+            dataProvider.SetIndex(index);
         }
 
         public string GetMergeBase(string oid1, string oid2)
@@ -350,6 +395,50 @@ namespace Ugit
                     return oid;
             }
             return null;
+        }
+
+        public void Add(IEnumerable<string> fileNames)
+        {
+            var index = dataProvider.GetIndex();
+
+            foreach (var name in fileNames)
+            {
+                if(fileSystem.File.Exists(name))
+                {
+                    AddFile(index, name);
+                }
+                else if (fileSystem.Directory.Exists(name))
+                {
+                    AddDirecotry(index, name);
+                }
+            }
+
+            dataProvider.SetIndex(index);
+        }
+
+        private void AddFile(IDictionary<string, string> index, string fileName)
+        {
+            var normalFileName = Path.GetRelativePath(".", fileName);
+            byte[] data = fileSystem.File.ReadAllBytes(normalFileName);
+            string oid = dataProvider.HashObject(data);
+            index[normalFileName] = oid;
+        }
+
+        private void AddDirecotry(IDictionary<string, string> index, string dirName)
+        {
+            foreach (var fileName in fileSystem.Walk(dirName))
+            {
+                if(!IsIgnore(fileName))
+                {
+                    AddFile(index, fileName);
+                }
+                    
+            }
+        }
+
+        public Dictionary<string, string> GetIndexTree()
+        {
+            return dataProvider.GetIndex();
         }
     }
 }

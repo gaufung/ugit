@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Text.Json;
 
 namespace Ugit
 {
@@ -148,6 +149,29 @@ namespace Ugit
             {
                 fileSystem.File.Delete(filePath);
             }
+        }
+
+        public Dictionary<string, string> GetIndex()
+        {
+            string path = Path.Join(GitDir, "index");
+            if(fileSystem.File.Exists(path))
+            {
+                var data = fileSystem.File.ReadAllBytes(path);
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
+            }
+
+            return new Dictionary<string, string>();
+        }
+
+        public void SetIndex(Dictionary<string, string> index)
+        {
+            string path = Path.Join(GitDir, "index");
+            string data = JsonSerializer.Serialize(index);
+            if(fileSystem.File.Exists(path))
+            {
+                fileSystem.File.Delete(path);
+            }
+            fileSystem.File.WriteAllText(path, data);
         }
     }
 }

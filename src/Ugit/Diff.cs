@@ -114,7 +114,7 @@ namespace Ugit
                 string path = entry.Item1;
                 string headOid = entry.Item2.First();
                 string otherOid = entry.Item2.Last();
-                tree[path] = MergeBlob(headOid, otherOid);
+                tree[path] = dataProvider.HashObject(MergeBlob(headOid, otherOid).Encode());
             }
             return tree;
         }

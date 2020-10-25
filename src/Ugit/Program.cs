@@ -46,7 +46,8 @@ namespace Ugit
                 ShowOption,
                 DiffOption,
                 MergeOption,
-                MergeBaseOption>(args).MapResult(
+                MergeBaseOption,
+                AddOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -64,8 +65,15 @@ namespace Ugit
                 (DiffOption o) => Different(o),
                 (MergeOption o) => Merge(o),
                 (MergeBaseOption o) => MergeBase(o),
+                (AddOption o) => Add(o),
                 errors => 1); 
             return exitCode;
+        }
+
+        private static int Add(AddOption o)
+        {
+            baseOperator.Add(o.Files);
+            return 0;
         }
 
         private static int MergeBase(MergeBaseOption o)
@@ -149,7 +157,13 @@ namespace Ugit
 
             Console.WriteLine("\nChanges to be committed:\n");
             string headTree = baseOperator.GetCommit(head).Tree;
-            foreach (var (path, action) in diff.IterChangedFiles(baseOperator.GetTree(headTree), baseOperator.GetWorkingTree()))
+            foreach (var (path, action) in diff.IterChangedFiles(baseOperator.GetTree(headTree), baseOperator.GetIndexTree()))
+            {
+                Console.WriteLine($"{action}   : {path}");
+            }
+
+            Console.WriteLine("\nChanges not staged for commit:\n");
+            foreach (var (path, action) in diff.IterChangedFiles(baseOperator.GetIndexTree(), baseOperator.GetWorkingTree()))
             {
                 Console.WriteLine($"{action}   : {path}");
             }
