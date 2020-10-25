@@ -313,7 +313,16 @@ namespace Ugit
         {
             string head = dataProvider.GetRef("HEAD").Value;
             var headCommit = GetCommit(head);
+            string mergeBase = GetMergeBase(other, head);
             var otherCommit = GetCommit(other);
+
+            if (mergeBase == head)
+            {
+                ReadTree(otherCommit.Tree);
+                dataProvider.UpdateRef("HEAD", RefValue.Create(false, other));
+                Console.WriteLine("Fast-forwad, no need to commit");
+                return;
+            }
 
             dataProvider.UpdateRef("MERGE_HEAD", RefValue.Create(false, other));
             ReadTreeMerged(headCommit.Tree, otherCommit.Tree);
