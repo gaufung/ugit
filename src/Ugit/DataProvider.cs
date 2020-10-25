@@ -123,5 +123,15 @@ namespace Ugit
 
             return ValueTuple.Create(@ref, RefValue.Create(symbolic, value));
         }
+
+        public void DeleteRef(string @ref, bool deref = true)
+        {
+            @ref = GetRefInternal(@ref, deref).Item1;
+            string filePath = Path.Join(GitDir, @ref);
+            if(fileSystem.File.Exists(filePath))
+            {
+                fileSystem.File.Delete(filePath);
+            }
+        }
     }
 }

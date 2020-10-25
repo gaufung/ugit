@@ -190,5 +190,18 @@ namespace Ugit
                 ValueTuple.Create(Path.Join("refs", "tags", "v1.0"), RefValue.Create(false, "bar"))
             }, refs);
         }
+
+        [TestMethod]
+        public void DeleteRefTest()
+        {
+            string @ref = Path.Join("refs", "head", "dev");
+            fileMock.Setup(f => f.Exists(Path.Join(".ugit", @ref))).Returns(true);
+            fileMock.Setup(f => f.ReadAllBytes(Path.Join(".ugit", @ref))).Returns("foo".Encode());
+            fileMock.Setup(f => f.Delete(Path.Join(".ugit", @ref)));
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            dataProvider.DeleteRef(@ref);
+            fileMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+        }
     }
 }
