@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Reflection.PortableExecutable;
-
-namespace Ugit
+﻿namespace Ugit
 {
+    using System.Collections.Generic;
+
     internal interface IDataProvider
     {
         string GitDirFullPath { get; }

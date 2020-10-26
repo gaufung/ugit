@@ -1,8 +1,8 @@
-﻿using CommandLine;
-using System.Collections.Generic;
-
-namespace Ugit.Options
+﻿namespace Ugit.Options
 {
+    using System.Collections.Generic;
+    using CommandLine;
+
     [Verb("add")]
     internal class AddOption
     {

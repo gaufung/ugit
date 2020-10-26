@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace Ugit
+﻿namespace Ugit
 {
+    using System.Diagnostics;
+
     public class DefaultDiffProxy : IDiffProxy
     {
         public (int, string, string) Execute(string name, string arguments)

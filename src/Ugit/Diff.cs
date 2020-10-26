@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-
-namespace Ugit
+﻿namespace Ugit
 {
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.Abstractions;
+    using System.Linq;
+
     internal class Diff : IDiff
     {
         private readonly IDataProvider dataProvider;
@@ -23,7 +23,7 @@ namespace Ugit
         public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params IDictionary<string, string>[] trees)
         {
             IDictionary<string, string[]> entries = new Dictionary<string, string[]>();
-            for(int i = 0; i < trees.Length; i++)
+            for (int i = 0; i < trees.Length; i++)
             {
                 IDictionary<string, string> tree = trees[i];
                 foreach (var entry in tree)
@@ -48,7 +48,7 @@ namespace Ugit
         public string DiffBlob(string fromOid, string toOid, string path)
         {
             string fromFile = Path.GetTempFileName();
-            fileSystem.File.WriteAllBytes(fromFile, dataProvider.GetObject(fromOid));
+            this.fileSystem.File.WriteAllBytes(fromFile, dataProvider.GetObject(fromOid));
             string toFile = Path.GetTempFileName();
             fileSystem.File.WriteAllBytes(toFile, dataProvider.GetObject(toOid));
             var (_, output, _) = diffProxy.Execute("diff",
@@ -69,12 +69,12 @@ namespace Ugit
 
         public IEnumerable<(string, string)> IterChangedFiles(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
         {
-            foreach(var entry in CompareTrees(fromTree, toTree))
+            foreach (var entry in CompareTrees(fromTree, toTree))
             {
                 string path = entry.Item1;
                 string fromOid = entry.Item2.First();
                 string toOid = entry.Item2.Last();
-                if(fromOid!=toOid)
+                if (fromOid!=toOid)
                 {
                     string action;
                     if (string.IsNullOrEmpty(fromOid))

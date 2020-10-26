@@ -1,7 +1,6 @@
-﻿using CommandLine;
-
-namespace Ugit.Options
+﻿namespace Ugit.Options
 {
+    using CommandLine;
 
     [Verb("checkout")]
     internal class CheckoutOption

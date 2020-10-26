@@ -1,16 +1,15 @@
-﻿using CommandLine;
-using DiffPlex.DiffBuilder.Model;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace Ugit
+﻿namespace Ugit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.Abstractions;
+    using System.Linq;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using CommandLine;
+
     internal static class Extensions
     {
         public static string Sha1HexDigest(this byte[] data)
@@ -77,30 +76,6 @@ namespace Ugit
                     yield return filepath;
                 }
             }
-        }
-
-        public static string Show(this DiffPaneModel diffPaneModel, string path)
-        {
-            IList<string> lines = new List<string>();
-            lines.Add($"--- a/{path}");
-            lines.Add($"+++ b/{path}");
-            foreach (var line in diffPaneModel.Lines)
-            {
-                if(line.Type == ChangeType.Deleted)
-                {
-                    lines.Add("-" + line.Text);
-                }
-                else if(line.Type == ChangeType.Inserted)
-                {
-                    lines.Add("+" + line.Text);
-                }
-                else
-                {
-                    lines.Add(" " + line.Text);
-                }
-            }
-
-            return string.Join("\n", lines);
         }
 
         public static ParserResult<object> ParseArguments<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12

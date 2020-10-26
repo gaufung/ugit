@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-namespace Ugit
+﻿namespace Ugit
 {
+    using System.Collections.Generic;
+
     internal interface IBaseOperator
     {
         string WriteTree();

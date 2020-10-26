@@ -1,7 +1,7 @@
-﻿using CommandLine;
-
-namespace Ugit.Options
+﻿namespace Ugit.Options
 {
+    using CommandLine;
+
     [Verb("cat-file", HelpText="Display the object by object id.")]
     internal class CatFileOption
     {

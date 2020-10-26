@@ -1,11 +1,11 @@
-﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-using Ugit.Options;
-
-namespace Ugit
+﻿namespace Ugit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO.Abstractions;
+    using CommandLine;
+    using Ugit.Options;
+
     class Program
     {
         static readonly IDataProvider dataProvider;
@@ -102,7 +102,7 @@ namespace Ugit
         private static int Show(ShowOption o)
         {
             string oid = OidConverter(o.Oid);
-            if(string.IsNullOrEmpty(oid))
+            if (string.IsNullOrEmpty(oid))
             {
                 return 0;
             }
@@ -123,10 +123,10 @@ namespace Ugit
 
         private static void PrintCommit(string oid, Commit commit, IEnumerable<string> @ref=null)
         {
-            string refStr = @ref != null ? $"({string.Join(',', @ref)})" : "";
+            string refStr = @ref != null ? $"({string.Join(',', @ref)})" : string.Empty;
             Console.WriteLine($"commit {oid}{refStr}\n");
             Console.WriteLine($"{commit.Message}     ");
-            Console.WriteLine("");
+            Console.WriteLine(string.Empty);
         }
 
         private static int Reset(ResetOption o)
@@ -140,7 +140,7 @@ namespace Ugit
         {
             string head = baseOperator.GetOid("@");
             string branch = baseOperator.GetBranchName();
-            if(string.IsNullOrEmpty(branch))
+            if (string.IsNullOrEmpty(branch))
             {
                 Console.WriteLine($"HEAD detached at {head.Substring(0, 10)}");
             }
@@ -150,7 +150,7 @@ namespace Ugit
             }
 
             string mergeHead = dataProvider.GetRef("MERGE_HEAD").Value;
-            if(!string.IsNullOrEmpty(mergeHead))
+            if (!string.IsNullOrEmpty(mergeHead))
             {
                 Console.WriteLine($"Merging with {mergeHead.Substring(0, 10)}");
             }
@@ -300,6 +300,7 @@ namespace Ugit
                 baseOperator.CreateBranch(o.Name, startPoint);
                 Console.WriteLine($"Branch {o.Name} create at {startPoint.Substring(0, 10)}");
             }
+
             return 0;
         }
     }

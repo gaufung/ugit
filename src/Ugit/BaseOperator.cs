@@ -1,13 +1,13 @@
-﻿using Nito.Collections;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-
-namespace Ugit
+﻿namespace Ugit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.IO.Abstractions;
+    using System.Linq;
+    using Nito.Collections;
+
     internal class BaseOperator : IBaseOperator
     {
         private readonly IFileSystem fileSystem;
@@ -26,7 +26,7 @@ namespace Ugit
         public string WriteTree()
         {
             IDictionary<string, object> indexAsTree = new Dictionary<string, object>();
-            Dictionary<string, string> index = dataProvider.GetIndex();
+            Dictionary<string, string> index = this.dataProvider.GetIndex();
             foreach (var entry in index)
             {
                 string path = entry.Key;
@@ -215,7 +215,7 @@ namespace Ugit
             {
                 Tree = tree,
                 Parents = parents,
-                Message = message
+                Message = message,
             };
         }
 
@@ -275,14 +275,18 @@ namespace Ugit
             Deque<string> oidQueue = new Deque<string>(oids);
             HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            while(oidQueue.Count > 0)
+            while (oidQueue.Count > 0)
             {
                 string oid = oidQueue.RemoveFromFront();
-                if (string.IsNullOrWhiteSpace(oid) || visited.Contains(oid)) continue;
+                if (string.IsNullOrWhiteSpace(oid) || visited.Contains(oid))
+                {
+                    continue;
+                }
+
                 visited.Add(oid);
                 yield return oid;
 
-                var commit = GetCommit(oid);
+                var commit = this.GetCommit(oid);
                 oidQueue.AddToFront(commit.Parents.FirstOrDefault());
                 if (commit.Parents.Count > 1)
                 {
@@ -296,7 +300,7 @@ namespace Ugit
         public void CreateBranch(string name, string oid)
         {
             string @ref = Path.Join("refs", "heads", name);
-            dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
+            this.dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
         }
 
         private bool IsBranch(string branch)
@@ -392,53 +396,55 @@ namespace Ugit
             foreach (var oid in IterCommitsAndParents(new[] { oid2 }))
             {
                 if (parents.Contains(oid))
+                {
                     return oid;
+                }
             }
+
             return null;
         }
 
         public void Add(IEnumerable<string> fileNames)
         {
-            var index = dataProvider.GetIndex();
+            var index = this.dataProvider.GetIndex();
 
             foreach (var name in fileNames)
             {
-                if(fileSystem.File.Exists(name))
+                if (this.fileSystem.File.Exists(name))
                 {
-                    AddFile(index, name);
+                    this.AddFile(index, name);
                 }
-                else if (fileSystem.Directory.Exists(name))
+                else if (this.fileSystem.Directory.Exists(name))
                 {
-                    AddDirecotry(index, name);
+                    this.AddDirecotry(index, name);
                 }
             }
 
-            dataProvider.SetIndex(index);
+            this.dataProvider.SetIndex(index);
         }
 
         private void AddFile(IDictionary<string, string> index, string fileName)
         {
             var normalFileName = Path.GetRelativePath(".", fileName);
-            byte[] data = fileSystem.File.ReadAllBytes(normalFileName);
-            string oid = dataProvider.HashObject(data);
+            byte[] data = this.fileSystem.File.ReadAllBytes(normalFileName);
+            string oid = this.dataProvider.HashObject(data);
             index[normalFileName] = oid;
         }
 
         private void AddDirecotry(IDictionary<string, string> index, string dirName)
         {
-            foreach (var fileName in fileSystem.Walk(dirName))
+            foreach (var fileName in this.fileSystem.Walk(dirName))
             {
-                if(!IsIgnore(fileName))
+                if (!this.IsIgnore(fileName))
                 {
-                    AddFile(index, fileName);
+                    this.AddFile(index, fileName);
                 }
-                    
             }
         }
 
         public Dictionary<string, string> GetIndexTree()
         {
-            return dataProvider.GetIndex();
+            return this.dataProvider.GetIndex();
         }
     }
 }

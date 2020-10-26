@@ -1,7 +1,7 @@
-﻿using CommandLine;
-
-namespace Ugit.Options
+﻿namespace Ugit.Options
 {
+    using CommandLine;
+
     [Verb("status")]
     internal class StatusOption
     {

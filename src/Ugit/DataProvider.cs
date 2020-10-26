@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Text.Json;
-
-namespace Ugit
+﻿namespace Ugit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.IO.Abstractions;
+    using System.Linq;
+    using System.Text.Json;
+
     internal class DataProvider : IDataProvider
     {
         private readonly byte _typeSeparator = 0;
@@ -98,6 +98,7 @@ namespace Ugit
                     yield return ("HEAD", GetRef("HEAD", deref));
                 }
             }
+
             if ("MERGE_HEAD".StartsWith(prefix))
             {
                 if (!string.IsNullOrEmpty(GetRef("MERGE_HEAD", deref).Value))
@@ -105,6 +106,7 @@ namespace Ugit
                     yield return ("MERGE_HEAD", GetRef("MERGE_HEAD", deref));
                 }
             }
+
             string refDirectory = Path.Join(GitDir, "refs");
             foreach (var filePath in fileSystem.Walk(refDirectory))
             {
@@ -128,11 +130,12 @@ namespace Ugit
             {
                 value = fileSystem.File.ReadAllBytes(refPath).Decode();
             }
+
             bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");
-            if(symbolic)
+            if (symbolic)
             {
                 value = value.Split(":")[1].Trim();
-                if(deref)
+                if (deref)
                 {
                     return GetRefInternal(value, true);
                 }
@@ -145,7 +148,7 @@ namespace Ugit
         {
             @ref = GetRefInternal(@ref, deref).Item1;
             string filePath = Path.Join(GitDir, @ref);
-            if(fileSystem.File.Exists(filePath))
+            if (fileSystem.File.Exists(filePath))
             {
                 fileSystem.File.Delete(filePath);
             }
@@ -154,7 +157,7 @@ namespace Ugit
         public Dictionary<string, string> GetIndex()
         {
             string path = Path.Join(GitDir, "index");
-            if(fileSystem.File.Exists(path))
+            if (fileSystem.File.Exists(path))
             {
                 var data = fileSystem.File.ReadAllBytes(path);
                 return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
@@ -167,10 +170,11 @@ namespace Ugit
         {
             string path = Path.Join(GitDir, "index");
             string data = JsonSerializer.Serialize(index);
-            if(fileSystem.File.Exists(path))
+            if (fileSystem.File.Exists(path))
             {
                 fileSystem.File.Delete(path);
             }
+
             fileSystem.File.WriteAllText(path, data);
         }
     }

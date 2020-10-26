@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace Ugit
+﻿namespace Ugit
 {
+    using System.Collections.Generic;
+
     internal interface IDiff
     {
         string DiffTree(IDictionary<string, string> fromTree, IDictionary<string, string> toTree);
