@@ -5,6 +5,5 @@
     [Verb("write-tree", HelpText = "Write current directory")]
     internal class WriteTreeOption
     {
-
     }
 }

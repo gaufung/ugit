@@ -26,7 +26,7 @@ namespace Ugit
             direcotryMock = new Mock<IDirectory>(MockBehavior.Loose);
             fileSystemMock = new Mock<IFileSystem>(MockBehavior.Loose);
             fileMock = new Mock<IFile>(MockBehavior.Loose);
-            dataProvider = new DataProvider(fileSystemMock.Object);
+            dataProvider = new DefaultDataProvider(fileSystemMock.Object);
         }
 
         [TestMethod]

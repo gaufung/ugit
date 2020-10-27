@@ -29,7 +29,7 @@ namespace Ugit
             diffProxyMock = new Mock<IDiffProxy>();
             fileSystemMock = new Mock<IFileSystem>();
             fileMock = new Mock<IFile>();
-            diff = new Diff(dataproviderMock.Object, diffProxyMock.Object, fileSystemMock.Object);
+            diff = new DefaultDiff(dataproviderMock.Object, diffProxyMock.Object, fileSystemMock.Object);
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace Ugit
 
             });
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            string actual = diff.DiffTree(fromTree, toTree);
+            string actual = diff.DiffTrees(fromTree, toTree);
             Assert.AreEqual("foo\nbar", actual);
         }
 

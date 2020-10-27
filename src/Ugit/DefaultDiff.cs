@@ -5,7 +5,10 @@
     using System.IO.Abstractions;
     using System.Linq;
 
-    internal class Diff : IDiff
+    /// <summary>
+    /// The default implemantation of <see cref="IDiff"/>.
+    /// </summary>
+    internal class DefaultDiff : IDiff
     {
         private readonly IDataProvider dataProvider;
 
@@ -13,13 +16,20 @@
 
         private readonly IFileSystem fileSystem;
 
-        public Diff(IDataProvider dataProvider, IDiffProxy diffProxy, IFileSystem fileSystem)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultDiff"/> class.
+        /// </summary>
+        /// <param name="dataProvider">the data provider.</param>
+        /// <param name="diffProxy">the diff command proxy.</param>
+        /// <param name="fileSystem">file system.</param>
+        public DefaultDiff(IDataProvider dataProvider, IDiffProxy diffProxy, IFileSystem fileSystem)
         {
             this.dataProvider = dataProvider;
             this.diffProxy = diffProxy;
             this.fileSystem = fileSystem;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params IDictionary<string, string>[] trees)
         {
             IDictionary<string, string[]> entries = new Dictionary<string, string[]>();
@@ -34,6 +44,7 @@
                     {
                         entries[path] = new string[trees.Length];
                     }
+
                     entries[path][i] = oid;
                 }
             }
@@ -42,39 +53,38 @@
             {
                 yield return (entry.Key, entry.Value);
             }
-
         }
 
+        /// <inheritdoc/>
         public string DiffBlob(string fromOid, string toOid, string path)
         {
             string fromFile = Path.GetTempFileName();
-            this.fileSystem.File.WriteAllBytes(fromFile, dataProvider.GetObject(fromOid));
+            this.fileSystem.File.WriteAllBytes(fromFile, this.dataProvider.GetObject(fromOid));
             string toFile = Path.GetTempFileName();
-            fileSystem.File.WriteAllBytes(toFile, dataProvider.GetObject(toOid));
-            var (_, output, _) = diffProxy.Execute("diff",
+            this.fileSystem.File.WriteAllBytes(toFile, this.dataProvider.GetObject(toOid));
+            var (_, output, _) = this.diffProxy.Execute("diff",
                 $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
             return output;
-
         }
 
-        public string DiffTree(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
+        public string DiffTrees(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
         {
             return string.Join(
                 "\n",
-                CompareTrees(fromTree, toTree)
+                this.CompareTrees(fromTree, toTree)
                 .Where(t => t.Item2.First() != t.Item2.Last())
-                .Select(t => DiffBlob(t.Item2.First(), t.Item2.Last(), t.Item1))
-                );
+                .Select(t => this.DiffBlob(t.Item2.First(), t.Item2.Last(), t.Item1)));
         }
 
+        /// <inheritdoc/>
         public IEnumerable<(string, string)> IterChangedFiles(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
         {
-            foreach (var entry in CompareTrees(fromTree, toTree))
+            foreach (var entry in this.CompareTrees(fromTree, toTree))
             {
                 string path = entry.Item1;
                 string fromOid = entry.Item2.First();
                 string toOid = entry.Item2.Last();
-                if (fromOid!=toOid)
+                if (fromOid != toOid)
                 {
                     string action;
                     if (string.IsNullOrEmpty(fromOid))
@@ -95,27 +105,30 @@
             }
         }
 
+        /// <inheritdoc/>
         public string MergeBlob(string headOid, string otherOid)
         {
             string headFile = Path.GetTempFileName();
-            fileSystem.File.WriteAllBytes(headFile, dataProvider.GetObject(headOid));
+            this.fileSystem.File.WriteAllBytes(headFile, this.dataProvider.GetObject(headOid));
             string otherFile = Path.GetTempFileName();
-            fileSystem.File.WriteAllBytes(otherFile, dataProvider.GetObject(otherOid));
+            this.fileSystem.File.WriteAllBytes(otherFile, this.dataProvider.GetObject(otherOid));
             string arguments = string.Join(" ", new string[] { "-DHEAD", headFile, otherFile });
-            var (_, output, _) = diffProxy.Execute("diff", arguments);
+            var (_, output, _) = this.diffProxy.Execute("diff", arguments);
             return output;
         }
 
+        /// <inheritdoc/>
         public IDictionary<string, string> MergeTree(IDictionary<string, string> headTree, IDictionary<string, string> otherTree)
         {
             var tree = new Dictionary<string, string>();
-            foreach (var entry in CompareTrees(headTree, otherTree))
+            foreach (var entry in this.CompareTrees(headTree, otherTree))
             {
                 string path = entry.Item1;
                 string headOid = entry.Item2.First();
                 string otherOid = entry.Item2.Last();
-                tree[path] = dataProvider.HashObject(MergeBlob(headOid, otherOid).Encode());
+                tree[path] = this.dataProvider.HashObject(this.MergeBlob(headOid, otherOid).Encode());
             }
+
             return tree;
         }
     }

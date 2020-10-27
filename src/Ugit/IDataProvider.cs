@@ -2,6 +2,9 @@
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Data provider for file operation.
+    /// </summary>
     internal interface IDataProvider
     {
         string GitDirFullPath { get; }

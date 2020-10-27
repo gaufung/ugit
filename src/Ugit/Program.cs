@@ -8,22 +8,22 @@
 
     class Program
     {
-        static readonly IDataProvider dataProvider;
+        private static readonly IDataProvider dataProvider;
 
-        static readonly IFileSystem fileSystem;
+        private static readonly IFileSystem fileSystem;
 
-        static readonly IBaseOperator baseOperator;
+        private static readonly IBaseOperator baseOperator;
 
-        static readonly IDiff diff;
+        private static readonly IDiff diff;
 
-        static readonly Func<string, string> OidConverter;
+        private static readonly Func<string, string> OidConverter;
 
         static Program()
         {
             fileSystem = new FileSystem();
-            dataProvider = new DataProvider();
-            diff = new Diff(dataProvider, new DefaultDiffProxy(), fileSystem);
-            baseOperator = new BaseOperator(fileSystem, dataProvider, diff);
+            dataProvider = new DefaultDataProvider();
+            diff = new DefaultDiff(dataProvider, new DefaultDiffProxy(), fileSystem);
+            baseOperator = new DefaultBaseOperator(fileSystem, dataProvider, diff);
             OidConverter = baseOperator.GetOid;
         }
 
@@ -94,7 +94,7 @@
         {
             var commit = OidConverter(o.Commit);
             var tree = baseOperator.GetCommit(commit).Tree;
-            var result = diff.DiffTree(baseOperator.GetTree(tree), baseOperator.GetWorkingTree());
+            var result = diff.DiffTrees(baseOperator.GetTree(tree), baseOperator.GetWorkingTree());
             Console.WriteLine(result);
             return 0;
         }
@@ -116,7 +116,7 @@
             }
 
             PrintCommit(oid, commit);
-            var result = diff.DiffTree(baseOperator.GetTree(parentTree), baseOperator.GetTree(commit.Tree));
+            var result = diff.DiffTrees(baseOperator.GetTree(parentTree), baseOperator.GetTree(commit.Tree));
             Console.WriteLine(result);
             return 0;
         }
@@ -175,7 +175,7 @@
         {
             string dot = "digraph commits {\n";
             var oids = new HashSet<string>();
-            foreach (var (refName, @ref) in dataProvider.IterRefs("", false))
+            foreach (var (refName, @ref) in dataProvider.IterRefs(string.Empty, false))
             {
                 dot += $"\"{refName}\" [shape=note]\n";
                 dot += $"\"{refName}\" -> \"{@ref.Value}\"\n";
@@ -214,56 +214,57 @@
             return 0;
         }
 
-        static int Init(InitOption _)
+        private static int Init(InitOption _)
         {
             baseOperator.Init();
             Console.WriteLine($"Initialized empty ugit repository in {dataProvider.GitDirFullPath}");
             return 0;
         }
 
-        static int HashObject(HashObjectOption o)
+        private static int HashObject(HashObjectOption o)
         {
             byte[] data = fileSystem.File.ReadAllBytes(o.File);
             Console.WriteLine(dataProvider.HashObject(data));
             return 0;
         }
 
-        static int CatFile(CatFileOption o)
+        private static int CatFile(CatFileOption o)
         {
             byte[] data = dataProvider.GetObject(OidConverter(o.Object));
-            if(data.Length > 0)
+            if (data.Length > 0)
             {
                 Console.WriteLine(data.Decode());
             }
+
             return 0;
         }
 
-        static int WriteTree(WriteTreeOption _)
+        private static int WriteTree(WriteTreeOption _)
         {
             Console.WriteLine(baseOperator.WriteTree());
             return 0;
         }
 
-        static int ReadTree(ReadTreeOption o)
+        private static int ReadTree(ReadTreeOption o)
         {
             baseOperator.ReadTree(OidConverter(o.Tree));
             return 0;
         }
 
-        static int Commit(CommitOption o)
+        private static int Commit(CommitOption o)
         {
             Console.WriteLine(baseOperator.Commit(o.Message));
             return 0;
         }
 
-        static int Log(LogOption o)
+        private static int Log(LogOption o)
         {
             string oid = OidConverter(o.Oid);
 
             IDictionary<string, IList<string>> refs = new Dictionary<string, IList<string>>();
             foreach (var (refname, @ref) in dataProvider.IterRefs())
             {
-                if(refs.ContainsKey(@ref.Value))
+                if (refs.ContainsKey(@ref.Value))
                 {
                     refs[@ref.Value].Add(refname);
                 }
@@ -276,13 +277,13 @@
             foreach (var objectId in baseOperator.IterCommitsAndParents(new string[] { oid }))
             {
                 var commit = baseOperator.GetCommit(objectId);
-                PrintCommit(objectId, commit, refs.ContainsKey(objectId) ? refs[objectId]: null);
+                PrintCommit(objectId, commit, refs.ContainsKey(objectId) ? refs[objectId] : null);
             }
 
             return 0;
         }
 
-        static int Branch(BranchOption o)
+        private static int Branch(BranchOption o)
         {
             string startPoint = OidConverter(o.StartPoint);
 
@@ -291,7 +292,7 @@
                 string current = baseOperator.GetBranchName();
                 foreach (var branch in baseOperator.IterBranchNames())
                 {
-                    string prefix = branch == current ? "*" : "";
+                    string prefix = branch == current ? "*" : string.Empty;
                     Console.WriteLine($"{prefix}{branch}");
                 }
             }

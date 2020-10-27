@@ -35,7 +35,7 @@ namespace Ugit
             directoryMock = new Mock<IDirectory>();
             fileMock = new Mock<IFile>();
             diffMock = new Mock<IDiff>();
-            baseOperator = new BaseOperator(fileSystemMock.Object, dataProviderMock.Object, diffMock.Object);
+            baseOperator = new DefaultBaseOperator(fileSystemMock.Object, dataProviderMock.Object, diffMock.Object);
         }
 
         [TestMethod]

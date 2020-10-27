@@ -2,8 +2,12 @@
 {
     using System.Diagnostics;
 
+    /// <summary>
+    /// The implmentation of <see cref="IDiff"/>.
+    /// </summary>
     public class DefaultDiffProxy : IDiffProxy
     {
+        /// <inheritdoc/>
         public (int, string, string) Execute(string name, string arguments)
         {
             Process process = new Process();

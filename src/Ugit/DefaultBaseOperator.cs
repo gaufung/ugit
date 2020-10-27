@@ -8,7 +8,7 @@
     using System.Linq;
     using Nito.Collections;
 
-    internal class BaseOperator : IBaseOperator
+    internal class DefaultBaseOperator : IBaseOperator
     {
         private readonly IFileSystem fileSystem;
 
@@ -16,7 +16,7 @@
 
         private readonly IDiff diff;
 
-        public BaseOperator(IFileSystem fileSystem, IDataProvider dataprovider, IDiff diff)
+        public DefaultBaseOperator(IFileSystem fileSystem, IDataProvider dataprovider, IDiff diff)
         {
             this.fileSystem = fileSystem;
             this.dataProvider = dataprovider;
@@ -47,15 +47,17 @@
                         if (!current.ContainsKey(dirName))
                         {
                             current[dirName] = new Dictionary<string, object>();
-
                         }
+
                         current = current[dirName] as IDictionary<string, object>;
                     }
+
                     current[fileName] = oid;
                 }
             }
-            dataProvider.SetIndex(index);
-            return WriteTreeRecursive(indexAsTree);
+
+            this.dataProvider.SetIndex(index);
+            return this.WriteTreeRecursive(indexAsTree);
         }
 
         private string WriteTreeRecursive(IDictionary<string, object> treeDict)
@@ -66,7 +68,7 @@
                 if (entry.Value is IDictionary<string, object> val)
                 {
                     string type = "tree";
-                    string oid = WriteTreeRecursive(val);
+                    string oid = this.WriteTreeRecursive(val);
                     string name = entry.Key;
                     entries.Add((name, oid, type));
                 }
@@ -78,16 +80,21 @@
                     entries.Add((name, oid, type));
                 }
             }
-            string tree = string.Join("\n",
+
+            string tree = string.Join(
+                "\n",
                 entries.Select(e => $"{e.Item3} {e.Item2} {e.Item1}"));
-            return dataProvider.HashObject(tree.Encode(), "tree");
+            return this.dataProvider.HashObject(tree.Encode(), "tree");
         }
 
         private IEnumerable<(string, string, string)> IterTreeEntry(string oid)
         {
             if (string.IsNullOrWhiteSpace(oid))
+            {
                 yield break;
-            byte[] tree = dataProvider.GetObject(oid, "tree");
+            }
+
+            byte[] tree = this.dataProvider.GetObject(oid, "tree");
             foreach (string entry in tree.Decode().Split("\n"))
             {
                 string[] tokens = entry.Split(' ');
@@ -101,7 +108,7 @@
         public IDictionary<string, string> GetTree(string treeOid, string basePath = "")
         {
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var (type, oid, name) in IterTreeEntry(treeOid))
+            foreach (var (type, oid, name) in this.IterTreeEntry(treeOid))
             {
                 string path = Path.Join(basePath, name);
                 if (type == "blob")
@@ -110,7 +117,7 @@
                 }
                 else if (type == "tree")
                 {
-                    result.Update(GetTree(oid, $"{path}{Path.DirectorySeparatorChar}"));
+                    result.Update(this.GetTree(oid, $"{path}{Path.DirectorySeparatorChar}"));
                 }
                 else
                 {
@@ -123,74 +130,84 @@
 
         private void EmptyCurrentDirectory()
         {
-            foreach (var filePath in fileSystem.Directory.EnumerateFiles("."))
+            foreach (var filePath in this.fileSystem.Directory.EnumerateFiles("."))
             {
-                if (IsIgnore(filePath)) continue;
-                fileSystem.File.Delete(filePath);
+                if (this.IsIgnore(filePath))
+                {
+                    continue;
+                }
+
+                this.fileSystem.File.Delete(filePath);
             }
-            foreach (var directoryPath in fileSystem.Directory.EnumerateDirectories("."))
+
+            foreach (var directoryPath in this.fileSystem.Directory.EnumerateDirectories("."))
             {
-                if (IsIgnore(directoryPath)) continue;
-                fileSystem.Directory.Delete(directoryPath, true);
+                if (this.IsIgnore(directoryPath))
+                {
+                    continue;
+                }
+
+                this.fileSystem.Directory.Delete(directoryPath, true);
             }
         }
 
-        public void ReadTree(string treeOid,bool updateWorking=false)
+        public void ReadTree(string treeOid, bool updateWorking = false)
         {
-            var index = dataProvider.GetIndex();
+            var index = this.dataProvider.GetIndex();
             index.Clear();
-            index.Update(GetTree(treeOid));
+            index.Update(this.GetTree(treeOid));
             if (updateWorking)
             {
-                CheckoutIndex(index);
+                this.CheckoutIndex(index);
             }
-            dataProvider.SetIndex(index);
+
+            this.dataProvider.SetIndex(index);
         }
 
         private void CheckoutIndex(Dictionary<string, string> index)
         {
-            EmptyCurrentDirectory();
+            this.EmptyCurrentDirectory();
             foreach (var entry in index)
             {
                 string path = entry.Key;
                 string oid = entry.Value;
-                fileSystem.CreateParentDirectory(path);
-                fileSystem.File.WriteAllBytes(path, dataProvider.GetObject(oid, "blob"));
+                this.fileSystem.CreateParentDirectory(path);
+                this.fileSystem.File.WriteAllBytes(path, this.dataProvider.GetObject(oid, "blob"));
             }
         }
 
-        private bool IsIgnore(string path) => path.Split(Path.DirectorySeparatorChar).Contains(dataProvider.GitDir);
+        private bool IsIgnore(string path) => path.Split(Path.DirectorySeparatorChar).Contains(this.dataProvider.GitDir);
 
         public string Commit(string message)
         {
-            string commit = $"tree {WriteTree()}\n";
-            string HEAD = dataProvider.GetRef("HEAD").Value;
-            if(!string.IsNullOrWhiteSpace(HEAD))
+            string commit = $"tree {this.WriteTree()}\n";
+            string HEAD = this.dataProvider.GetRef("HEAD").Value;
+            if (!string.IsNullOrWhiteSpace(HEAD))
             {
                 commit += $"parent {HEAD}\n";
             }
 
-            string mergeHead = dataProvider.GetRef("MERGE_HEAD").Value;
-            if(!string.IsNullOrEmpty(mergeHead))
+            string mergeHead = this.dataProvider.GetRef("MERGE_HEAD").Value;
+            if (!string.IsNullOrEmpty(mergeHead))
             {
                 commit += $"parent {mergeHead}\n";
-                dataProvider.DeleteRef("MERGE_HEAD", false);
+                this.dataProvider.DeleteRef("MERGE_HEAD", false);
             }
 
             commit += "\n";
             commit += $"{message}\n";
 
-            string oid = dataProvider.HashObject(commit.Encode(), "commit");
-            dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
+            string oid = this.dataProvider.HashObject(commit.Encode(), "commit");
+            this.dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
             return oid;
         }
 
         public Commit GetCommit(string oid)
         {
             var parents = new List<string>();
-            var commit = dataProvider.GetObject(oid, "commit").Decode();
+            var commit = this.dataProvider.GetObject(oid, "commit").Decode();
             string[] lines = commit.Split("\n");
-            string tree=null, parent=null;
+            string tree = null;
             int index;
             for (index = 0; index < lines.Length; index++)
             {
@@ -199,11 +216,13 @@
                 {
                     break;
                 }
+
                 string[] tokens = line.Split(' ');
                 if (tokens[0].Equals("tree"))
                 {
                     tree = tokens[1];
                 }
+
                 if (tokens[0].Equals("parent"))
                 {
                     parents.Add(tokens[1]);
@@ -221,12 +240,12 @@
 
         public void Checkout(string name)
         {
-            string oid = GetOid(name);
-            var commit = GetCommit(oid);
-            ReadTree(commit.Tree, true);
+            string oid = this.GetOid(name);
+            var commit = this.GetCommit(oid);
+            this.ReadTree(commit.Tree, true);
 
             RefValue HEAD;
-            if(IsBranch(name))
+            if (this.IsBranch(name))
             {
                 HEAD = RefValue.Create(true, Path.Join("refs", "heads", name));
             }
@@ -235,13 +254,13 @@
                 HEAD = RefValue.Create(false, oid);
             }
 
-            dataProvider.UpdateRef("HEAD", HEAD, false);
+            this.dataProvider.UpdateRef("HEAD", HEAD, false);
         }
 
         public void CreateTag(string name, string oid)
         {
             string @ref = Path.Join("refs", "tags", name);
-            dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
+            this.dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
         }
 
         public string GetOid(string name)
@@ -252,17 +271,17 @@
                 Path.Join(name),
                 Path.Join("refs", name),
                 Path.Join("refs", "tags", name),
-                Path.Join("refs", "heads", name)
+                Path.Join("refs", "heads", name),
             };
             foreach (var @ref in refsToTry)
             {
-                if(!string.IsNullOrEmpty(dataProvider.GetRef(@ref, false).Value))
+                if (!string.IsNullOrEmpty(this.dataProvider.GetRef(@ref, false).Value))
                 {
-                    return dataProvider.GetRef(@ref).Value;
+                    return this.dataProvider.GetRef(@ref).Value;
                 }
             }
 
-            if(name.IsOnlyHex() && name.Length == 40)
+            if (name.IsOnlyHex() && name.Length == 40)
             {
                 return name;
             }
@@ -311,26 +330,26 @@
 
         public void Init()
         {
-            dataProvider.Init();
-            dataProvider.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", "master")));
+            this.dataProvider.Init();
+            this.dataProvider.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", "master")));
         }
 
         public string GetBranchName()
         {
-            var HEAD = dataProvider.GetRef("HEAD", false);
-            if(!HEAD.Symbolic)
+            var HEAD = this.dataProvider.GetRef("HEAD", false);
+            if (!HEAD.Symbolic)
             {
                 return null;
             }
 
             var head = HEAD.Value;
-            Debug.Assert(head.StartsWith(Path.Join("refs", "heads")));
+            Debug.Assert(head.StartsWith(Path.Join("refs", "heads")), "Branch ref should start with refs/heads");
             return Path.GetRelativePath(Path.Join("refs", "heads"), head);
         }
 
         public IEnumerable<string> IterBranchNames()
         {
-            foreach (var (refName, _) in dataProvider.IterRefs(Path.Join("refs", "heads")))
+            foreach (var (refName, _) in this.dataProvider.IterRefs(Path.Join("refs", "heads")))
             {
                 yield return Path.GetRelativePath(Path.Join("refs", "heads"), refName);
             }
@@ -338,21 +357,21 @@
 
         public void Reset(string oid)
         {
-            dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
+            this.dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
         }
 
         public IDictionary<string, string> GetWorkingTree()
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
-            foreach (var filePath in fileSystem.Walk("."))
+            foreach (var filePath in this.fileSystem.Walk("."))
             {
                 string path = Path.GetRelativePath(".", filePath);
-                if (IsIgnore(path))
+                if (this.IsIgnore(path))
                 {
                     continue;
                 }
 
-                result[path] = dataProvider.HashObject(fileSystem.File.ReadAllBytes(path));
+                result[path] = this.dataProvider.HashObject(this.fileSystem.File.ReadAllBytes(path));
             }
 
             return result;
@@ -360,40 +379,41 @@
 
         public void Merge(string other)
         {
-            string head = dataProvider.GetRef("HEAD").Value;
-            var headCommit = GetCommit(head);
-            string mergeBase = GetMergeBase(other, head);
-            var otherCommit = GetCommit(other);
+            string head = this.dataProvider.GetRef("HEAD").Value;
+            var headCommit = this.GetCommit(head);
+            string mergeBase = this.GetMergeBase(other, head);
+            var otherCommit = this.GetCommit(other);
 
             if (mergeBase == head)
             {
-                ReadTree(otherCommit.Tree, true);
-                dataProvider.UpdateRef("HEAD", RefValue.Create(false, other));
+                this.ReadTree(otherCommit.Tree, true);
+                this.dataProvider.UpdateRef("HEAD", RefValue.Create(false, other));
                 Console.WriteLine("Fast-forwad, no need to commit");
                 return;
             }
 
-            dataProvider.UpdateRef("MERGE_HEAD", RefValue.Create(false, other));
-            ReadTreeMerged(headCommit.Tree, otherCommit.Tree, true);
+            this.dataProvider.UpdateRef("MERGE_HEAD", RefValue.Create(false, other));
+            this.ReadTreeMerged(headCommit.Tree, otherCommit.Tree, true);
             Console.WriteLine("Merged in working tree\nPlease commit");
         }
 
         private void ReadTreeMerged(string headTree, string otherTree, bool updateWorking = false)
         {
-            var index = dataProvider.GetIndex();
+            var index = this.dataProvider.GetIndex();
             index.Clear();
-            index.Update(diff.MergeTree(GetTree(headTree), GetTree(otherTree)));
+            index.Update(this.diff.MergeTree(this.GetTree(headTree), this.GetTree(otherTree)));
             if (updateWorking)
             {
-                CheckoutIndex(index);
+                this.CheckoutIndex(index);
             }
-            dataProvider.SetIndex(index);
+
+            this.dataProvider.SetIndex(index);
         }
 
         public string GetMergeBase(string oid1, string oid2)
         {
-            IEnumerable<string> parents = IterCommitsAndParents(new [] { oid1 });
-            foreach (var oid in IterCommitsAndParents(new[] { oid2 }))
+            IEnumerable<string> parents = this.IterCommitsAndParents(new[] { oid1 });
+            foreach (var oid in this.IterCommitsAndParents(new[] { oid2 }))
             {
                 if (parents.Contains(oid))
                 {
