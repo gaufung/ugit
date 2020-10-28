@@ -8,34 +8,47 @@
     using System.Linq;
     using System.Text.Json;
 
+    /// <summary>
+    /// Default implementation of <see cref="IDataProvider"/>.
+    /// </summary>
     internal class DefaultDataProvider : IDataProvider
     {
-        private readonly byte _typeSeparator = 0;
+        private readonly byte typeSeparator = 0;
 
         private readonly IFileSystem fileSystem;
 
-        internal DefaultDataProvider() : this(new FileSystem())
-        {
-
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultDataProvider"/> class.
+        /// </summary>
+        /// <param name="fileSystem">The file system.</param>
         public DefaultDataProvider(IFileSystem fileSystem)
         {
             this.fileSystem = fileSystem;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultDataProvider"/> class.
+        /// </summary>
+        internal DefaultDataProvider()
+            : this(new FileSystem())
+        {
+        }
+
+        /// <inheritdoc/>
         public string GitDir { get; } = ".ugit";
 
+        /// <inheritdoc/>
         public string GitDirFullPath =>
             Path.Join(this.fileSystem.Directory.GetCurrentDirectory(), this.GitDir);
 
-        public byte[] GetObject(string oid, string expected="blob")
+        /// <inheritdoc/>
+        public byte[] GetObject(string oid, string expected = "blob")
         {
             string filePath = Path.Join(this.GitDir, "objects", oid);
             if (this.fileSystem.File.Exists(filePath))
             {
                 var data = this.fileSystem.File.ReadAllBytes(filePath);
-                var index = Array.IndexOf(data, this._typeSeparator);
+                var index = Array.IndexOf(data, this.typeSeparator);
                 if (!string.IsNullOrWhiteSpace(expected) && index > 0)
                 {
                     var type = data.Take(index).ToArray().Decode();
@@ -47,11 +60,12 @@
             return Array.Empty<byte>();
         }
 
-        public string HashObject(byte[] data, string type="blob")
+        /// <inheritdoc/>
+        public string HashObject(byte[] data, string type = "blob")
         {
             if (!string.IsNullOrWhiteSpace(type))
             {
-                data = type.Encode().Concat(new byte[] { this._typeSeparator }).Concat(data).ToArray();
+                data = type.Encode().Concat(new byte[] { this.typeSeparator }).Concat(data).ToArray();
             }
 
             string oid = data.Sha1HexDigest();
@@ -60,12 +74,14 @@
             return oid;
         }
 
+        /// <inheritdoc/>
         public void Init()
         {
             this.fileSystem.Directory.CreateDirectory(this.GitDir);
             this.fileSystem.Directory.CreateDirectory(Path.Join(this.GitDir, "objects"));
         }
 
+        /// <inheritdoc/>
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
             @ref = this.GetRefInternal(@ref, deref).Item1;
@@ -85,11 +101,13 @@
             this.fileSystem.File.WriteAllBytes(filePath, val.Encode());
         }
 
-        public RefValue GetRef(string @ref, bool deref=true)
+        /// <inheritdoc/>
+        public RefValue GetRef(string @ref, bool deref = true)
         {
             return this.GetRefInternal(@ref, deref).Item2;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<(string, RefValue)> IterRefs(string prefix = "", bool deref = true)
         {
             if ("HEAD".StartsWith(prefix))
@@ -123,6 +141,43 @@
             }
         }
 
+        /// <inheritdoc/>
+        public void DeleteRef(string @ref, bool deref = true)
+        {
+            @ref = this.GetRefInternal(@ref, deref).Item1;
+            string filePath = Path.Join(this.GitDir, @ref);
+            if (this.fileSystem.File.Exists(filePath))
+            {
+                this.fileSystem.File.Delete(filePath);
+            }
+        }
+
+        /// <inheritdoc/>
+        public Dictionary<string, string> GetIndex()
+        {
+            string path = Path.Join(this.GitDir, "index");
+            if (this.fileSystem.File.Exists(path))
+            {
+                var data = this.fileSystem.File.ReadAllBytes(path);
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
+            }
+
+            return new Dictionary<string, string>();
+        }
+
+        /// <inheritdoc/>
+        public void SetIndex(Dictionary<string, string> index)
+        {
+            string path = Path.Join(this.GitDir, "index");
+            string data = JsonSerializer.Serialize(index);
+            if (this.fileSystem.File.Exists(path))
+            {
+                this.fileSystem.File.Delete(path);
+            }
+
+            this.fileSystem.File.WriteAllText(path, data);
+        }
+
         private (string, RefValue) GetRefInternal(string @ref, bool deref)
         {
             var refPath = Path.Join(this.GitDir, @ref);
@@ -143,40 +198,6 @@
             }
 
             return ValueTuple.Create(@ref, RefValue.Create(symbolic, value));
-        }
-
-        public void DeleteRef(string @ref, bool deref = true)
-        {
-            @ref = GetRefInternal(@ref, deref).Item1;
-            string filePath = Path.Join(this.GitDir, @ref);
-            if (this.fileSystem.File.Exists(filePath))
-            {
-                this.fileSystem.File.Delete(filePath);
-            }
-        }
-
-        public Dictionary<string, string> GetIndex()
-        {
-            string path = Path.Join(this.GitDir, "index");
-            if (this.fileSystem.File.Exists(path))
-            {
-                var data = this.fileSystem.File.ReadAllBytes(path);
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
-            }
-
-            return new Dictionary<string, string>();
-        }
-
-        public void SetIndex(Dictionary<string, string> index)
-        {
-            string path = Path.Join(this.GitDir, "index");
-            string data = JsonSerializer.Serialize(index);
-            if (this.fileSystem.File.Exists(path))
-            {
-                this.fileSystem.File.Delete(path);
-            }
-
-            this.fileSystem.File.WriteAllText(path, data);
         }
     }
 }

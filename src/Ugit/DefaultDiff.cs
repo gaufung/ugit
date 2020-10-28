@@ -62,7 +62,8 @@
             this.fileSystem.File.WriteAllBytes(fromFile, this.dataProvider.GetObject(fromOid));
             string toFile = Path.GetTempFileName();
             this.fileSystem.File.WriteAllBytes(toFile, this.dataProvider.GetObject(toOid));
-            var (_, output, _) = this.diffProxy.Execute("diff",
+            var (_, output, _) = this.diffProxy.Execute(
+                "diff",
                 $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
             return output;
         }

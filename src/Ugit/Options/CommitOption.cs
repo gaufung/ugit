@@ -6,7 +6,7 @@
     internal class CommitOption
     {
         [Value(0)]
-        [Option(shortName:'m', longName:"message")]
+        [Option(shortName: 'm', longName: "message")]
         public string Message { get; set; }
     }
 }

@@ -10,8 +10,16 @@
     using System.Text.RegularExpressions;
     using CommandLine;
 
+    /// <summary>
+    /// The ugit extension methods.
+    /// </summary>
     internal static class Extensions
     {
+        /// <summary>
+        /// Digest a byte array with sha1 algorithm.
+        /// </summary>
+        /// <param name="data">The data array.</param>
+        /// <returns>The digest value.</returns>
         public static string Sha1HexDigest(this byte[] data)
         {
             using var sha1 = new SHA1Managed();
@@ -19,17 +27,34 @@
             return string.Join(string.Empty, hash.Select(h => h.ToString("x2")));
         }
 
+        /// <summary>
+        /// Encode string to byte array with UTF8.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns>The encode byte array.</returns>
         public static byte[] Encode(this string str)
         {
             return Encoding.UTF8.GetBytes(str);
         }
 
+        /// <summary>
+        /// Decode byte array to string with UTF8.
+        /// </summary>
+        /// <param name="data">The byte array.</param>
+        /// <returns>The decode string.</returns>
         public static string Decode(this byte[] data)
         {
             return Encoding.UTF8.GetString(data);
         }
 
-        public static IDictionary<TKey, TValue> Update<TKey, TValue>(
+        /// <summary>
+        /// Update a dictionary with another dictionary.
+        /// </summary>
+        /// <typeparam name="TKey">The dictionary key type.</typeparam>
+        /// <typeparam name="TValue">The dictionary value type.</typeparam>
+        /// <param name="dic">The dictionary.</param>
+        /// <param name="other">The other dictionary.</param>
+        public static void Update<TKey, TValue>(
             this IDictionary<TKey, TValue> dic,
             IDictionary<TKey, TValue> other)
         {
@@ -37,9 +62,13 @@
             {
                 dic[entry.Key] = entry.Value;
             }
-            return dic;
         }
 
+        /// <summary>
+        /// Create parent directionary for given filepath.
+        /// </summary>
+        /// <param name="fileSystem">The file system.</param>
+        /// <param name="filePath">the file path.</param>
         public static void CreateParentDirectory(this IFileSystem fileSystem, string filePath)
         {
             string parentDirectory = Path.GetDirectoryName(filePath);
@@ -49,6 +78,11 @@
             }
         }
 
+        /// <summary>
+        /// Whether a string contains hex character.
+        /// </summary>
+        /// <param name="str">the string.</param>
+        /// <returns>True if all character is hex format.</returns>
         public static bool IsOnlyHex(this string str)
         {
             if (string.IsNullOrEmpty(str))
@@ -59,6 +93,12 @@
             return Regex.IsMatch(str, @"\A\b[0-9a-fA-F]+\b\Z");
         }
 
+        /// <summary>
+        /// Walk through a dicrionary recursively.
+        /// </summary>
+        /// <param name="fileSystem">The file system.</param>
+        /// <param name="directory">The directory.</param>
+        /// <returns>The all files path.</returns>
         public static IEnumerable<string> Walk(this IFileSystem fileSystem, string directory)
         {
             foreach (var filePath in fileSystem.Directory.EnumerateFiles(directory))
@@ -75,8 +115,8 @@
             }
         }
 
-        public static ParserResult<object> ParseArguments<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
-        , T13, T14, T15, T16, T17>(this Parser parser, IEnumerable<string> args)
+        public static ParserResult<object> ParseArguments<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12,
+            T13, T14, T15, T16, T17>(this Parser parser, IEnumerable<string> args)
         {
             if (parser == null)
             {
@@ -90,7 +130,7 @@
                 typeof(T3),
                 typeof(T4),
                 typeof(T5),
-                typeof(T6), 
+                typeof(T6),
                 typeof(T7),
                 typeof(T8),
                 typeof(T9),
@@ -219,8 +259,7 @@
             return notParsedFunc(((NotParsed<object>)result).Errors);
         }
 
-        public static ParserResult<object> ParseArguments<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
-        , T13, T14, T15, T16, T17, T18>(this Parser parser, IEnumerable<string> args)
+        public static ParserResult<object> ParseArguments<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(this Parser parser, IEnumerable<string> args)
         {
             if (parser == null)
             {
@@ -231,7 +270,7 @@
             {
                 typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8),
                 typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13),
-                typeof(T14),typeof(T15),typeof(T16),typeof(T17), typeof(T18)
+                typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18),
             });
         }
 
