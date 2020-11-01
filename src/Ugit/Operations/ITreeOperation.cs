@@ -13,7 +13,7 @@
         /// <param name="oid">Tree object id.</param>
         /// <param name="basePath">The base path.</param>
         /// <returns>The tree. {filePath : object id}.</returns>
-        IDictionary<string, string> GetTree(string oid, string basePath = ".");
+        IDictionary<string, string> GetTree(string oid, string basePath = "");
 
         /// <summary>
         /// Read the tree to index.
@@ -39,5 +39,7 @@
         /// </summary>
         /// <returns>The working tree. {filepath: oid}.</returns>
         IDictionary<string, string> GetWorkingTree();
+
+        Dictionary<string, string> GetIndexTree();
     }
 }

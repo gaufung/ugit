@@ -15,15 +15,13 @@
     {
         private readonly byte typeSeparator = 0;
 
-        private readonly IFileSystem fileSystem;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDataProvider"/> class.
         /// </summary>
         /// <param name="fileSystem">The file system.</param>
         public DefaultDataProvider(IFileSystem fileSystem)
         {
-            this.fileSystem = fileSystem;
+            this.FileSystem = fileSystem;
         }
 
         /// <summary>
@@ -39,15 +37,15 @@
 
         /// <inheritdoc/>
         public string GitDirFullPath =>
-            Path.Join(this.fileSystem.Directory.GetCurrentDirectory(), this.GitDir);
+            Path.Join(this.FileSystem.Directory.GetCurrentDirectory(), this.GitDir);
 
         /// <inheritdoc/>
         public byte[] GetObject(string oid, string expected = "blob")
         {
             string filePath = Path.Join(this.GitDir, "objects", oid);
-            if (this.fileSystem.File.Exists(filePath))
+            if (this.FileSystem.File.Exists(filePath))
             {
-                var data = this.fileSystem.File.ReadAllBytes(filePath);
+                var data = this.FileSystem.File.ReadAllBytes(filePath);
                 var index = Array.IndexOf(data, this.typeSeparator);
                 if (!string.IsNullOrWhiteSpace(expected) && index > 0)
                 {
@@ -70,20 +68,20 @@
 
             string oid = data.Sha1HexDigest();
             string filePath = Path.Join(this.GitDir, "objects", oid);
-            this.fileSystem.File.WriteAllBytes(filePath, data);
+            this.FileSystem.File.WriteAllBytes(filePath, data);
             return oid;
         }
 
         /// <inheritdoc/>
         public void Init()
         {
-            if (this.fileSystem.Directory.Exists(this.GitDir))
+            if (this.FileSystem.Directory.Exists(this.GitDir))
             {
-                this.fileSystem.Directory.Delete(this.GitDir, true);
+                this.FileSystem.Directory.Delete(this.GitDir, true);
             }
 
-            this.fileSystem.Directory.CreateDirectory(this.GitDir);
-            this.fileSystem.Directory.CreateDirectory(Path.Join(this.GitDir, "objects"));
+            this.FileSystem.Directory.CreateDirectory(this.GitDir);
+            this.FileSystem.Directory.CreateDirectory(Path.Join(this.GitDir, "objects"));
         }
 
         /// <inheritdoc/>
@@ -102,8 +100,8 @@
             }
 
             string filePath = Path.Join(this.GitDir, @ref);
-            this.fileSystem.CreateParentDirectory(filePath);
-            this.fileSystem.File.WriteAllBytes(filePath, val.Encode());
+            this.FileSystem.CreateParentDirectory(filePath);
+            this.FileSystem.File.WriteAllBytes(filePath, val.Encode());
         }
 
         /// <inheritdoc/>
@@ -132,7 +130,7 @@
             }
 
             string refDirectory = Path.Join(this.GitDir, "refs");
-            foreach (var filePath in this.fileSystem.Walk(refDirectory))
+            foreach (var filePath in this.FileSystem.Walk(refDirectory))
             {
                 string refName = Path.GetRelativePath(this.GitDir, filePath);
                 if (refName.StartsWith(prefix))
@@ -151,9 +149,9 @@
         {
             @ref = this.GetRefInternal(@ref, deref).Item1;
             string filePath = Path.Join(this.GitDir, @ref);
-            if (this.fileSystem.File.Exists(filePath))
+            if (this.FileSystem.File.Exists(filePath))
             {
-                this.fileSystem.File.Delete(filePath);
+                this.FileSystem.File.Delete(filePath);
             }
         }
 
@@ -161,9 +159,9 @@
         public Dictionary<string, string> GetIndex()
         {
             string path = Path.Join(this.GitDir, "index");
-            if (this.fileSystem.File.Exists(path))
+            if (this.FileSystem.File.Exists(path))
             {
-                var data = this.fileSystem.File.ReadAllBytes(path);
+                var data = this.FileSystem.File.ReadAllBytes(path);
                 return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
             }
 
@@ -175,12 +173,12 @@
         {
             string path = Path.Join(this.GitDir, "index");
             string data = JsonSerializer.Serialize(index);
-            if (this.fileSystem.File.Exists(path))
+            if (this.FileSystem.File.Exists(path))
             {
-                this.fileSystem.File.Delete(path);
+                this.FileSystem.File.Delete(path);
             }
 
-            this.fileSystem.File.WriteAllText(path, data);
+            this.FileSystem.File.WriteAllText(path, data);
         }
 
         /// <inheritdoc/>
@@ -211,7 +209,7 @@
         }
 
         /// <inheritdoc/>
-        public IFileSystem FileSystem => this.fileSystem;
+        public IFileSystem FileSystem { get; private set; }
 
         /// <inheritdoc/>
         public bool IsIgnore(string path) => path.Split(Path.DirectorySeparatorChar).Contains(this.GitDir);
@@ -220,9 +218,9 @@
         {
             var refPath = Path.Join(this.GitDir, @ref);
             string value = null;
-            if (this.fileSystem.File.Exists(refPath))
+            if (this.FileSystem.File.Exists(refPath))
             {
-                value = this.fileSystem.File.ReadAllBytes(refPath).Decode();
+                value = this.FileSystem.File.ReadAllBytes(refPath).Decode();
             }
 
             bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");

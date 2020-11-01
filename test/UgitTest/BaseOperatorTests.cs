@@ -13,6 +13,7 @@ using System.Text;
 namespace Ugit
 {
     [TestClass]
+    [Ignore]
     public class BaseOperatorTests
     {
         private Mock<IFileSystem> fileSystemMock;

@@ -16,13 +16,27 @@
 
         private static readonly IFileSystem FileSystem;
 
-        private static readonly IBaseOperator BaseOperator;
+        //private static readonly IBaseOperator BaseOperator;
 
         private static readonly IDiff Diff;
 
         private static readonly ICommitOperation CommitOperation;
 
         private static readonly ITreeOperation TreeOperation;
+
+        private static readonly ITagOperation TagOperation;
+
+        private static readonly IResetOperation ResetOperation;
+
+        private static readonly IMergeOperation MergeOperation;
+
+        private static readonly IInitOperation InitOperation;
+
+        private static readonly ICheckoutOperation CheckoutOperation;
+
+        private static readonly IBranchOperation BranchOperation;
+
+        private static readonly IAddOperation AddOperation;
 
         private static readonly Func<string, string> OidConverter;
 
@@ -31,10 +45,16 @@
             FileSystem = new FileSystem();
             DataProvider = new DefaultDataProvider();
             Diff = new DefaultDiff(DataProvider, new DefaultDiffProxy(), FileSystem);
-            BaseOperator = new DefaultBaseOperator(FileSystem, DataProvider, Diff);
             TreeOperation = new DefaultTreeOperation(DataProvider);
             CommitOperation = new DefaultCommitOperation(DataProvider, TreeOperation);
-            OidConverter = BaseOperator.GetOid;
+            TagOperation = new DefaultTagOperation(DataProvider);
+            ResetOperation = new DefaultResetOperation(DataProvider);
+            MergeOperation = new DefaultMergeOperation(DataProvider, CommitOperation, TreeOperation, Diff);
+            InitOperation = new DefaultInitOperation(DataProvider);
+            BranchOperation = new DefaultBranchOperation(DataProvider);
+            CheckoutOperation = new DefaultCheckoutOperation(DataProvider, TreeOperation, CommitOperation, BranchOperation);
+            AddOperation = new DefaultAddOperation(DataProvider);
+            OidConverter = DataProvider.GetOid;
         }
 
         private static int Main(string[] args)
@@ -65,14 +85,12 @@
                 (LogOption o) => Log(o),
                 (CheckoutOption o) => Checkout(o),
                 (TagOption o) => CreateTag(o),
-                (KOption o) => K(o),
                 (BranchOption o) => Branch(o),
                 (StatusOption o) => Status(o),
                 (ResetOption o) => Reset(o),
                 (ShowOption o) => Show(o),
                 (DiffOption o) => Different(o),
                 (MergeOption o) => Merge(o),
-                (MergeBaseOption o) => MergeBase(o),
                 (AddOption o) => Add(o),
                 errors => 1);
             return exitCode;
@@ -80,29 +98,21 @@
 
         private static int Add(AddOption o)
         {
-            BaseOperator.Add(o.Files);
-            return 0;
-        }
-
-        private static int MergeBase(MergeBaseOption o)
-        {
-            string commit1 = OidConverter(o.Commit1);
-            string commit2 = OidConverter(o.Commit2);
-            Console.WriteLine(BaseOperator.GetMergeBase(commit1, commit2));
+            AddOperation.Add(o.Files);
             return 0;
         }
 
         private static int Merge(MergeOption o)
         {
-            BaseOperator.Merge(o.Commit);
+            MergeOperation.Merge(o.Commit);
             return 0;
         }
 
         private static int Different(DiffOption o)
         {
             var commit = OidConverter(o.Commit);
-            var tree = BaseOperator.GetCommit(commit).Tree;
-            var result = Diff.DiffTrees(BaseOperator.GetTree(tree), BaseOperator.GetWorkingTree());
+            var tree = CommitOperation.GetCommit(commit).Tree;
+            var result = Diff.DiffTrees(TreeOperation.GetTree(tree), TreeOperation.GetWorkingTree());
             Console.WriteLine(result);
             return 0;
         }
@@ -115,16 +125,16 @@
                 return 0;
             }
 
-            var commit = BaseOperator.GetCommit(oid);
+            var commit = CommitOperation.GetCommit(oid);
 
             string parentTree = null;
             if (commit.Parents.Count > 0)
             {
-                parentTree = BaseOperator.GetCommit(commit.Parents[0]).Tree;
+                parentTree = CommitOperation.GetCommit(commit.Parents[0]).Tree;
             }
 
             PrintCommit(oid, commit);
-            var result = Diff.DiffTrees(BaseOperator.GetTree(parentTree), BaseOperator.GetTree(commit.Tree));
+            var result = Diff.DiffTrees(TreeOperation.GetTree(parentTree), TreeOperation.GetTree(commit.Tree));
             Console.WriteLine(result);
             return 0;
         }
@@ -140,14 +150,14 @@
         private static int Reset(ResetOption o)
         {
             string oid = OidConverter(o.Commit);
-            BaseOperator.Reset(oid);
+            ResetOperation.Reset(oid);
             return 0;
         }
 
         private static int Status(StatusOption _)
         {
-            string head = BaseOperator.GetOid("@");
-            string branch = BaseOperator.GetBranchName();
+            string head = OidConverter("@");
+            string branch = BranchOperation.Current;
             if (string.IsNullOrEmpty(branch))
             {
                 Console.WriteLine($"HEAD detached at {head.Substring(0, 10)}");
@@ -164,47 +174,17 @@
             }
 
             Console.WriteLine("\nChanges to be committed:\n");
-            string headTree = BaseOperator.GetCommit(head).Tree;
-            foreach (var (path, action) in Diff.IterChangedFiles(BaseOperator.GetTree(headTree), BaseOperator.GetIndexTree()))
+            string headTree = CommitOperation.GetCommit(head).Tree;
+            foreach (var (path, action) in Diff.IterChangedFiles(TreeOperation.GetTree(headTree), TreeOperation.GetIndexTree()))
             {
                 Console.WriteLine($"{action}   : {path}");
             }
 
             Console.WriteLine("\nChanges not staged for commit:\n");
-            foreach (var (path, action) in Diff.IterChangedFiles(BaseOperator.GetIndexTree(), BaseOperator.GetWorkingTree()))
+            foreach (var (path, action) in Diff.IterChangedFiles(TreeOperation.GetIndexTree(), TreeOperation.GetWorkingTree()))
             {
                 Console.WriteLine($"{action}   : {path}");
             }
-
-            return 0;
-        }
-
-        private static int K(KOption _)
-        {
-            string dot = "digraph commits {\n";
-            var oids = new HashSet<string>();
-            foreach (var (refName, @ref) in DataProvider.IterRefs(string.Empty, false))
-            {
-                dot += $"\"{refName}\" [shape=note]\n";
-                dot += $"\"{refName}\" -> \"{@ref.Value}\"\n";
-                if (!@ref.Symbolic)
-                {
-                    oids.Add(@ref.Value);
-                }
-            }
-
-            foreach (var oid in BaseOperator.IterCommitsAndParents(oids))
-            {
-                var commit = BaseOperator.GetCommit(oid);
-                dot += $"\"{oid}\" [shape=box style=filled label=\"{oid.Substring(0, 10)}\"]\n";
-                foreach (var parent in commit.Parents)
-                {
-                    dot += $"\"{oid}\" -> \"{parent}\"\n";
-                }
-            }
-
-            dot += "}";
-            Console.WriteLine(dot);
 
             return 0;
         }
@@ -212,19 +192,19 @@
         private static int CreateTag(TagOption o)
         {
             string oid = OidConverter(o.Oid);
-            BaseOperator.CreateTag(o.Name, oid);
+            TagOperation.Create(o.Name, oid);
             return 0;
         }
 
         private static int Checkout(CheckoutOption o)
         {
-            BaseOperator.Checkout(o.Commit);
+            CheckoutOperation.Checkout(o.Commit);
             return 0;
         }
 
         private static int Init(InitOption _)
         {
-            BaseOperator.Init();
+            InitOperation.Init();
             Console.WriteLine($"Initialized empty ugit repository in {DataProvider.GitDirFullPath}");
             return 0;
         }
@@ -249,7 +229,7 @@
 
         private static int ReadTree(ReadTreeOption o)
         {
-            BaseOperator.ReadTree(OidConverter(o.Tree));
+            TreeOperation.ReadTree(OidConverter(o.Tree));
             return 0;
         }
 
@@ -276,9 +256,9 @@
                 }
             }
 
-            foreach (var objectId in BaseOperator.IterCommitsAndParents(new string[] { oid }))
+            foreach (var objectId in CommitOperation.IterCommitsAndParents(new string[] { oid }))
             {
-                var commit = BaseOperator.GetCommit(objectId);
+                var commit = CommitOperation.GetCommit(objectId);
                 PrintCommit(objectId, commit, refs.ContainsKey(objectId) ? refs[objectId] : null);
             }
 
@@ -291,8 +271,8 @@
 
             if (string.IsNullOrEmpty(o.Name))
             {
-                string current = BaseOperator.GetBranchName();
-                foreach (var branch in BaseOperator.IterBranchNames())
+                string current = BranchOperation.Current;
+                foreach (var branch in BranchOperation.Names)
                 {
                     string prefix = branch == current ? "*" : string.Empty;
                     Console.WriteLine($"{prefix}{branch}");
@@ -300,7 +280,7 @@
             }
             else
             {
-                BaseOperator.CreateBranch(o.Name, startPoint);
+                BranchOperation.Create(o.Name, startPoint);
                 Console.WriteLine($"Branch {o.Name} create at {startPoint.Substring(0, 10)}");
             }
 

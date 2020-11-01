@@ -19,8 +19,26 @@
             this.dataProvider = dataProvider;
         }
 
-        /// <inheritdoc/>
-        public void AddDirectionary(IDictionary<string, string> index, string directoryName)
+        public void Add(IEnumerable<string> fileNames)
+        {
+            var index = this.dataProvider.GetIndex();
+
+            foreach (var name in fileNames)
+            {
+                if (this.dataProvider.FileSystem.File.Exists(name))
+                {
+                    this.AddFile(index, name);
+                }
+                else if (this.dataProvider.FileSystem.Directory.Exists(name))
+                {
+                    this.AddDirectionary(index, name);
+                }
+            }
+
+            this.dataProvider.SetIndex(index);
+        }
+
+        private void AddDirectionary(IDictionary<string, string> index, string directoryName)
         {
             foreach (var fileName in this.dataProvider.FileSystem.Walk(directoryName))
             {
@@ -31,8 +49,7 @@
             }
         }
 
-        /// <inheritdoc/>
-        public void AddFile(IDictionary<string, string> index, string fileName)
+        private void AddFile(IDictionary<string, string> index, string fileName)
         {
             var normalFileName = Path.GetRelativePath(".", fileName);
             byte[] data = this.dataProvider.FileSystem.File.ReadAllBytes(normalFileName);

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
 
@@ -35,7 +36,7 @@
         }
 
         /// <inheritdoc/>
-        public IDictionary<string, string> GetTree(string treeOid, string basePath = ".")
+        public IDictionary<string, string> GetTree(string treeOid, string basePath = "")
         {
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var (type, oid, name) in this.IterTreeEntry(treeOid))
@@ -194,6 +195,11 @@
                 "\n",
                 entries.Select(e => $"{e.Item3} {e.Item2} {e.Item1}"));
             return this.dataProvider.HashObject(subTree.Encode(), "tree");
+        }
+
+        public Dictionary<string, string> GetIndexTree()
+        {
+            return this.dataProvider.GetIndex();
         }
     }
 }
