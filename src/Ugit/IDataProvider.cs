@@ -1,12 +1,18 @@
 ﻿namespace Ugit
 {
     using System.Collections.Generic;
+    using System.IO.Abstractions;
 
     /// <summary>
     /// Data provider for file operation.
     /// </summary>
     internal interface IDataProvider
     {
+        /// <summary>
+        /// Gets a file system.
+        /// </summary>
+        IFileSystem FileSystem { get; }
+
         /// <summary>
         /// Gets the git directory full path.
         /// </summary>
@@ -80,5 +86,19 @@
         /// </summary>
         /// <param name="index">The index.</param>
         void SetIndex(Dictionary<string, string> index);
+
+        /// <summary>
+        /// Get object id from name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>The object id.</returns>
+        string GetOid(string name);
+
+        /// <summary>
+        /// Should ignore this file or directory. (.ugit) folder.
+        /// </summary>
+        /// <param name="path">the file path or directory.</param>
+        /// <returns>True if it need to be ignored.</returns>
+        bool IsIgnore(string path);
     }
 }

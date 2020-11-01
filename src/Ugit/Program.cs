@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO.Abstractions;
     using CommandLine;
+    using Ugit.Operations;
     using Ugit.Options;
 
     /// <summary>
@@ -19,6 +20,10 @@
 
         private static readonly IDiff Diff;
 
+        private static readonly ICommitOperation CommitOperation;
+
+        private static readonly ITreeOperation TreeOperation;
+
         private static readonly Func<string, string> OidConverter;
 
         static Program()
@@ -27,6 +32,8 @@
             DataProvider = new DefaultDataProvider();
             Diff = new DefaultDiff(DataProvider, new DefaultDiffProxy(), FileSystem);
             BaseOperator = new DefaultBaseOperator(FileSystem, DataProvider, Diff);
+            TreeOperation = new DefaultTreeOperation(DataProvider);
+            CommitOperation = new DefaultCommitOperation(DataProvider, TreeOperation);
             OidConverter = BaseOperator.GetOid;
         }
 
@@ -36,7 +43,6 @@
                 InitOption,
                 HashObjectOption,
                 CatFileOption,
-                WriteTreeOption,
                 ReadTreeOption,
                 CommitOption,
                 LogOption,
@@ -54,7 +60,6 @@
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
-                (WriteTreeOption o) => WriteTree(o),
                 (ReadTreeOption o) => ReadTree(o),
                 (CommitOption o) => Commit(o),
                 (LogOption o) => Log(o),
@@ -242,12 +247,6 @@
             return 0;
         }
 
-        private static int WriteTree(WriteTreeOption _)
-        {
-            Console.WriteLine(BaseOperator.WriteTree());
-            return 0;
-        }
-
         private static int ReadTree(ReadTreeOption o)
         {
             BaseOperator.ReadTree(OidConverter(o.Tree));
@@ -256,7 +255,7 @@
 
         private static int Commit(CommitOption o)
         {
-            Console.WriteLine(BaseOperator.Commit(o.Message));
+            Console.WriteLine(CommitOperation.CreateCommit(o.Message));
             return 0;
         }
 

@@ -183,6 +183,39 @@
             this.fileSystem.File.WriteAllText(path, data);
         }
 
+        /// <inheritdoc/>
+        public string GetOid(string name)
+        {
+            name = name == "@" ? "HEAD" : name;
+            string[] refsToTry = new string[]
+            {
+                Path.Join(name),
+                Path.Join("refs", name),
+                Path.Join("refs", "tags", name),
+                Path.Join("refs", "heads", name),
+            };
+            foreach (var @ref in refsToTry)
+            {
+                if (!string.IsNullOrEmpty(this.GetRef(@ref, false).Value))
+                {
+                    return this.GetRef(@ref).Value;
+                }
+            }
+
+            if (name.IsOnlyHex() && name.Length == 40)
+            {
+                return name;
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc/>
+        public IFileSystem FileSystem => this.fileSystem;
+
+        /// <inheritdoc/>
+        public bool IsIgnore(string path) => path.Split(Path.DirectorySeparatorChar).Contains(this.GitDir);
+
         private (string, RefValue) GetRefInternal(string @ref, bool deref)
         {
             var refPath = Path.Join(this.GitDir, @ref);
