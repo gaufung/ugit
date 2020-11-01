@@ -1,7 +1,9 @@
 ﻿namespace Ugit.Operations
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Nito.Collections;
 
     /// <summary>
     /// Default implmentation of <see cref="ICommitOperation"/>.
@@ -82,6 +84,34 @@
                 Parents = parents,
                 Message = message,
             };
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids)
+        {
+            Deque<string> oidQueue = new Deque<string>(oids);
+            HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            while (oidQueue.Count > 0)
+            {
+                string oid = oidQueue.RemoveFromFront();
+                if (string.IsNullOrWhiteSpace(oid) || visited.Contains(oid))
+                {
+                    continue;
+                }
+
+                visited.Add(oid);
+                yield return oid;
+
+                var commit = this.GetCommit(oid);
+                oidQueue.AddToFront(commit.Parents.FirstOrDefault());
+                if (commit.Parents.Count > 1)
+                {
+                    commit.Parents.TakeLast(commit.Parents.Count - 1)
+                        .ToList()
+                        .ForEach(id => oidQueue.AddToBack(id));
+                }
+            }
         }
     }
 }

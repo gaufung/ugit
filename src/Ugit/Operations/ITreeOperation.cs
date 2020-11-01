@@ -31,7 +31,13 @@
         /// <summary>
         /// Write index to the current working.
         /// </summary>
-        /// <param name="index">The index value</param>
+        /// <param name="index">The index value.</param>
         void CheckoutIndex(Dictionary<string, string> index);
+
+        /// <summary>
+        /// Get working tree.
+        /// </summary>
+        /// <returns>The working tree. {filepath: oid}.</returns>
+        IDictionary<string, string> GetWorkingTree();
     }
 }

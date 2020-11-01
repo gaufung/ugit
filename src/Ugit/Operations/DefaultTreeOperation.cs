@@ -110,6 +110,24 @@
             return this.WriteTreeRecursive(indexAsTree);
         }
 
+        /// <inheritdoc/>
+        public IDictionary<string, string> GetWorkingTree()
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            foreach (var filePath in this.dataProvider.FileSystem.Walk("."))
+            {
+                string path = Path.GetRelativePath(".", filePath);
+                if (this.dataProvider.IsIgnore(path))
+                {
+                    continue;
+                }
+
+                result[path] = this.dataProvider.HashObject(this.dataProvider.FileSystem.File.ReadAllBytes(path));
+            }
+
+            return result;
+        }
+
         private IEnumerable<(string, string, string)> IterTreeEntry(string oid)
         {
             if (string.IsNullOrWhiteSpace(oid))

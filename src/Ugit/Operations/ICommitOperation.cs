@@ -1,5 +1,7 @@
 ﻿namespace Ugit.Operations
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Commit Operation interface.
     /// </summary>
@@ -18,5 +20,12 @@
         /// <param name="message">The commit message.</param>
         /// <returns>Create Commit.</returns>
         string CreateCommit(string message);
+
+        /// <summary>
+        /// Iter commits and parents.
+        /// </summary>
+        /// <param name="oids">oids.</param>
+        /// <returns>histrory oids.</returns>
+        IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids);
     }
 }
