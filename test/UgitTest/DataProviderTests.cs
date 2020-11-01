@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using System.Collections;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -32,6 +31,21 @@ namespace Ugit
         [TestMethod]
         public void InitTest()
         {
+            direcotryMock.Setup(d => d.Exists(".ugit")).Returns(false);
+            direcotryMock.Setup(d => d.CreateDirectory(".ugit"));
+            string directoryPath = Path.Combine(".ugit", "objects");
+            direcotryMock.Setup(d => d.CreateDirectory(directoryPath));
+            fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
+            dataProvider.Init();
+            direcotryMock.VerifyAll();
+            fileSystemMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void InitTwiceTest()
+        {
+            direcotryMock.Setup(d => d.Exists(".ugit")).Returns(true);
+            direcotryMock.Setup(d => d.Delete(".ugit", true));
             direcotryMock.Setup(d => d.CreateDirectory(".ugit"));
             string directoryPath = Path.Combine(".ugit", "objects");
             direcotryMock.Setup(d => d.CreateDirectory(directoryPath));

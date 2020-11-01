@@ -77,6 +77,11 @@
         /// <inheritdoc/>
         public void Init()
         {
+            if (this.fileSystem.Directory.Exists(this.GitDir))
+            {
+                this.fileSystem.Directory.Delete(this.GitDir, true);
+            }
+
             this.fileSystem.Directory.CreateDirectory(this.GitDir);
             this.fileSystem.Directory.CreateDirectory(Path.Join(this.GitDir, "objects"));
         }
