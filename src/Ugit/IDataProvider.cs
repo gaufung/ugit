@@ -6,13 +6,8 @@
     /// <summary>
     /// Data provider for file operation.
     /// </summary>
-    internal interface IDataProvider
+    internal interface IDataProvider : IFileOperator
     {
-        /// <summary>
-        /// Gets a file system.
-        /// </summary>
-        IFileSystem FileSystem { get; }
-
         /// <summary>
         /// Gets the git directory full path.
         /// </summary>

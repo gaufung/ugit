@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
 
@@ -16,7 +15,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTreeOperation"/> class.
         /// </summary>
-        /// <param name="dataProvider">The data provider</param>
+        /// <param name="dataProvider">The data provider.</param>
         public DefaultTreeOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
@@ -25,13 +24,12 @@
         /// <inheritdoc/>
         public void CheckoutIndex(Dictionary<string, string> index)
         {
-            this.EmptyCurrentDirectory();
+            this.dataProvider.EmptyCurrentDirectory();
             foreach (var entry in index)
             {
                 string path = entry.Key;
                 string oid = entry.Value;
-                this.dataProvider.FileSystem.CreateParentDirectory(path);
-                this.dataProvider.FileSystem.File.WriteAllBytes(path, this.dataProvider.GetObject(oid, "blob"));
+                this.dataProvider.WriteAllBytes(path, this.dataProvider.GetObject(oid, "blob"));
             }
         }
 
@@ -115,7 +113,7 @@
         public IDictionary<string, string> GetWorkingTree()
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
-            foreach (var filePath in this.dataProvider.FileSystem.Walk("."))
+            foreach (var filePath in this.dataProvider.Walk("."))
             {
                 string path = Path.GetRelativePath(".", filePath);
                 if (this.dataProvider.IsIgnore(path))
@@ -123,10 +121,16 @@
                     continue;
                 }
 
-                result[path] = this.dataProvider.HashObject(this.dataProvider.FileSystem.File.ReadAllBytes(path));
+                result[path] = this.dataProvider.HashObject(this.dataProvider.ReadAllBytes(path));
             }
 
             return result;
+        }
+
+        /// <inheritdoc/>
+        public Dictionary<string, string> GetIndexTree()
+        {
+            return this.dataProvider.GetIndex();
         }
 
         private IEnumerable<(string, string, string)> IterTreeEntry(string oid)
@@ -144,29 +148,6 @@
                 {
                     yield return (tokens[0], tokens[1], tokens[2]);
                 }
-            }
-        }
-
-        private void EmptyCurrentDirectory()
-        {
-            foreach (var filePath in this.dataProvider.FileSystem.Directory.EnumerateFiles("."))
-            {
-                if (this.dataProvider.IsIgnore(filePath))
-                {
-                    continue;
-                }
-
-                this.dataProvider.FileSystem.File.Delete(filePath);
-            }
-
-            foreach (var directoryPath in this.dataProvider.FileSystem.Directory.EnumerateDirectories("."))
-            {
-                if (this.dataProvider.IsIgnore(directoryPath))
-                {
-                    continue;
-                }
-
-                this.dataProvider.FileSystem.Directory.Delete(directoryPath, true);
             }
         }
 
@@ -195,11 +176,6 @@
                 "\n",
                 entries.Select(e => $"{e.Item3} {e.Item2} {e.Item1}"));
             return this.dataProvider.HashObject(subTree.Encode(), "tree");
-        }
-
-        public Dictionary<string, string> GetIndexTree()
-        {
-            return this.dataProvider.GetIndex();
         }
     }
 }

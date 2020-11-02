@@ -19,17 +19,18 @@
             this.dataProvider = dataProvider;
         }
 
+        /// <inheritdoc/>
         public void Add(IEnumerable<string> fileNames)
         {
             var index = this.dataProvider.GetIndex();
 
             foreach (var name in fileNames)
             {
-                if (this.dataProvider.FileSystem.File.Exists(name))
+                if (this.dataProvider.Exist(name, true))
                 {
                     this.AddFile(index, name);
                 }
-                else if (this.dataProvider.FileSystem.Directory.Exists(name))
+                else if (this.dataProvider.Exist(name, false))
                 {
                     this.AddDirectionary(index, name);
                 }
@@ -40,7 +41,7 @@
 
         private void AddDirectionary(IDictionary<string, string> index, string directoryName)
         {
-            foreach (var fileName in this.dataProvider.FileSystem.Walk(directoryName))
+            foreach (var fileName in this.dataProvider.Walk(directoryName))
             {
                 if (this.dataProvider.IsIgnore(fileName))
                 {
@@ -52,7 +53,7 @@
         private void AddFile(IDictionary<string, string> index, string fileName)
         {
             var normalFileName = Path.GetRelativePath(".", fileName);
-            byte[] data = this.dataProvider.FileSystem.File.ReadAllBytes(normalFileName);
+            byte[] data = this.dataProvider.ReadAllBytes(normalFileName);
             string oid = this.dataProvider.HashObject(data);
             index[normalFileName] = oid;
         }

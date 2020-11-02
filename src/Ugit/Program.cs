@@ -16,8 +16,6 @@
 
         private static readonly IFileSystem FileSystem;
 
-        //private static readonly IBaseOperator BaseOperator;
-
         private static readonly IDiff Diff;
 
         private static readonly ICommitOperation CommitOperation;
