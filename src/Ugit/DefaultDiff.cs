@@ -1,9 +1,7 @@
 ﻿namespace Ugit
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.IO.Abstractions;
     using System.Linq;
 
     /// <summary>
@@ -15,19 +13,16 @@
 
         private readonly IDiffProxy diffProxy;
 
-        private readonly IFileSystem fileSystem;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDiff"/> class.
         /// </summary>
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
         /// <param name="fileSystem">file system.</param>
-        public DefaultDiff(IDataProvider dataProvider, IDiffProxy diffProxy, IFileSystem fileSystem)
+        public DefaultDiff(IDataProvider dataProvider, IDiffProxy diffProxy)
         {
             this.dataProvider = dataProvider;
             this.diffProxy = diffProxy;
-            this.fileSystem = fileSystem;
         }
 
         /// <inheritdoc/>
@@ -60,9 +55,9 @@
         public string DiffBlob(string fromOid, string toOid, string path)
         {
             string fromFile = Path.GetTempFileName();
-            this.fileSystem.File.WriteAllBytes(fromFile, this.dataProvider.GetObject(fromOid));
+            this.dataProvider.WriteAllBytes(fromFile, this.dataProvider.GetObject(fromOid));
             string toFile = Path.GetTempFileName();
-            this.fileSystem.File.WriteAllBytes(toFile, this.dataProvider.GetObject(toOid));
+            this.dataProvider.WriteAllBytes(toFile, this.dataProvider.GetObject(toOid));
             var (_, output, _) = this.diffProxy.Execute(
                 "diff",
                 $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
@@ -111,9 +106,9 @@
         public string MergeBlob(string headOid, string otherOid)
         {
             string headFile = Path.GetTempFileName();
-            this.fileSystem.File.WriteAllBytes(headFile, this.dataProvider.GetObject(headOid));
+            this.dataProvider.WriteAllBytes(headFile, this.dataProvider.GetObject(headOid));
             string otherFile = Path.GetTempFileName();
-            this.fileSystem.File.WriteAllBytes(otherFile, this.dataProvider.GetObject(otherOid));
+            this.dataProvider.WriteAllBytes(otherFile, this.dataProvider.GetObject(otherOid));
             string arguments = string.Join(" ", new string[] { "-DHEAD", headFile, otherFile });
             var (_, output, _) = this.diffProxy.Execute("diff", arguments);
             return output;

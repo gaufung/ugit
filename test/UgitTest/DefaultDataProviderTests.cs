@@ -9,7 +9,7 @@ using System.Text;
 namespace Ugit
 {
     [TestClass]
-    public class DataProviderTests
+    public class DefaultDataProviderTests
     {
         private Mock<IDirectory> direcotryMock;
 
@@ -62,7 +62,6 @@ namespace Ugit
             string expected = Path.Join(@"D:\test", ".ugit");
             Assert.AreEqual(expected, dataProvider.GitDirFullPath);
             direcotryMock.VerifyAll();
-            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -169,7 +168,6 @@ namespace Ugit
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             Assert.IsNull(dataProvider.GetRef("HEAD").Value);
             fileMock.VerifyAll();
-            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -182,7 +180,6 @@ namespace Ugit
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             Assert.AreEqual(head, dataProvider.GetRef("HEAD").Value);
             fileMock.VerifyAll();
-            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -199,9 +196,6 @@ namespace Ugit
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             Assert.AreEqual("foo", dataProvider.GetRef("HEAD").Value);
             fileMock.VerifyAll();
-            fileSystemMock.VerifyAll();
-
-
         }
 
         [TestMethod]
@@ -245,7 +239,6 @@ namespace Ugit
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             dataProvider.DeleteRef(@ref);
             fileMock.VerifyAll();
-            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -315,7 +308,7 @@ namespace Ugit
             });
 
             fileMock.Setup(f => f.Delete(Path.Join("foo.txt")));
-            direcotryMock.Setup(d => d.Delete("sub"));
+            direcotryMock.Setup(d => d.Delete("sub", true));
             dataProvider.EmptyCurrentDirectory();
             fileMock.VerifyAll();
             direcotryMock.VerifyAll();

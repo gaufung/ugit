@@ -42,7 +42,7 @@
         {
             FileSystem = new FileSystem();
             DataProvider = new DefaultDataProvider();
-            Diff = new DefaultDiff(DataProvider, new DefaultDiffProxy(), FileSystem);
+            Diff = new DefaultDiff(DataProvider, new DefaultDiffProxy());
             TreeOperation = new DefaultTreeOperation(DataProvider);
             CommitOperation = new DefaultCommitOperation(DataProvider, TreeOperation);
             TagOperation = new DefaultTagOperation(DataProvider);

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Ugit
 {
     [TestClass]
-    public class DiffTests
+    public class DefaultDiffTests
     {
 
         private IDiff diff;
@@ -18,18 +15,12 @@ namespace Ugit
 
         private Mock<IDiffProxy> diffProxyMock;
 
-        private Mock<IFileSystem> fileSystemMock;
-
-        private Mock<IFile> fileMock;
-
         [TestInitialize]
         public void Init()
         {
             dataproviderMock = new Mock<IDataProvider>();
             diffProxyMock = new Mock<IDiffProxy>();
-            fileSystemMock = new Mock<IFileSystem>();
-            fileMock = new Mock<IFile>();
-            diff = new DefaultDiff(dataproviderMock.Object, diffProxyMock.Object, fileSystemMock.Object);
+            diff = new DefaultDiff(dataproviderMock.Object, diffProxyMock.Object);
         }
 
         [TestMethod]
@@ -75,7 +66,7 @@ namespace Ugit
                 { "hello.txt", "foo1" },
                 { "world.txt", "bar" },
             };
-            fileMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
+            dataproviderMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
             diffProxyMock.Setup(d => d.Execute("diff", It.IsAny<string>())).Returns<string, string>( (_, args) => 
             {
                 if (args.Contains("hello.txt"))
@@ -91,7 +82,6 @@ namespace Ugit
                 return (-1, "", "");
 
             });
-            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             string actual = diff.DiffTrees(fromTree, toTree);
             Assert.AreEqual("foo\nbar", actual);
         }
@@ -136,9 +126,8 @@ namespace Ugit
             dataproviderMock.Setup(d => d.GetObject("foo", "blob")).Returns("hello".Encode());
             dataproviderMock.Setup(d => d.GetObject("foo1", "blob")).Returns("Hello".Encode());
             dataproviderMock.Setup(d => d.HashObject(It.IsAny<byte[]>(), "blob")).Returns("foo");
-            fileMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
+            dataproviderMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
             diffProxyMock.Setup(d => d.Execute(It.IsAny<string>(), It.IsAny<string>())).Returns((0, "Hello", ""));
-            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             var acutal = diff.MergeTree(headTree, otherTree);
             Assert.AreEqual("foo", acutal["hello.txt"]);
         }
