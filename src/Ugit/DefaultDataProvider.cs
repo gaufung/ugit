@@ -52,7 +52,11 @@
                 if (!string.IsNullOrWhiteSpace(expected) && index > 0)
                 {
                     var type = data.Take(index).ToArray().Decode();
-                    Debug.Assert(expected == type, $"expected {expected}, got {type}");
+                    if (!string.Equals(expected, type, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new ArgumentException($"Unknow object type, got {type}");
+                    }
+
                     return data.TakeLast(data.Length - index - 1).ToArray();
                 }
             }
@@ -90,7 +94,11 @@
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
             @ref = this.GetRefInternal(@ref, deref).Item1;
-            Debug.Assert(!string.IsNullOrEmpty(value.Value), "ref value should be null or empty");
+            if (string.IsNullOrWhiteSpace(value.Value))
+            {
+                throw new ArgumentException("ref value could be null or empty");
+            }
+
             string val;
             if (value.Symbolic)
             {

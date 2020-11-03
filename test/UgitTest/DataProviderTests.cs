@@ -23,8 +23,10 @@ namespace Ugit
         public void Init()
         {
             direcotryMock = new Mock<IDirectory>(MockBehavior.Loose);
-            fileSystemMock = new Mock<IFileSystem>(MockBehavior.Loose);
             fileMock = new Mock<IFile>(MockBehavior.Loose);
+            fileSystemMock = new Mock<IFileSystem>(MockBehavior.Loose);
+            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
+            fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
             dataProvider = new DefaultDataProvider(fileSystemMock.Object);
         }
 
@@ -33,12 +35,10 @@ namespace Ugit
         {
             direcotryMock.Setup(d => d.Exists(".ugit")).Returns(false);
             direcotryMock.Setup(d => d.CreateDirectory(".ugit"));
-            string directoryPath = Path.Combine(".ugit", "objects");
+            string directoryPath = Path.Join(".ugit", "objects");
             direcotryMock.Setup(d => d.CreateDirectory(directoryPath));
-            fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
             dataProvider.Init();
             direcotryMock.VerifyAll();
-            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -52,15 +52,13 @@ namespace Ugit
             fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
             dataProvider.Init();
             direcotryMock.VerifyAll();
-            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
-        public void GitDirTest()
+        public void GitDirAndPathTest()
         {
             Assert.AreEqual(".ugit", dataProvider.GitDir);
             direcotryMock.Setup(d => d.GetCurrentDirectory()).Returns(@"D:\test");
-            fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
             string expected = Path.Join(@"D:\test", ".ugit");
             Assert.AreEqual(expected, dataProvider.GitDirFullPath);
             direcotryMock.VerifyAll();
@@ -73,9 +71,18 @@ namespace Ugit
             byte[] data = Encoding.UTF8.GetBytes("Hello World");
             string filePath = Path.Join(".ugit", "objects", "0a6649a0077da1bf5a8b3b5dd3ea733ea6a81938");
             fileMock.Setup(f => f.WriteAllBytes(filePath, data));
-            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             var actual = dataProvider.HashObject(data);
             Assert.AreEqual("0a6649a0077da1bf5a8b3b5dd3ea733ea6a81938", actual);
+        }
+
+        [TestMethod]
+        public void HashObjectEmptyTypeTest()
+        {
+            byte[] data = Encoding.UTF8.GetBytes("Hello World");
+            string filePath = Path.Join(".ugit", "objects", "0a4d55a8d778e5022fab701977c5d840bbc486d0");
+            fileMock.Setup(f => f.WriteAllBytes(filePath, data));
+            var actual = dataProvider.HashObject(data, "");
+            Assert.AreEqual("0a4d55a8d778e5022fab701977c5d840bbc486d0", actual);
         }
 
         [TestMethod]
@@ -98,9 +105,34 @@ namespace Ugit
             string filePath = Path.Join(".ugit", "objects", oid);
             fileMock.Setup(f => f.Exists(filePath)).Returns(true);
             fileMock.Setup(f => f.ReadAllBytes(filePath)).Returns(data);
-            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             var expected = "Hello World".Encode();
             CollectionAssert.AreEqual(expected, dataProvider.GetObject(oid));
+        }
+
+        [TestMethod]
+        public void GetObjectWithoutTypeTest()
+        {
+            string oid = "foo";
+            byte[] data = "Hello World".Encode();
+            string filePath = Path.Join(".ugit", "objects", oid);
+            fileMock.Setup(f => f.Exists(filePath)).Returns(true);
+            fileMock.Setup(f => f.ReadAllBytes(filePath)).Returns(data);
+            var actual = dataProvider.GetObject(oid);
+            CollectionAssert.AreEqual(Array.Empty<byte>(), actual);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void GetObjectUnexpectedTypeTest()
+        {
+            string oid = "foo";
+            byte[] data = "Hello World".Encode();
+            data = "unknow".Encode().Concat(new[] { byte.Parse("0") }).Concat(data).ToArray();
+            string filePath = Path.Join(".ugit", "objects", oid);
+            fileMock.Setup(f => f.Exists(filePath)).Returns(true);
+            fileMock.Setup(f => f.ReadAllBytes(filePath)).Returns(data);
+            dataProvider.GetObject(oid);
+            fileSystemMock.VerifyAll();
         }
 
         [TestMethod]
@@ -110,8 +142,6 @@ namespace Ugit
             string oid = "foo";
             direcotryMock.Setup(d => d.Exists(".ugit")).Returns(true);
             fileMock.Setup(f => f.WriteAllBytes(filePath, It.IsAny<byte[]>()));
-            fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
             dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
@@ -216,6 +246,79 @@ namespace Ugit
             dataProvider.DeleteRef(@ref);
             fileMock.VerifyAll();
             fileSystemMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetIndexEmptyTest()
+        {
+            string indexPath = Path.Join(".ugit", "index");
+            fileMock.Setup(f => f.Exists(indexPath)).Returns(false);
+            var index = dataProvider.GetIndex();
+            Assert.AreEqual(0, index.Count);
+        }
+
+        [TestMethod]
+        public void GetIndexTest()
+        {
+            string indexPath = Path.Join(".ugit", "index");
+            fileMock.Setup(f => f.Exists(indexPath)).Returns(true);
+            fileMock.Setup(f => f.ReadAllBytes(indexPath)).Returns("{\"foo\": \"bar\"}".Encode());
+            var index = dataProvider.GetIndex();
+            Assert.AreEqual(1, index.Count);
+            Assert.IsTrue(index.ContainsKey("foo"));
+            Assert.AreEqual("bar", index["foo"]);
+        }
+
+        [TestMethod]
+        public void SetIndexTest()
+        {
+            string indexPath = Path.Join(".ugit", "index");
+            fileMock.Setup(f => f.Exists(indexPath)).Returns(true);
+            fileMock.Setup(f => f.Delete(indexPath));
+            string data = "{\"foo\":\"bar\"}";
+            fileMock.Setup(f => f.WriteAllText(indexPath, data));
+            dataProvider.SetIndex(new System.Collections.Generic.Dictionary<string, string>()
+            {
+                { "foo", "bar"}
+            });
+            fileMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void IsIgnoreTrueTest()
+        {
+            string path = Path.Join(".ugit", "objects", "foo");
+            var actual = dataProvider.IsIgnore(path);
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod]
+        public void IsIgnoreFalseTest()
+        {
+            string path = Path.Join("sub", "objects", "foo");
+            var actual = dataProvider.IsIgnore(path);
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod]
+        public void EmptyCurrentDirectoryTest()
+        {
+            direcotryMock.Setup(d => d.EnumerateFiles(".")).Returns(new string[]
+            {
+                Path.Join("foo.txt"),
+                Path.Join(".ugit", "bar.txt")
+            });
+            direcotryMock.Setup(d => d.EnumerateDirectories(".")).Returns(new string[]
+            {
+                Path.Join("sub"),
+                Path.Join(".ugit")
+            });
+
+            fileMock.Setup(f => f.Delete(Path.Join("foo.txt")));
+            direcotryMock.Setup(d => d.Delete("sub"));
+            dataProvider.EmptyCurrentDirectory();
+            fileMock.VerifyAll();
+            direcotryMock.VerifyAll();
         }
     }
 }
