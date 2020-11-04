@@ -44,7 +44,11 @@
                 }
 
                 var head = HEAD.Value;
-                Debug.Assert(head.StartsWith(Path.Join("refs", "heads")), "Branch ref should start with refs/heads");
+                if (!head.StartsWith(Path.Join("refs", "heads")))
+                {
+                    throw new System.Exception("Branch ref should start with refs/heads");
+                }
+
                 return Path.GetRelativePath(Path.Join("refs", "heads"), head);
             }
         }
