@@ -115,12 +115,12 @@
             Dictionary<string, string> result = new Dictionary<string, string>();
             foreach (var filePath in this.dataProvider.Walk("."))
             {
-                string path = Path.GetRelativePath(".", filePath);
-                if (this.dataProvider.IsIgnore(path))
+                if (this.dataProvider.IsIgnore(filePath))
                 {
                     continue;
                 }
 
+                string path = Path.GetRelativePath(".", filePath);
                 result[path] = this.dataProvider.HashObject(this.dataProvider.ReadAllBytes(path));
             }
 

@@ -40,6 +40,10 @@
         /// <returns>The working tree. {filepath: oid}.</returns>
         IDictionary<string, string> GetWorkingTree();
 
+        /// <summary>
+        /// Get Index Tree.
+        /// </summary>
+        /// <returns>Index tree.</returns>
         Dictionary<string, string> GetIndexTree();
     }
 }
