@@ -87,7 +87,7 @@
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids)
+        public IEnumerable<string> GetCommitHistory(IEnumerable<string> oids)
         {
             Deque<string> oidQueue = new Deque<string>(oids);
             HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

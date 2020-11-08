@@ -121,7 +121,7 @@
         }
 
         /// <inheritdoc/>
-        public IEnumerable<(string, RefValue)> IterRefs(string prefix = "", bool deref = true)
+        public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
         {
             if ("HEAD".StartsWith(prefix))
             {

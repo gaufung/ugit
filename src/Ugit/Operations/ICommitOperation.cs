@@ -26,6 +26,6 @@
         /// </summary>
         /// <param name="oids">oids.</param>
         /// <returns>histrory oids.</returns>
-        IEnumerable<string> IterCommitsAndParents(IEnumerable<string> oids);
+        IEnumerable<string> GetCommitHistory(IEnumerable<string> oids);
     }
 }

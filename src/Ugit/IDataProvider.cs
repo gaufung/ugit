@@ -1,7 +1,6 @@
 ﻿namespace Ugit
 {
     using System.Collections.Generic;
-    using System.IO.Abstractions;
 
     /// <summary>
     /// Data provider for file operation.
@@ -61,7 +60,7 @@
         /// <param name="prefix">The refer prefix.</param>
         /// <param name="deref">Whether needs to derefence.</param>
         /// <returns>The refernces list.</returns>
-        IEnumerable<(string, RefValue)> IterRefs(string prefix = "", bool deref = true);
+        IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true);
 
         /// <summary>
         /// Delete reference.

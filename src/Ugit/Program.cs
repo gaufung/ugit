@@ -242,7 +242,7 @@
             string oid = OidConverter(o.Oid);
 
             IDictionary<string, IList<string>> refs = new Dictionary<string, IList<string>>();
-            foreach (var (refname, @ref) in DataProvider.IterRefs())
+            foreach (var (refname, @ref) in DataProvider.GetAllRefs())
             {
                 if (refs.ContainsKey(@ref.Value))
                 {
@@ -254,7 +254,7 @@
                 }
             }
 
-            foreach (var objectId in CommitOperation.IterCommitsAndParents(new string[] { oid }))
+            foreach (var objectId in CommitOperation.GetCommitHistory(new string[] { oid }))
             {
                 var commit = CommitOperation.GetCommit(objectId);
                 PrintCommit(objectId, commit, refs.ContainsKey(objectId) ? refs[objectId] : null);

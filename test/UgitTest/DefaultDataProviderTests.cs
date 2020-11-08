@@ -199,7 +199,7 @@ namespace Ugit
         }
 
         [TestMethod]
-        public void IterRefsTest()
+        public void GetAllRefsTest()
         {
             string headPath = Path.Join(".ugit", "HEAD");
             fileMock.Setup(f => f.Exists(headPath)).Returns(true);
@@ -221,7 +221,7 @@ namespace Ugit
             });
             fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
-            (string, RefValue)[] refs = dataProvider.IterRefs().ToArray();
+            (string, RefValue)[] refs = dataProvider.GetAllRefs().ToArray();
             CollectionAssert.AreEqual(new (string, RefValue)[]
             {
                 ValueTuple.Create("HEAD", RefValue.Create(false, "foo")),

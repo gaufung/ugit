@@ -25,7 +25,7 @@
         {
             get
             {
-                foreach (var (refName, _) in this.dataProvider.IterRefs(Path.Join("refs", "heads")))
+                foreach (var (refName, _) in this.dataProvider.GetAllRefs(Path.Join("refs", "heads")))
                 {
                     yield return Path.GetRelativePath(Path.Join("refs", "heads"), refName);
                 }

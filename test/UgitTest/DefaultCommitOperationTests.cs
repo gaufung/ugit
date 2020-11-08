@@ -58,7 +58,7 @@ namespace Ugit
         }
 
         [TestMethod]
-        public void IterCommitsAndParentsTest()
+        public void CommitHistoryTest()
         {
             string commitMessage1 = string.Join("\n", new[]
 {
@@ -78,7 +78,7 @@ namespace Ugit
             this.dataProvider.Setup(d => d.GetObject("foo-oid", "commit")).Returns(commitMessage1.Encode());
             this.dataProvider.Setup(d => d.GetObject("parent-oid", "commit")).Returns(
                 commitMessage2.Encode());
-            var history = commitOperation.IterCommitsAndParents(new string[] { "foo-oid" });
+            var history = commitOperation.GetCommitHistory(new string[] { "foo-oid" });
             CollectionAssert.AreEqual(new string[] { "foo-oid", "parent-oid" }, history.ToArray());
             dataProvider.VerifyAll();
         }

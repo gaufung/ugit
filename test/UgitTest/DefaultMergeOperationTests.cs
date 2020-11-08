@@ -45,7 +45,7 @@ namespace Ugit
                 Tree = "other-tree-oid",
             });
 
-            commitOperation.Setup(c => c.IterCommitsAndParents(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>((oids) =>
+            commitOperation.Setup(c => c.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>((oids) =>
             {
                 if (oids.ToArray()[0] == "other-oid")
                 {
@@ -80,7 +80,7 @@ namespace Ugit
                 Tree = "other-tree-oid",
             });
 
-            commitOperation.Setup(c => c.IterCommitsAndParents(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>((oids) =>
+            commitOperation.Setup(c => c.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>((oids) =>
             {
                 if (oids.ToArray()[0] == "other-oid")
                 {

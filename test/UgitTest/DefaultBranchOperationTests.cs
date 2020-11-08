@@ -24,7 +24,7 @@ namespace Ugit
         [TestMethod]
         public void NamesTest()
         {
-            dataProvider.Setup(d => d.IterRefs(Path.Join("refs", "heads"), true)).Returns(new [] { 
+            dataProvider.Setup(d => d.GetAllRefs(Path.Join("refs", "heads"), true)).Returns(new [] { 
                 (Path.Join("refs", "heads", "master"), RefValue.Create(false, "foo")),
                 (Path.Join("refs", "heads", "dev"), RefValue.Create(false, "bar")),
                 (Path.Join("refs", "heads", "test"), RefValue.Create(false, "baz")),
