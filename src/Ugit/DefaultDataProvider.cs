@@ -41,6 +41,32 @@
         public string GitDirFullPath =>
             Path.Join(this.fileSystem.Directory.GetCurrentDirectory(), this.GitDir);
 
+        public Dictionary<string, string> Index 
+        { 
+            get 
+            {
+                string path = Path.Join(this.GitDir, "index");
+                if (this.fileSystem.File.Exists(path))
+                {
+                    var data = this.fileSystem.File.ReadAllBytes(path);
+                    return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
+                }
+                
+                return new Dictionary<string, string>();
+            } 
+            set
+            {
+                string path = Path.Join(this.GitDir, "index");
+                string data  = JsonSerializer.Serialize(value);
+                if (this.fileSystem.File.Exists(path))
+                {
+                    this.fileSystem.File.Delete(path);
+                }
+
+                this.fileSystem.File.WriteAllText(path, data);
+            }
+        }
+
         /// <inheritdoc/>
         public byte[] GetObject(string oid, string expected = "blob")
         {

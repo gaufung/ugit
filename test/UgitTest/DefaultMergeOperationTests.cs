@@ -94,7 +94,7 @@ namespace Ugit
             });
 
             this.dataProvider.Setup(d => d.UpdateRef("MERGE_HEAD", It.Is<RefValue>(r => !r.Symbolic && r.Value == "other-oid"), true));
-            this.dataProvider.Setup(d => d.GetIndex()).Returns(new Dictionary<string, string>());
+            this.dataProvider.Setup(d => d.Index).Returns(new Dictionary<string, string>());
             this.treeOperation.Setup(d => d.GetTree("head-tree-oid", "")).Returns(
                 new Dictionary<string, string>()
                 {
@@ -124,7 +124,6 @@ namespace Ugit
 
                     throw new Exception();
                 });
-            this.dataProvider.Setup(d => d.SetIndex(It.Is<Dictionary<string, string>>(d => d.Count == 2 && d.ContainsKey("foo.txt") && d.ContainsKey("bar.txt"))));
             mergeOperation.Merge("other-oid");
             dataProvider.VerifyAll();
             treeOperation.VerifyAll();

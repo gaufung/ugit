@@ -246,7 +246,7 @@ namespace Ugit
         {
             string indexPath = Path.Join(".ugit", "index");
             fileMock.Setup(f => f.Exists(indexPath)).Returns(false);
-            var index = dataProvider.GetIndex();
+            var index = dataProvider.Index;
             Assert.AreEqual(0, index.Count);
         }
 
@@ -256,7 +256,7 @@ namespace Ugit
             string indexPath = Path.Join(".ugit", "index");
             fileMock.Setup(f => f.Exists(indexPath)).Returns(true);
             fileMock.Setup(f => f.ReadAllBytes(indexPath)).Returns("{\"foo\": \"bar\"}".Encode());
-            var index = dataProvider.GetIndex();
+            var index = dataProvider.Index;
             Assert.AreEqual(1, index.Count);
             Assert.IsTrue(index.ContainsKey("foo"));
             Assert.AreEqual("bar", index["foo"]);
@@ -270,10 +270,10 @@ namespace Ugit
             fileMock.Setup(f => f.Delete(indexPath));
             string data = "{\"foo\":\"bar\"}";
             fileMock.Setup(f => f.WriteAllText(indexPath, data));
-            dataProvider.SetIndex(new System.Collections.Generic.Dictionary<string, string>()
+            dataProvider.Index = new System.Collections.Generic.Dictionary<string, string>()
             {
                 { "foo", "bar"}
-            });
+            };
             fileMock.VerifyAll();
         }
 

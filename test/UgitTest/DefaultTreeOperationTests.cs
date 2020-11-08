@@ -71,7 +71,7 @@ namespace Ugit
         [TestMethod]
         public void ReadTreeTest()
         {
-            dataProvider.Setup(d => d.GetIndex()).Returns(new Dictionary<string, string>()
+            dataProvider.Setup(d => d.Index).Returns(new Dictionary<string, string>()
             {
             });
 
@@ -89,12 +89,6 @@ namespace Ugit
 
             var tree = treeOpeartion.GetTree("foo-oid", "");
 
-            dataProvider.Setup(d => d.SetIndex(It.Is<Dictionary<string, string>>(
-                mo => mo.Count == 3 && 
-                mo.ContainsKey("a.txt") &&
-                mo.ContainsKey(Path.Join("bar", "b.txt")) &&
-                mo.ContainsKey(Path.Join("bar", "c.md"))
-             )));
             dataProvider.Setup(d => d.EmptyCurrentDirectory());
             dataProvider.Setup(d => d.GetObject("a-oid", "blob")).Returns("Hello a".Encode());
             dataProvider.Setup(d => d.GetObject("b-oid", "blob")).Returns("Hello b".Encode());
@@ -110,7 +104,7 @@ namespace Ugit
         [TestMethod]
         public void WriteTreeTest()
         {
-            dataProvider.Setup(d => d.GetIndex()).Returns(new Dictionary<string, string>()
+            dataProvider.Setup(d => d.Index).Returns(new Dictionary<string, string>()
             {
                 { Path.Join("foo.txt"), "foo-oid" },
                 { Path.Join("sub", "bar.md"), "bar-oid" }

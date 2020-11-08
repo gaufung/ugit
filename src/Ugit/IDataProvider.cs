@@ -70,16 +70,9 @@
         void DeleteRef(string @ref, bool deref = true);
 
         /// <summary>
-        /// Get index value.
-        /// </summary>
-        /// <returns>The stage index.</returns>
-        Dictionary<string, string> GetIndex();
-
+        /// Gets or sets Index.
         /// <summary>
-        /// Set the stage index.
-        /// </summary>
-        /// <param name="index">The index.</param>
-        void SetIndex(Dictionary<string, string> index);
+        Dictionary<string, string> Index { get; set; }
 
         /// <summary>
         /// Get object id from name.

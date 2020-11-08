@@ -60,7 +60,7 @@
         /// <inheritdoc/>
         public void ReadTree(string treeOid, bool updateWorking = false)
         {
-            var index = this.dataProvider.GetIndex();
+            var index = this.dataProvider.Index;
             index.Clear();
             index.Update(this.GetTree(treeOid));
             if (updateWorking)
@@ -68,14 +68,14 @@
                 this.CheckoutIndex(index);
             }
 
-            this.dataProvider.SetIndex(index);
+            this.dataProvider.Index = index;
         }
 
         /// <inheritdoc/>
         public string WriteTree()
         {
             IDictionary<string, object> indexAsTree = new Dictionary<string, object>();
-            Dictionary<string, string> index = this.dataProvider.GetIndex();
+            Dictionary<string, string> index = this.dataProvider.Index;
             foreach (var entry in index)
             {
                 string path = entry.Key;
@@ -105,7 +105,7 @@
                 }
             }
 
-            this.dataProvider.SetIndex(index);
+            this.dataProvider.Index = index;
             return this.WriteTreeRecursive(indexAsTree);
         }
 
@@ -130,7 +130,7 @@
         /// <inheritdoc/>
         public Dictionary<string, string> GetIndexTree()
         {
-            return this.dataProvider.GetIndex();
+            return this.dataProvider.Index;
         }
 
         private IEnumerable<(string, string, string)> IterTreeEntry(string oid)

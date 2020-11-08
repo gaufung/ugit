@@ -23,7 +23,7 @@
         /// <inheritdoc/>
         public void Add(IEnumerable<string> fileNames)
         {
-            var index = this.dataProvider.GetIndex();
+            var index = this.dataProvider.Index;
             foreach (var name in fileNames)
             {
                 if (this.dataProvider.Exist(name, true))
@@ -36,7 +36,7 @@
                 }
             }
 
-            this.dataProvider.SetIndex(index);
+            this.dataProvider.Index = index;
         }
 
         private void AddDirectionary(IDictionary<string, string> index, string directoryName)

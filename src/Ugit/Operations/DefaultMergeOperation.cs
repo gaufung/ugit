@@ -72,7 +72,7 @@
 
         private void ReadTreeMerged(string headTree, string otherTree, bool updateWorking = false)
         {
-            var index = this.dataProvider.GetIndex();
+            var index = this.dataProvider.Index;
             index.Clear();
             index.Update(this.diff.MergeTree(this.treeOperation.GetTree(headTree), this.treeOperation.GetTree(otherTree)));
             if (updateWorking)
@@ -80,7 +80,7 @@
                 this.treeOperation.CheckoutIndex(index);
             }
 
-            this.dataProvider.SetIndex(index);
+            this.dataProvider.Index = index;
         }
     }
 }
