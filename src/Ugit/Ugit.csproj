@@ -36,13 +36,12 @@
     <None Update="scripts\Windows\Test-Ugit.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="scripts\Linux\test_ugit.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="scripts\data\hello.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="scripts\Linux\" />
   </ItemGroup>
 
 </Project>
