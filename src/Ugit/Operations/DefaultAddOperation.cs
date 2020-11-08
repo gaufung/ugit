@@ -1,6 +1,7 @@
 ﻿namespace Ugit.Operations
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
 
     /// <summary>
@@ -23,7 +24,6 @@
         public void Add(IEnumerable<string> fileNames)
         {
             var index = this.dataProvider.GetIndex();
-
             foreach (var name in fileNames)
             {
                 if (this.dataProvider.Exist(name, true))
@@ -43,19 +43,19 @@
         {
             foreach (var fileName in this.dataProvider.Walk(directoryName))
             {
-                if (this.dataProvider.IsIgnore(fileName))
-                {
-                    this.AddDirectionary(index, fileName);
-                }
+                this.AddFile(index, fileName);
             }
         }
 
         private void AddFile(IDictionary<string, string> index, string fileName)
         {
-            var normalFileName = Path.GetRelativePath(".", fileName);
-            byte[] data = this.dataProvider.ReadAllBytes(normalFileName);
-            string oid = this.dataProvider.HashObject(data);
-            index[normalFileName] = oid;
+            if (!this.dataProvider.IsIgnore(fileName))
+            {
+                var normalFileName = Path.GetRelativePath(".", fileName);
+                byte[] data = this.dataProvider.ReadAllBytes(normalFileName);
+                string oid = this.dataProvider.HashObject(data);
+                index[normalFileName] = oid;
+            }
         }
     }
 }

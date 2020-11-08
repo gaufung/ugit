@@ -102,7 +102,8 @@
 
         private static int Merge(MergeOption o)
         {
-            MergeOperation.Merge(o.Commit);
+            var commit = OidConverter(o.Commit);
+            MergeOperation.Merge(commit);
             return 0;
         }
 
