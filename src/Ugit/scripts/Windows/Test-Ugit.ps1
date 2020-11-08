@@ -44,5 +44,5 @@ ugit checkout master
 ugit merge dev
 ugit log
 
-
+Write-Host "Done"
 Set-Location "../"
