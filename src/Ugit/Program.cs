@@ -172,17 +172,31 @@
                 Console.WriteLine($"Merging with {mergeHead.Substring(0, 10)}");
             }
 
-            Console.WriteLine("\nChanges to be committed:\n");
             string headTree = CommitOperation.GetCommit(head).Tree;
+            bool section = false;
             foreach (var (path, action) in Diff.IterChangedFiles(TreeOperation.GetTree(headTree), TreeOperation.GetIndexTree()))
             {
-                Console.WriteLine($"{action}   : {path}");
+                if (!section)
+                {
+                    Console.WriteLine("\nChanges to be committed:");
+                    section = true;
+                }
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"{action}: {path}");
             }
 
-            Console.WriteLine("\nChanges not staged for commit:\n");
+            Console.ResetColor();
+            section = false;
             foreach (var (path, action) in Diff.IterChangedFiles(TreeOperation.GetIndexTree(), TreeOperation.GetWorkingTree()))
             {
-                Console.WriteLine($"{action}   : {path}");
+                if (!section)
+                {
+                    Console.WriteLine("\nChanges not staged for commit:");
+                    section = true;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{action}: {path}");
             }
 
             return 0;
