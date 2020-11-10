@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using Nito.Collections;
 
     /// <summary>
@@ -28,6 +29,7 @@
         /// <inheritdoc/>
         public string CreateCommit(string message)
         {
+            this.CommitValidate();
             string commit = $"tree {this.treeOperation.WriteTree()}\n";
             string HEAD = this.dataProvider.GetRef("HEAD").Value;
             if (!string.IsNullOrWhiteSpace(HEAD))
@@ -111,6 +113,47 @@
                         .ToList()
                         .ForEach(id => oidQueue.AddToBack(id));
                 }
+            }
+        }
+
+        private void CommitValidate()
+        {
+            string HEAD = this.dataProvider.GetRef("HEAD").Value;
+            IDictionary<string, string> headTree = new Dictionary<string, string>();
+            if (!string.IsNullOrWhiteSpace(HEAD))
+            {
+                Commit commit = this.GetCommit(HEAD);
+                headTree = this.treeOperation.GetTree(commit.Tree);
+            }
+
+            IDictionary<string, string> indexTree = this.treeOperation.GetIndexTree();
+            bool isSame = true;
+
+            if (headTree.Count != indexTree.Count)
+            {
+                isSame = false;
+            }
+            else
+            {
+                foreach (var headTreeEntry in headTree)
+                {
+                    if (!indexTree.ContainsKey(headTreeEntry.Key))
+                    {
+                        isSame = false;
+                        break;
+                    }
+
+                    if (indexTree[headTreeEntry.Key] != headTree[headTreeEntry.Key])
+                    {
+                        isSame = false;
+                        break;
+                    }
+                }
+            }
+
+            if (isSame)
+            {
+                throw new UgitException("nothing to commit (create/copy files and use \"ugit add\" to track.");
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
 using System.Linq;
 using Ugit.Operations;
 
@@ -26,6 +27,22 @@ namespace Ugit
         {
             this.treeOperation.Setup(t => t.WriteTree()).Returns("tree-oid");
             this.dataProvider.Setup(d => d.GetRef("HEAD", true)).Returns(RefValue.Create(false, "master-first-oid"));
+            this.dataProvider.Setup(d => d.GetObject("master-first-oid", "commit")).Returns(string.Join("\n", new[]
+            {
+                "tree master-tree-oid",
+                "",
+                "this is message."
+
+            }).Encode());
+            this.treeOperation.Setup(d => d.GetTree("master-tree-oid", "")).Returns(new Dictionary<string, string>()
+            {
+                { "hello.txt", "hello.oid"}
+            });
+            this.treeOperation.Setup(d => d.GetIndexTree()).Returns(new Dictionary<string, string>()
+            {
+                {"hello.txt", "hello.oid" },
+                {"ugit.txt", "ugit.oid" }
+            });
             this.dataProvider.Setup(d => d.GetRef("MERGE_HEAD", true)).Returns(RefValue.Create(false, "merge-head-oid"));
             this.dataProvider.Setup(d => d.DeleteRef("MERGE_HEAD", false));
             string commit = "tree tree-oid\nparent master-first-oid\nparent merge-head-oid\n\nhello foo\n";
@@ -33,6 +50,21 @@ namespace Ugit
             dataProvider.Setup(d => d.UpdateRef("HEAD", It.Is<RefValue>(i => !i.Symbolic && i.Value == "commit-oid"), true));
             string actual = commitOperation.CreateCommit("hello foo");
             Assert.AreEqual("commit-oid", actual);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UgitException))]
+        public void CreateCommitExceptionTest()
+        {
+            this.treeOperation.Setup(t => t.WriteTree()).Returns("tree-oid");
+            this.dataProvider.Setup(d => d.GetRef("HEAD", true)).Returns(RefValue.Create(false, ""));
+            this.treeOperation.Setup(d => d.GetTree("", "")).Returns(new Dictionary<string, string>()
+            {
+            });
+            this.treeOperation.Setup(d => d.GetIndexTree()).Returns(new Dictionary<string, string>()
+            {
+            });
+            _ = commitOperation.CreateCommit("hello foo");
         }
 
         [TestMethod]

@@ -119,7 +119,7 @@ namespace Ugit
             {
                 Path.Join(".ugit", "sub", "ugit.txt")
             });
-
+            directoryMock.Setup(d => d.Exists(It.IsAny<string>())).Returns(true);
             Mock<IFileSystem> fileSystemMock = new Mock<IFileSystem>();
             fileSystemMock.Setup(s => s.Directory).Returns(directoryMock.Object);
             string[] filePaths = fileSystemMock.Object.Walk(directory).ToArray();

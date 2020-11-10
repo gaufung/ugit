@@ -101,6 +101,11 @@
         /// <returns>The all files path.</returns>
         public static IEnumerable<string> Walk(this IFileSystem fileSystem, string directory)
         {
+            if (!fileSystem.Directory.Exists(directory))
+            {
+                yield break;
+            }
+
             foreach (var filePath in fileSystem.Directory.EnumerateFiles(directory))
             {
                 yield return filePath;

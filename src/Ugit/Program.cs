@@ -181,6 +181,7 @@
                     Console.WriteLine("\nChanges to be committed:");
                     section = true;
                 }
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"{action}: {path}");
             }
@@ -198,7 +199,7 @@
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"{action}: {path}");
             }
-
+            Console.ResetColor();
             return 0;
         }
 
@@ -248,7 +249,15 @@
 
         private static int Commit(CommitOption o)
         {
-            Console.WriteLine(CommitOperation.CreateCommit(o.Message));
+            try
+            {
+                Console.WriteLine(CommitOperation.CreateCommit(o.Message));
+            }
+            catch (UgitException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
             return 0;
         }
 

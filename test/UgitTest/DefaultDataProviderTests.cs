@@ -219,6 +219,7 @@ namespace Ugit
             {
                 Path.Join(".ugit", "refs", "tags", "v1.0")
             });
+            direcotryMock.Setup(d => d.Exists(It.IsAny<string>())).Returns(true);
             fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             (string, RefValue)[] refs = dataProvider.GetAllRefs().ToArray();
