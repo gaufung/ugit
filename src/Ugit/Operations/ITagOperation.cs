@@ -1,10 +1,17 @@
-﻿namespace Ugit.Operations
+﻿using System.Collections.Generic;
+
+namespace Ugit.Operations
 {
     /// <summary>
     /// Tag operation interface.
     /// </summary>
     internal interface ITagOperation
     {
+        /// <summary>
+        /// Gets all tags.
+        /// </summary>
+        IEnumerable<string> All { get; }
+
         /// <summary>
         /// Create an tag.
         /// </summary>

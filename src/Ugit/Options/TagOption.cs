@@ -11,7 +11,7 @@
         /// <summary>
         /// Gets or sets name.
         /// </summary>
-        [Value(0)]
+        [Value(0, Required = false)]
         public string Name { get; set; }
 
         /// <summary>

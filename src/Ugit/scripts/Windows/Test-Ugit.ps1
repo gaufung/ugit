@@ -29,6 +29,7 @@ ugit log
 ugit tag v1.0 
 ugit log
 
+
 ugit branch dev
 ugit checkout dev
 ugit branch
@@ -43,6 +44,8 @@ ugit log
 ugit checkout master
 ugit merge dev
 ugit log
+ugit tag v2.0
+ugit tag
 
 Write-Host "Done"
 Set-Location "../"

@@ -1,5 +1,7 @@
 ﻿namespace Ugit.Operations
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
 
     /// <summary>
@@ -16,6 +18,19 @@
         public DefaultTagOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<string> All
+        {
+            get
+            {
+                string prefix = Path.Join("refs", "tags");
+                foreach (var (tagRef, _) in this.dataProvider.GetAllRefs(prefix, false))
+                {
+                    yield return Path.GetRelativePath(prefix, tagRef);
+                }
+            }
         }
 
         /// <inheritdoc/>

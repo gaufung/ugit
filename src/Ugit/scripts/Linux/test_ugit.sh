@@ -53,3 +53,6 @@ ugit log
 ugit checkout master
 ugit merge dev
 ugit log
+
+ugit tag v2.0
+ugit tag

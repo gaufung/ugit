@@ -82,7 +82,7 @@
                 (CommitOption o) => Commit(o),
                 (LogOption o) => Log(o),
                 (CheckoutOption o) => Checkout(o),
-                (TagOption o) => CreateTag(o),
+                (TagOption o) => TagOp(o),
                 (BranchOption o) => Branch(o),
                 (StatusOption o) => Status(o),
                 (ResetOption o) => Reset(o),
@@ -203,10 +203,21 @@
             return 0;
         }
 
-        private static int CreateTag(TagOption o)
+        private static int TagOp(TagOption o)
         {
-            string oid = OidConverter(o.Oid);
-            TagOperation.Create(o.Name, oid);
+            if (string.IsNullOrWhiteSpace(o.Oid) && string.IsNullOrWhiteSpace(o.Name))
+            {
+                foreach (var tag in TagOperation.All)
+                {
+                    Console.WriteLine(tag);
+                }
+            }
+            else
+            {
+                string oid = OidConverter(o.Oid);
+                TagOperation.Create(o.Name, oid);
+            }
+
             return 0;
         }
 
