@@ -1,5 +1,5 @@
 ![.Net Core Build](https://github.com/gaufung/ugit/workflows/.NET%20Core/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/gaufung/ugit/badge.svg?branch=master)](https://coveralls.io/github/gaufung/ugit?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/gaufung/ugit/badge.svg)](https://coveralls.io/github/gaufung/ugit)
 
 
 
