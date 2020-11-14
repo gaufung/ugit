@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Abstractions;
     using System.Linq;
@@ -120,6 +121,7 @@
             }
         }
 
+        [ExcludeFromCodeCoverage]
         public static ParserResult<object> ParseArguments<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12,
             T13, T14, T15, T16, T17>(this Parser parser, IEnumerable<string> args)
         {
@@ -150,6 +152,7 @@
             });
         }
 
+        [ExcludeFromCodeCoverage]
         public static TResult MapResult<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, TResult>(
             this ParserResult<object> result,
             Func<T1, TResult> parsedFunc1,
@@ -264,6 +267,7 @@
             return notParsedFunc(((NotParsed<object>)result).Errors);
         }
 
+        [ExcludeFromCodeCoverage]
         public static ParserResult<object> ParseArguments<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>(this Parser parser, IEnumerable<string> args)
         {
             if (parser == null)
@@ -279,6 +283,7 @@
             });
         }
 
+        [ExcludeFromCodeCoverage]
         public static TResult MapResult<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, TResult>(
             this ParserResult<object> result,
             Func<T1, TResult> parsedFunc1,

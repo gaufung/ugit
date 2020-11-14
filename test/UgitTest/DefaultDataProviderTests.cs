@@ -314,5 +314,82 @@ namespace Ugit
             fileMock.VerifyAll();
             direcotryMock.VerifyAll();
         }
+
+        [TestMethod]
+        public void GetOidHEADTest()
+        {
+            string @ref = Path.Join(".ugit", "HEAD");
+            fileMock.Setup(f => f.Exists(@ref)).Returns(true);
+            fileMock.Setup(f => f.ReadAllBytes(@ref)).Returns("oid".Encode());
+            Assert.AreEqual("oid", this.dataProvider.GetOid("@"));
+            fileMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetOidTest()
+        {
+            string name = new string('a', 40);
+            Assert.AreEqual(name, this.dataProvider.GetOid(name));
+        }
+
+        [TestMethod]
+        public void GetOidNullTest()
+        {
+            string name = "illegalOid";
+            Assert.IsNull(this.dataProvider.GetOid(name));
+        }
+
+        [TestMethod]
+        public void ExistFileTest()
+        {
+            string path = "test";
+            this.fileMock.Setup(f => f.Exists(path)).Returns(true);
+            Assert.IsTrue(this.dataProvider.Exist(path));
+            fileMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void ExistDirectroyTest()
+        {
+            string directory = "test";
+            this.direcotryMock.Setup(d => d.Exists(directory)).Returns(true);
+            Assert.IsTrue(this.dataProvider.Exist(directory, false));
+            direcotryMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void WriteAllBytesTest()
+        {
+            string path = Path.Join("sub", "hello.txt");
+            direcotryMock.Setup(d => d.Exists("sub")).Returns(true);
+            fileMock.Setup(d => d.WriteAllBytes(path, It.IsAny<byte[]>()));
+            dataProvider.WriteAllBytes(path, Array.Empty<byte>());
+            direcotryMock.VerifyAll();
+            fileMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void ReadAllBytesTest()
+        {
+            this.fileMock.Setup(d => d.ReadAllBytes("test.txt")).Returns(Array.Empty<byte>());
+            CollectionAssert.AreEqual(Array.Empty<byte>(), dataProvider.ReadAllBytes("test.txt"));
+            fileMock.VerifyAll();
+        }
+
+        [TestMethod]
+        public void DeleteIgnoreTest()
+        {
+            string path = Path.Join(".ugit", "HEAD");
+            dataProvider.Delete(path);
+        }
+
+        [TestMethod]
+        public void DeleteTest()
+        {
+            string path = Path.Join("sub", "foo.txt");
+            this.fileMock.Setup(d => d.Delete(path));
+            dataProvider.Delete(path);
+            this.fileMock.VerifyAll();
+        }
     }
 }

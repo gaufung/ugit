@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO.Abstractions;
     using CommandLine;
     using Ugit.Operations;
@@ -10,6 +11,7 @@
     /// <summary>
     /// The console program.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class Program
     {
         private static readonly IDataProvider DataProvider;

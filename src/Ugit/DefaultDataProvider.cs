@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Abstractions;
     using System.Linq;
@@ -194,32 +194,6 @@
         }
 
         /// <inheritdoc/>
-        public Dictionary<string, string> GetIndex()
-        {
-            string path = Path.Join(this.GitDir, "index");
-            if (this.fileSystem.File.Exists(path))
-            {
-                var data = this.fileSystem.File.ReadAllBytes(path);
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
-            }
-
-            return new Dictionary<string, string>();
-        }
-
-        /// <inheritdoc/>
-        public void SetIndex(Dictionary<string, string> index)
-        {
-            string path = Path.Join(this.GitDir, "index");
-            string data = JsonSerializer.Serialize(index);
-            if (this.fileSystem.File.Exists(path))
-            {
-                this.fileSystem.File.Delete(path);
-            }
-
-            this.fileSystem.File.WriteAllText(path, data);
-        }
-
-        /// <inheritdoc/>
         public string GetOid(string name)
         {
             name = name == "@" ? "HEAD" : name;
@@ -276,6 +250,7 @@
         }
 
         /// <inheritdoc/>
+        [ExcludeFromCodeCoverage]
         public IEnumerable<string> Walk(string path)
         {
             return this.fileSystem.Walk(path);
