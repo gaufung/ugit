@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Show option.
     /// </summary>
     [Verb("show")]
+    [ExcludeFromCodeCoverage]
     internal class ShowOption
     {
         /// <summary>

@@ -20,3 +20,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("StyleCop.CSharp.NamingRules", "SA1312:Variable names should begin with lower-case letter", Justification = "By design", Scope = "member", Target = "~P:Ugit.Operations.DefaultBranchOperation.Current")]
 [assembly: SuppressMessage("StyleCop.CSharp.NamingRules", "SA1312:Variable names should begin with lower-case letter", Justification = "By Design", Scope = "member", Target = "~M:Ugit.Operations.DefaultCheckoutOperation.Checkout(System.String)")]
 [assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1633:File should have header", Justification = "By Design", Scope = "namespace", Target = "~N:Ugit.Operations")]
+[assembly: SuppressMessage("StyleCop.CSharp.NamingRules", "SA1312:Variable names should begin with lower-case letter", Justification = "By design", Scope = "member", Target = "~M:Ugit.Operations.DefaultCommitOperation.CommitValidate()")]

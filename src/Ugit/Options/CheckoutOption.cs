@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Commit option.
     /// </summary>
     [Verb("checkout")]
+    [ExcludeFromCodeCoverage]
     internal class CheckoutOption
     {
         /// <summary>

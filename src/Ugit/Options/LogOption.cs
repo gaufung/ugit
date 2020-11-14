@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Log option
     /// </summary>
     [Verb("log")]
+    [ExcludeFromCodeCoverage]
     internal class LogOption
     {
         /// <summary>

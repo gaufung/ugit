@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Reset option
     /// </summary>
     [Verb("reset")]
+    [ExcludeFromCodeCoverage]
     public class ResetOption
     {
         /// <summary>

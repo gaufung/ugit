@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Cat file option.
     /// </summary>
     [Verb("cat-file", HelpText="Display the object by object id.")]
+    [ExcludeFromCodeCoverage]
     internal class CatFileOption
     {
         /// <summary>

@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Merge options.
     /// </summary>
     [Verb("merge")]
+    [ExcludeFromCodeCoverage]
     internal class MergeOption
     {
         /// <summary>

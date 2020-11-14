@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace Ugit.Operations
+﻿namespace Ugit.Operations
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Tag operation interface.
     /// </summary>

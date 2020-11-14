@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Diff Option.
     /// </summary>
     [Verb("diff")]
+    [ExcludeFromCodeCoverage]
     internal class DiffOption
     {
         /// <summary>

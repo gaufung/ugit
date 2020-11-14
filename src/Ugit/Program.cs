@@ -66,7 +66,6 @@
                 LogOption,
                 CheckoutOption,
                 TagOption,
-                KOption,
                 BranchOption,
                 StatusOption,
                 ResetOption,
@@ -199,6 +198,7 @@
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"{action}: {path}");
             }
+
             Console.ResetColor();
             return 0;
         }

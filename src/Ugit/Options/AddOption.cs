@@ -1,12 +1,14 @@
 ﻿namespace Ugit.Options
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Add Option.
     /// </summary>
     [Verb("add")]
+    [ExcludeFromCodeCoverage]
     internal class AddOption
     {
         /// <summary>

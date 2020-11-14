@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Tag option.
     /// </summary>
     [Verb("tag")]
+    [ExcludeFromCodeCoverage]
     internal class TagOption
     {
         /// <summary>

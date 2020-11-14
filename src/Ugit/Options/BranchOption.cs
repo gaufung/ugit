@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Branch Option.
     /// </summary>
     [Verb("branch")]
+    [ExcludeFromCodeCoverage]
     internal class BranchOption
     {
         /// <summary>

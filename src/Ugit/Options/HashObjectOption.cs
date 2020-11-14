@@ -1,11 +1,13 @@
 ﻿namespace Ugit.Options
 {
+    using System.Diagnostics.CodeAnalysis;
     using CommandLine;
 
     /// <summary>
     /// Hash object option.
     /// </summary>
     [Verb("hash-object", HelpText ="Hash an file.")]
+    [ExcludeFromCodeCoverage]
     internal class HashObjectOption
     {
         /// <summary>

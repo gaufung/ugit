@@ -18,6 +18,11 @@
         string GitDir { get;  }
 
         /// <summary>
+        /// Gets or sets Index.
+        /// <summary>
+        Dictionary<string, string> Index { get; set; }
+
+        /// <summary>
         /// Initialize the git directory.
         /// </summary>
         void Init();
@@ -68,11 +73,6 @@
         /// <param name="ref">The refernce name.</param>
         /// <param name="deref">Whether needs to deference.</param>
         void DeleteRef(string @ref, bool deref = true);
-
-        /// <summary>
-        /// Gets or sets Index.
-        /// <summary>
-        Dictionary<string, string> Index { get; set; }
 
         /// <summary>
         /// Get object id from name.
