@@ -19,12 +19,11 @@ jobs:
         dotnet-version: 5.0.x
     - name: Install dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Run Linux script
+    - name: Build & Function Test
       run: |
-        cd src/Ugit/bin/Release/net5.0/script/Linux
-        ./test_ugit.sh
+      dotnet build --configuration Release --no-restore
+      cd src/Ugit/bin/Release/net5.0/script/Linux
+      bash ./test_ugit.sh
     - name: Gernerate coverage report
       run: |
         dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
