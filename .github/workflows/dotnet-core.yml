@@ -21,9 +21,9 @@ jobs:
       run: dotnet restore
     - name: Build & Function Test
       run: |
-      dotnet build --configuration Release --no-restore
-      cd src/Ugit/bin/Release/net5.0/script/Linux
-      bash ./test_ugit.sh
+        dotnet build --configuration Release --no-restore
+        cd src/Ugit/bin/Release/net5.0/script/Linux
+        bash ./test_ugit.sh
     - name: Gernerate coverage report
       run: |
         dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
