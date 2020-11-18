@@ -229,7 +229,7 @@
         }
 
         /// <inheritdoc/>
-        public bool IsIgnore(string path) => path.Split(Path.DirectorySeparatorChar).Contains(this.GitDirFullPath);
+        public bool IsIgnore(string path) => path.Split(Path.DirectorySeparatorChar).Contains(this.GitDir);
 
         /// <inheritdoc/>
         public bool Exist(string path, bool isFile = true)
