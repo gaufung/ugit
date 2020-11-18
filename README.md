@@ -14,7 +14,7 @@
 - ...
 
 # Prequirements 
-- .Net Core 3.1
+- .Net Core 5.0.x
 - diff command
   - diff.exe (Windows)
   - diff (*nix)

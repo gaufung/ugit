@@ -391,5 +391,14 @@ namespace Ugit
             dataProvider.Delete(path);
             this.fileMock.VerifyAll();
         }
+
+        [TestMethod]
+        public void GitFullPathDirTest()
+        {
+            this.direcotryMock.Setup(d => d.SetCurrentDirectory(Path.Join("foo", "bar")));
+            this.direcotryMock.Setup(d => d.GetCurrentDirectory()).Returns(Path.Join("foo", "bar"));
+            this.dataProvider = new DefaultDataProvider(this.fileSystemMock.Object, Path.Join("foo", "bar"));
+            Assert.AreEqual(Path.Join("foo", "bar", ".ugit"), this.dataProvider.GitDirFullPath);
+        }
     }
 }
