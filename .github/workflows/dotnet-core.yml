@@ -22,7 +22,7 @@ jobs:
     - name: Build & Function Test
       run: |
         dotnet build --configuration Release --no-restore
-        cd src/Ugit/bin/Release/net5.0/script/Linux
+        cd /home/runner/work/ugit/ugit/src/Ugit/bin/Release/net5.0/scripts/Linux
         bash ./test_ugit.sh
     - name: Gernerate coverage report
       run: |
