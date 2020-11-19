@@ -44,7 +44,7 @@
         /// <summary>
         /// Delete a file.
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">filePath.</param>
         void Delete(string path);
     }
 }

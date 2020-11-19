@@ -75,7 +75,8 @@
                 DiffOption,
                 MergeOption,
                 MergeBaseOption,
-                AddOption>(args).MapResult(
+                AddOption,
+                FetchOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -91,8 +92,16 @@
                 (DiffOption o) => Different(o),
                 (MergeOption o) => Merge(o),
                 (AddOption o) => Add(o),
+                (FetchOption o) => Fetch(o),
                 errors => 1);
             return exitCode;
+        }
+
+        private static int Fetch(FetchOption o)
+        {
+            IRemote remote = new DefaultRemote(new DefaultDataProvider(new FileSystem(), o.Remote));
+            remote.Fetch();
+            return 0;
         }
 
         private static int Add(AddOption o)
