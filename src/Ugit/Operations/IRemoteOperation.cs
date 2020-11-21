@@ -1,6 +1,6 @@
 ﻿namespace Ugit
 {
-    internal interface IRemote
+    internal interface IRemoteOperation
     {
         void Fetch();
     }

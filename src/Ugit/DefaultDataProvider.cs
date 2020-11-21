@@ -320,5 +320,10 @@
 
             return ValueTuple.Create(@ref, RefValue.Create(symbolic, value));
         }
+
+        public bool ObjectExist(string oid)
+        {
+            return this.fileSystem.File.Exists(Path.Join(GitDirFullPath, "objects", oid));
+        }
     }
 }

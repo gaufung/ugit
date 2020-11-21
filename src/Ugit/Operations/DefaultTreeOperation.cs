@@ -133,7 +133,7 @@
             return this.dataProvider.Index;
         }
 
-        private IEnumerable<(string, string, string)> IterTreeEntry(string oid)
+        public IEnumerable<(string, string, string)> IterTreeEntry(string oid)
         {
             if (string.IsNullOrWhiteSpace(oid))
             {

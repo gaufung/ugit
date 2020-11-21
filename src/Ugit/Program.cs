@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO.Abstractions;
+    using System.Runtime.CompilerServices;
     using CommandLine;
     using Ugit.Operations;
     using Ugit.Options;
@@ -99,7 +100,7 @@
 
         private static int Fetch(FetchOption o)
         {
-            IRemote remote = new DefaultRemote(new DefaultDataProvider(new FileSystem(), o.Remote));
+            IRemoteOperation remote = new DefaultRemoteOperation(new DefaultDataProvider(new FileSystem(), o.Remote), new DefaultDataProvider(new FileSystem()));
             remote.Fetch();
             return 0;
         }

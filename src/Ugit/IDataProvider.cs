@@ -1,6 +1,7 @@
 ﻿namespace Ugit
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     /// <summary>
     /// Data provider for file operation.
@@ -87,5 +88,8 @@
         /// <param name="path">the file path or directory.</param>
         /// <returns>True if it need to be ignored.</returns>
         bool IsIgnore(string path);
+
+
+        bool ObjectExist(string oid);
     }
 }

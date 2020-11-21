@@ -45,5 +45,7 @@
         /// </summary>
         /// <returns>Index tree.</returns>
         Dictionary<string, string> GetIndexTree();
+
+        IEnumerable<(string, string, string)> IterTreeEntry(string oid);
     }
 }
