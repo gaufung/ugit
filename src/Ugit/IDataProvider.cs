@@ -1,7 +1,6 @@
 ﻿namespace Ugit
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
 
     /// <summary>
     /// Data provider for file operation.

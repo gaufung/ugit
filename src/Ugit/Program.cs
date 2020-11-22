@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
     using System.IO.Abstractions;
     using System.Runtime.CompilerServices;
     using CommandLine;
@@ -77,7 +78,8 @@
                 MergeOption,
                 MergeBaseOption,
                 AddOption,
-                FetchOption>(args).MapResult(
+                FetchOption,
+                PushOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -94,8 +96,17 @@
                 (MergeOption o) => Merge(o),
                 (AddOption o) => Add(o),
                 (FetchOption o) => Fetch(o),
+                (PushOption o) => Push(o),
                 errors => 1);
             return exitCode;
+        }
+
+        private static int Push(PushOption o)
+        {
+            IRemoteOperation remote = new DefaultRemoteOperation(new DefaultDataProvider(new FileSystem(), o.Remote), new DefaultDataProvider(new FileSystem()));
+            string refName = Path.Join("refs", "heads", o.Branch);
+            remote.Push(refName);
+            return 0;
         }
 
         private static int Fetch(FetchOption o)

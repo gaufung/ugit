@@ -27,10 +27,13 @@
         public DefaultDataProvider(IFileSystem fileSystem, string repoPath = "")
         {
             this.fileSystem = fileSystem;
-            this.repoPath = repoPath;
-            if (!string.IsNullOrWhiteSpace(this.repoPath))
+            if (string.IsNullOrWhiteSpace(repoPath))
             {
-                this.fileSystem.Directory.SetCurrentDirectory(this.repoPath);
+                this.repoPath = this.fileSystem.Directory.GetCurrentDirectory();
+            }
+            else
+            {
+                this.repoPath = repoPath;
             }
         }
 
@@ -47,7 +50,7 @@
 
         /// <inheritdoc/>
         public string GitDirFullPath =>
-            Path.Join(this.fileSystem.Directory.GetCurrentDirectory(), this.GitDir);
+            Path.Join(this.repoPath, this.GitDir);
 
         /// <inheritdoc/>
         public Dictionary<string, string> Index
