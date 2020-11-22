@@ -58,10 +58,7 @@ namespace Ugit
         public void GitDirAndPathTest()
         {
             Assert.AreEqual(".ugit", dataProvider.GitDir);
-            direcotryMock.Setup(d => d.GetCurrentDirectory()).Returns(@"D:\test");
-            string expected = Path.Join(@"D:\test", ".ugit");
-            Assert.AreEqual(expected, dataProvider.GitDirFullPath);
-            direcotryMock.VerifyAll();
+            Assert.AreEqual(".ugit", dataProvider.GitDirFullPath);
         }
 
         [TestMethod]

@@ -88,7 +88,11 @@
         /// <returns>True if it need to be ignored.</returns>
         bool IsIgnore(string path);
 
-
+        /// <summary>
+        /// Object exists by given object or not.
+        /// </summary>
+        /// <param name="oid">object Id.</param>
+        /// <returns>True if existing.</returns>
         bool ObjectExist(string oid);
     }
 }

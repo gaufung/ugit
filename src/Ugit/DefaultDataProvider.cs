@@ -302,6 +302,12 @@
             this.fileSystem.File.Delete(path);
         }
 
+        /// <inheritdoc/>
+        public bool ObjectExist(string oid)
+        {
+            return this.fileSystem.File.Exists(Path.Join(this.GitDirFullPath, "objects", oid));
+        }
+
         private (string, RefValue) GetRefInternal(string @ref, bool deref)
         {
             var refPath = Path.Join(this.GitDirFullPath, @ref);
@@ -322,11 +328,6 @@
             }
 
             return ValueTuple.Create(@ref, RefValue.Create(symbolic, value));
-        }
-
-        public bool ObjectExist(string oid)
-        {
-            return this.fileSystem.File.Exists(Path.Join(GitDirFullPath, "objects", oid));
         }
     }
 }
