@@ -1,12 +1,12 @@
 #! /bin/bash
 
-if [[ -d test ]]
+if [[ -d remote ]]
 then
-    rm -rf test
+    rm -rf remote
 fi
 
-mkdir test
-cd test
+mkdir remote
+cd remote
 
 directoryPath="$(pwd)"
 directoryPath="$(dirname "$directoryPath")"
@@ -19,7 +19,27 @@ export PATH=$PATH:"$directoryPath"
 cd -
 
 ugit init
-ugit status
+cp ../../data/remote.md ./
+ugit add "remote.md"
+ugit commit -m "zero remote commit"
+remotePath="$(pwd)"
+
+cd ../
+
+
+if [[ -d test ]]
+then
+    rm -rf test
+fi
+
+mkdir test
+cd test
+
+ugit init
+
+echo "$remotePath"
+ugit fetch "$remotePath"
+ugit merge remote/master
 
 cp ../../data/hello.txt ./
 
@@ -56,3 +76,5 @@ ugit log
 
 ugit tag v2.0
 ugit tag
+
+ugit push "$remotePath" master
