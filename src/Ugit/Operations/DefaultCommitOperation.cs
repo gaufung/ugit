@@ -54,7 +54,7 @@
         /// <inheritdoc/>
         public Commit GetCommit(string oid)
         {
-            var parents = new List<string>();
+            List<string> parents = new ();
             var commit = this.dataProvider.GetObject(oid, "commit").Decode();
             string[] lines = commit.Split("\n");
             string tree = null;

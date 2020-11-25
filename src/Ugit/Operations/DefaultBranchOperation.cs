@@ -46,7 +46,7 @@
                 var head = HEAD.Value;
                 if (!head.StartsWith(Path.Join("refs", "heads")))
                 {
-                    throw new System.Exception("Branch ref should start with refs/heads");
+                    throw new UgitException("Branch ref should start with refs/heads");
                 }
 
                 return Path.GetRelativePath(Path.Join("refs", "heads"), head);

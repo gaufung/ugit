@@ -28,7 +28,7 @@
         /// <inheritdoc/>
         public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params IDictionary<string, string>[] trees)
         {
-            IDictionary<string, string[]> entries = new Dictionary<string, string[]>();
+            Dictionary<string, string[]> entries = new ();
             for (int i = 0; i < trees.Length; i++)
             {
                 IDictionary<string, string> tree = trees[i];
@@ -117,7 +117,7 @@
         /// <inheritdoc/>
         public IDictionary<string, string> MergeTree(IDictionary<string, string> headTree, IDictionary<string, string> otherTree)
         {
-            var tree = new Dictionary<string, string>();
+            Dictionary<string, string> tree = new ();
             foreach (var entry in this.CompareTrees(headTree, otherTree))
             {
                 string path = entry.Item1;

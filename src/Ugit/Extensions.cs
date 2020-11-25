@@ -23,7 +23,7 @@
         /// <returns>The digest value.</returns>
         public static string Sha1HexDigest(this byte[] data)
         {
-            using var sha1 = new SHA1Managed();
+            using SHA1Managed sha1 = new ();
             var hash = sha1.ComputeHash(data);
             return string.Join(string.Empty, hash.Select(h => h.ToString("x2")));
         }
@@ -121,9 +121,15 @@
             }
         }
 
+        /// <summary>
+        /// Get refs mapping.
+        /// </summary>
+        /// <param name="dataProvider">the data provider.</param>
+        /// <param name="prefix">the ref prefix.</param>
+        /// <returns>The ref mapping { ref, ref-value }</returns>
         public static IDictionary<string, string> GetRefsMapping(this IDataProvider dataProvider, string prefix)
         {
-            IDictionary<string, string> refs = new Dictionary<string, string>();
+            Dictionary<string, string> refs = new ();
             foreach (var (refname, @ref) in dataProvider.GetAllRefs(prefix))
             {
                 refs.Add(refname, @ref.Value);

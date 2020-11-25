@@ -49,7 +49,7 @@ namespace Ugit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(UgitException))]
         public void CurrentIllegalTest()
         {
             dataProvider.Setup(d => d.GetRef("HEAD", false)).Returns(RefValue.Create(true, Path.Join("refs", "master")));

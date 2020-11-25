@@ -10,7 +10,7 @@
         /// <inheritdoc/>
         public (int, string, string) Execute(string name, string arguments)
         {
-            Process process = new Process();
+            Process process = new ();
             process.StartInfo.FileName = name;
             process.StartInfo.Arguments = arguments;
             process.StartInfo.UseShellExecute = false;
