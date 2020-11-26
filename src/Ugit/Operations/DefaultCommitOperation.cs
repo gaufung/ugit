@@ -54,7 +54,11 @@
         /// <inheritdoc/>
         public Commit GetCommit(string oid)
         {
+#if NET5_0
             List<string> parents = new ();
+#else
+            List<string> parents = new List<string>();
+#endif
             var commit = this.dataProvider.GetObject(oid, "commit").Decode();
             string[] lines = commit.Split("\n");
             string tree = null;

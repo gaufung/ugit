@@ -10,7 +10,11 @@
         /// <inheritdoc/>
         public (int, string, string) Execute(string name, string arguments)
         {
+#if NET5_0
             Process process = new ();
+#else
+            Process process = new Process();
+#endif
             process.StartInfo.FileName = name;
             process.StartInfo.Arguments = arguments;
             process.StartInfo.UseShellExecute = false;
