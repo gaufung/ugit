@@ -2,7 +2,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/gaufung/ugit/badge.svg)](https://coveralls.io/github/gaufung/ugit)
 [![GitHub issues](https://img.shields.io/github/issues/gaufung/ugit?style=plastic)](https://github.com/gaufung/ugit/issues)
 [![GitHub license](https://img.shields.io/github/license/gaufung/ugit)](https://github.com/gaufung/ugit/blob/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/release/gaufung/ugit.svg)](https://GitHub.com/gaufung/ugit/releases/)
+[![GitHub release](https://img.shields.io/github/release/gaufung/.svg)](https://GitHub.com/gaufung/ugit/releases/)
 
 
 
