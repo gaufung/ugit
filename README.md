@@ -1,4 +1,5 @@
 ![.Net Core Build](https://github.com/gaufung/ugit/workflows/.NET%20Core/badge.svg)
+![Publish](https://github.com/gaufung/ugit/workflows/publish/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/gaufung/ugit/badge.svg)](https://coveralls.io/github/gaufung/ugit)
 [![GitHub issues](https://img.shields.io/github/issues/gaufung/ugit?style=plastic)](https://github.com/gaufung/ugit/issues)
 [![GitHub license](https://img.shields.io/github/license/gaufung/ugit)](https://github.com/gaufung/ugit/blob/master/LICENSE)
@@ -14,10 +15,11 @@
 - ugit tag 
 - ugit merge
 - ugit branch
+- ugit push/fetch
 - ...
 
 # Prequirements 
-- .Net Core 5.0.x
+- .Net 5.0
 - diff command
   - diff.exe (Windows)
   - diff (*nix)
