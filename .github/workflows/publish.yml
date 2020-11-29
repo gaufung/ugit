@@ -3,7 +3,7 @@ on:
     tags:
       - 'v*'
 
-name: Create Relase
+name: Publish
 
 jobs:
   release:
