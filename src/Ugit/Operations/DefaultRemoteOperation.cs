@@ -10,8 +10,8 @@
     /// </summary>
     internal class DefaultRemoteOperation : IRemoteOperation
     {
-        private static readonly string RemoteRefsBase = Path.Join("refs", "heads");
-        private static readonly string LocalRefsBase = Path.Join("refs", "remote");
+        private static readonly string RemoteRefsBase = Path.Join(Constants.Refs, Constants.Heads);
+        private static readonly string LocalRefsBase = Path.Join(Constants.Refs, Constants.Remote);
         private readonly IDataProvider localDataProvider;
         private readonly ITreeOperation localTreeOperation;
         private readonly ICommitOperation localCommitOperation;
@@ -100,7 +100,7 @@
                 {
                     if (!visited.Contains(subOid))
                     {
-                        if (type == "tree")
+                        if (type == Constants.Tree)
                         {
                             foreach (var val in IterObjectsInTree(subOid))
                             {
@@ -137,16 +137,16 @@
                 return;
             }
 
-            string localPath = Path.Join(this.localDataProvider.GitDirFullPath, "objects", oid);
-            string remotePath = Path.Join(this.remoteDataProvider.GitDirFullPath, "objects", oid);
+            string localPath = Path.Join(this.localDataProvider.GitDirFullPath, Constants.Objects, oid);
+            string remotePath = Path.Join(this.remoteDataProvider.GitDirFullPath, Constants.Objects, oid);
             byte[] bytes = this.remoteDataProvider.ReadAllBytes(remotePath);
             this.localDataProvider.WriteAllBytes(localPath, bytes);
         }
 
         private void PushObject(string oid)
         {
-            string localPath = Path.Join(this.localDataProvider.GitDirFullPath, "objects", oid);
-            string remotePath = Path.Join(this.remoteDataProvider.GitDirFullPath, "objects", oid);
+            string localPath = Path.Join(this.localDataProvider.GitDirFullPath, Constants.Objects, oid);
+            string remotePath = Path.Join(this.remoteDataProvider.GitDirFullPath, Constants.Objects, oid);
             byte[] bytes = this.localDataProvider.ReadAllBytes(localPath);
             this.remoteDataProvider.WriteAllBytes(remotePath, bytes);
         }

@@ -57,7 +57,7 @@
         {
             get
             {
-                string path = Path.Join(this.GitDirFullPath, "index");
+                string path = Path.Join(this.GitDirFullPath, Constants.Index);
                 if (this.fileSystem.File.Exists(path))
                 {
                     var data = this.fileSystem.File.ReadAllBytes(path);
@@ -69,7 +69,7 @@
 
             set
             {
-                string path = Path.Join(this.GitDirFullPath, "index");
+                string path = Path.Join(this.GitDirFullPath, Constants.Index);
                 string data = JsonSerializer.Serialize(value);
                 if (this.fileSystem.File.Exists(path))
                 {
@@ -83,7 +83,7 @@
         /// <inheritdoc/>
         public byte[] GetObject(string oid, string expected = "blob")
         {
-            string filePath = Path.Join(this.GitDirFullPath, "objects", oid);
+            string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
             if (this.fileSystem.File.Exists(filePath))
             {
                 var data = this.fileSystem.File.ReadAllBytes(filePath);
@@ -93,7 +93,7 @@
                     var type = data.Take(index).ToArray().Decode();
                     if (!string.Equals(expected, type, StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new ArgumentException($"Unknow object type, got {type}");
+                        throw new UgitException($"Unknow object type, got {type}");
                     }
 
                     return data.TakeLast(data.Length - index - 1).ToArray();
@@ -112,7 +112,7 @@
             }
 
             string oid = data.Sha1HexDigest();
-            string filePath = Path.Join(this.GitDirFullPath, "objects", oid);
+            string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
             this.fileSystem.File.WriteAllBytes(filePath, data);
             return oid;
         }
@@ -126,7 +126,7 @@
             }
 
             this.fileSystem.Directory.CreateDirectory(this.GitDirFullPath);
-            this.fileSystem.Directory.CreateDirectory(Path.Join(this.GitDirFullPath, "objects"));
+            this.fileSystem.Directory.CreateDirectory(Path.Join(this.GitDirFullPath, Constants.Objects));
         }
 
         /// <inheritdoc/>
@@ -162,19 +162,19 @@
         /// <inheritdoc/>
         public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
         {
-            if ("HEAD".StartsWith(prefix))
+            if (Constants.HEAD.StartsWith(prefix))
             {
-                if (!string.IsNullOrEmpty(this.GetRef("HEAD", deref).Value))
+                if (!string.IsNullOrEmpty(this.GetRef(Constants.HEAD, deref).Value))
                 {
-                    yield return ("HEAD", this.GetRef("HEAD", deref));
+                    yield return (Constants.HEAD, this.GetRef(Constants.HEAD, deref));
                 }
             }
 
-            if ("MERGE_HEAD".StartsWith(prefix))
+            if (Constants.MergeHEAD.StartsWith(prefix))
             {
-                if (!string.IsNullOrEmpty(this.GetRef("MERGE_HEAD", deref).Value))
+                if (!string.IsNullOrEmpty(this.GetRef(Constants.MergeHEAD, deref).Value))
                 {
-                    yield return ("MERGE_HEAD", this.GetRef("MERGE_HEAD", deref));
+                    yield return (Constants.MergeHEAD, this.GetRef(Constants.MergeHEAD, deref));
                 }
             }
 
@@ -207,7 +207,7 @@
         /// <inheritdoc/>
         public string GetOid(string name)
         {
-            name = name == "@" ? "HEAD" : name;
+            name = name == "@" ? Constants.HEAD : name;
             string[] refsToTry = new string[]
             {
                 Path.Join(name),

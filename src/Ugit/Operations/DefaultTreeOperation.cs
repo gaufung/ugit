@@ -29,7 +29,7 @@
             {
                 string path = entry.Key;
                 string oid = entry.Value;
-                this.dataProvider.WriteAllBytes(path, this.dataProvider.GetObject(oid, "blob"));
+                this.dataProvider.WriteAllBytes(path, this.dataProvider.GetObject(oid, Constants.Blob));
             }
         }
 
@@ -40,11 +40,11 @@
             foreach (var (type, oid, name) in this.IterTreeEntry(treeOid))
             {
                 string path = Path.Join(basePath, name);
-                if (type == "blob")
+                if (type == Constants.Blob)
                 {
                     result[path] = oid;
                 }
-                else if (type == "tree")
+                else if (type == Constants.Tree)
                 {
                     result.Update(this.GetTree(oid, $"{path}{Path.DirectorySeparatorChar}"));
                 }
@@ -140,7 +140,7 @@
                 yield break;
             }
 
-            byte[] tree = this.dataProvider.GetObject(oid, "tree");
+            byte[] tree = this.dataProvider.GetObject(oid, Constants.Tree);
             foreach (string entry in tree.Decode().Split("\n"))
             {
                 string[] tokens = entry.Split(' ');
@@ -158,14 +158,14 @@
             {
                 if (entry.Value is IDictionary<string, object> val)
                 {
-                    string type = "tree";
+                    string type = Constants.Tree;
                     string oid = this.WriteTreeRecursive(val);
                     string name = entry.Key;
                     entries.Add((name, oid, type));
                 }
                 else
                 {
-                    string type = "blob";
+                    string type = Constants.Blob;
                     string oid = entry.Value as string;
                     string name = entry.Key;
                     entries.Add((name, oid, type));
@@ -175,7 +175,7 @@
             string subTree = string.Join(
                 "\n",
                 entries.Select(e => $"{e.Item3} {e.Item2} {e.Item1}"));
-            return this.dataProvider.HashObject(subTree.Encode(), "tree");
+            return this.dataProvider.HashObject(subTree.Encode(), Constants.Tree);
         }
     }
 }

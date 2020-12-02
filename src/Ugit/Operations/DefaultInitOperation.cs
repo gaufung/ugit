@@ -22,7 +22,7 @@
         public void Init()
         {
             this.dataProvider.Init();
-            this.dataProvider.UpdateRef("HEAD", RefValue.Create(true, Path.Join("refs", "heads", "master")));
+            this.dataProvider.UpdateRef(Constants.HEAD, RefValue.Create(true, Path.Join(Constants.Refs, Constants.Heads, Constants.Master)));
         }
     }
 }

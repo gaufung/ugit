@@ -118,7 +118,7 @@ namespace Ugit
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(UgitException))]
         public void GetObjectUnexpectedTypeTest()
         {
             string oid = "foo";

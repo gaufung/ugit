@@ -25,9 +25,9 @@
         {
             get
             {
-                foreach (var (refName, _) in this.dataProvider.GetAllRefs(Path.Join("refs", "heads")))
+                foreach (var (refName, _) in this.dataProvider.GetAllRefs(Path.Join(Constants.Refs, Constants.Heads)))
                 {
-                    yield return Path.GetRelativePath(Path.Join("refs", "heads"), refName);
+                    yield return Path.GetRelativePath(Path.Join(Constants.Refs, Constants.Heads), refName);
                 }
             }
         }
@@ -37,33 +37,33 @@
         {
             get
             {
-                var HEAD = this.dataProvider.GetRef("HEAD", false);
+                var HEAD = this.dataProvider.GetRef(Constants.HEAD, false);
                 if (!HEAD.Symbolic)
                 {
                     return null;
                 }
 
                 var head = HEAD.Value;
-                if (!head.StartsWith(Path.Join("refs", "heads")))
+                if (!head.StartsWith(Path.Join(Constants.Refs, Constants.Heads)))
                 {
                     throw new UgitException("Branch ref should start with refs/heads");
                 }
 
-                return Path.GetRelativePath(Path.Join("refs", "heads"), head);
+                return Path.GetRelativePath(Path.Join(Constants.Refs, Constants.Heads), head);
             }
         }
 
         /// <inheritdoc/>
         public void Create(string name, string oid)
         {
-            string @ref = Path.Join("refs", "heads", name);
+            string @ref = Path.Join(Constants.Refs, Constants.Heads, name);
             this.dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
         }
 
         /// <inheritdoc/>
         public bool IsBranch(string branch)
         {
-            string path = Path.Join("refs", "heads", branch);
+            string path = Path.Join(Constants.Refs, Constants.Heads, branch);
             return !string.IsNullOrWhiteSpace(this.dataProvider.GetRef(path).Value);
         }
     }

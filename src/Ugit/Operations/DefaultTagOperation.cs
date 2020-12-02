@@ -25,7 +25,7 @@
         {
             get
             {
-                string prefix = Path.Join("refs", "tags");
+                string prefix = Path.Join(Constants.Refs, Constants.Tags);
                 foreach (var (tagRef, _) in this.dataProvider.GetAllRefs(prefix, false))
                 {
                     yield return Path.GetRelativePath(prefix, tagRef);
@@ -36,7 +36,7 @@
         /// <inheritdoc/>
         public void Create(string name, string oid)
         {
-            string @ref = Path.Join("refs", "tags", name);
+            string @ref = Path.Join(Constants.Refs, Constants.Tags, name);
             this.dataProvider.UpdateRef(@ref, RefValue.Create(false, oid));
         }
     }

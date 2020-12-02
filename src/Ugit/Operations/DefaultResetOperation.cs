@@ -19,7 +19,7 @@
         /// <inheritdoc/>
         public void Reset(string oid)
         {
-            this.dataProvider.UpdateRef("HEAD", RefValue.Create(false, oid));
+            this.dataProvider.UpdateRef(Constants.HEAD, RefValue.Create(false, oid));
         }
     }
 }

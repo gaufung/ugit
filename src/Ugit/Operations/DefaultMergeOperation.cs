@@ -11,9 +11,7 @@
     {
         private readonly ICommitOperation commitOperation;
         private readonly IDataProvider dataProvider;
-
         private readonly IDiff diff;
-
         private readonly ITreeOperation treeOperation;
 
         /// <summary>

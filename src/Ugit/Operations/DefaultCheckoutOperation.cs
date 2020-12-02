@@ -42,9 +42,9 @@
             this.treeOperation.ReadTree(commit.Tree, true);
 
             RefValue HEAD = this.branchOperation.IsBranch(name)
-                ? RefValue.Create(true, Path.Join("refs", "heads", name))
+                ? RefValue.Create(true, Path.Join(Constants.Refs, Constants.Heads, name))
                 : RefValue.Create(false, oid);
-            this.dataProvider.UpdateRef("HEAD", HEAD, false);
+            this.dataProvider.UpdateRef(Constants.HEAD, HEAD, false);
         }
     }
 }
