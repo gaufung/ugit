@@ -12,13 +12,9 @@ namespace Ugit
     public class DefaultRemoteOperationTests
     {
         private Mock<IDataProvider> localDataProviderMock = new();
-        private Mock<ITreeOperation> localTreeOperationMock = new();
         private Mock<ICommitOperation> localCommitOperationMock = new();
         private Mock<IDataProvider> remoteDataProviderMock = new();
         private Mock<ICommitOperation> remoteCommitOperationMock = new();
-        private Mock<ITreeOperation> remoteTreeOperationMock = new();
-        
-
         private IRemoteOperation remoteOpetaion;
 
         [TestInitialize]
@@ -26,10 +22,8 @@ namespace Ugit
         {
             remoteOpetaion = new DefaultRemoteOperation(
                 localDataProviderMock.Object,
-                localTreeOperationMock.Object,
                 localCommitOperationMock.Object,
                 remoteDataProviderMock.Object,
-                remoteTreeOperationMock.Object,
                 remoteCommitOperationMock.Object
             );
         }
@@ -43,68 +37,21 @@ namespace Ugit
                 }
             );
 
-            this.remoteCommitOperationMock.Setup(r => r.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids =>
+            this.remoteCommitOperationMock.Setup(r => r.GetObjectHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids =>
             {
                 if (oids != null && oids.Count() == 1 && oids.First() == "second-commit-oid")
                 {
                     return new [] {
+                        "hello-oid",
+                        "world-oid",
+                        "sub-folder-oid",
                         "second-commit-oid",
-                        "first-commit-oid"
+                        "first-commit-oid",
+                        "second-tree-oid",
+                        "first-tree-oid",
                     };
                 }
                 return Array.Empty<string>();
-            });
-
-            this.remoteCommitOperationMock.Setup(r =>r.GetCommit(It.IsAny<string>())).Returns<string>(oid => 
-            {
-                if (oid == "second-commit-oid")
-                {
-                    return new Commit{
-                        Tree = "second-tree-oid"
-                    };
-                }
-
-                if (oid == "first-commit-oid")
-                {
-                    return new Commit{
-                        Tree = "first-tree-oid"
-                    };
-                }
-
-                throw new Exception("unexpected commit oid.");
-            });
-
-            this.remoteTreeOperationMock.Setup(r => r.IterTreeEntry(It.IsAny<string>())).Returns<string>(oid => {
-                if (oid == "second-tree-oid") 
-                {
-                    return new [] {
-                        ("blob", "hello-oid", "hello.txt"),
-                        ("tree", "sub-folder-oid", "sub"),
-                    };
-                }
-
-                if (oid == "sub-folder-oid")
-                {
-                    return new [] {
-                        ("blob", "world-oid", "world.txt")
-                    };
-                }
-                
-                if (oid == "first-commit-oid")
-                {
-                    return new [] {
-                        ("blob", "hello-oid", "hello.txt"),
-                    };
-                }
-
-                if (oid == "first-tree-oid")
-                {
-                    return new [] {
-                        ("blob", "hello-oid", "hello.txt"),
-                    };
-                }
-
-                throw new Exception($"unknow object id: {oid}");
             });
 
             this.localDataProviderMock.Setup(l => l.ObjectExist(It.IsAny<string>())).Returns<string>(oid => {
@@ -159,7 +106,6 @@ namespace Ugit
             this.localDataProviderMock.VerifyAll();
             this.remoteDataProviderMock.VerifyAll();
             this.remoteCommitOperationMock.VerifyAll();
-            this.remoteTreeOperationMock.VerifyAll();
         }
 
         [TestMethod]
@@ -199,7 +145,7 @@ namespace Ugit
             string refName = Path.Join("refs", "heads", "master");
             this.localDataProviderMock.Setup(l => l.GetRef(refName, true)).Returns(RefValue.Create(false, "second-commit-oid"));
             this.localDataProviderMock.Setup(l => l.ObjectExist("first-commit-oid")).Returns(true);
-            this.localCommitOperationMock.Setup(l => l.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids =>{
+            this.localCommitOperationMock.Setup(l => l.GetObjectHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids =>{
                 if (oids != null && oids.Count() == 1 && oids.First() == "second-commit-oid")
                 {
                     return new [] {"second-commit-oid", "first-commit-oid"};
@@ -207,7 +153,7 @@ namespace Ugit
                 throw new Exception($"unknown local ref");
             });
 
-            this.localCommitOperationMock.Setup(r => r.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids =>
+            this.localCommitOperationMock.Setup(r => r.GetObjectHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids =>
             {
                 if (oids != null && oids.Count() == 1 && oids.First() == "second-commit-oid")
                 {
@@ -225,58 +171,17 @@ namespace Ugit
                 }
                 return Array.Empty<string>();
             });
-
-            this.localCommitOperationMock.Setup(r =>r.GetCommit(It.IsAny<string>())).Returns<string>(oid => 
-            {
-                if (oid == "second-commit-oid")
+            this.localCommitOperationMock.Setup(l => l.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids => {
+                if (oids!=null && oids.Count()== 1 && oids.First() == "second-commit-oid")
                 {
-                    return new Commit{
-                        Tree = "second-tree-oid"
+                    return new []{
+                        "second-commit-oid",
+                        "first-commit-oid"
                     };
                 }
-
-                if (oid == "first-commit-oid")
-                {
-                    return new Commit{
-                        Tree = "first-tree-oid"
-                    };
-                }
-
-                throw new Exception("unexpected commit oid.");
+                throw new Exception("Unknown object ids");
             });
 
-            this.localTreeOperationMock.Setup(r => r.IterTreeEntry(It.IsAny<string>())).Returns<string>(oid => {
-                if (oid == "second-tree-oid") 
-                {
-                    return new [] {
-                        ("blob", "hello-oid", "hello.txt"),
-                        ("tree", "sub-folder-oid", "sub"),
-                    };
-                }
-
-                if (oid == "sub-folder-oid")
-                {
-                    return new [] {
-                        ("blob", "world-oid", "world.txt")
-                    };
-                }
-                
-                if (oid == "first-commit-oid")
-                {
-                    return new [] {
-                        ("blob", "hello-oid", "hello.txt"),
-                    };
-                }
-
-                if (oid == "first-tree-oid")
-                {
-                    return new [] {
-                        ("blob", "hello-oid", "hello.txt"),
-                    };
-                }
-
-                throw new Exception($"unknow object id: {oid}");
-            });
             this.localDataProviderMock.Setup(l => l.GitDirFullPath).Returns(Path.Join("local", "repo", ".ugit"));
             this.remoteDataProviderMock.Setup(l => l.GitDirFullPath).Returns(Path.Join("remote", "repo", ".ugit"));
             this.localDataProviderMock.Setup(l => l.Read(It.IsAny<string>())).Returns(Array.Empty<byte>());
@@ -286,7 +191,6 @@ namespace Ugit
             
             this.localDataProviderMock.VerifyAll();
             this.remoteDataProviderMock.VerifyAll();
-            this.localTreeOperationMock.VerifyAll();
             this.localCommitOperationMock.VerifyAll();
         }
     }

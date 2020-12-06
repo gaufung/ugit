@@ -93,7 +93,7 @@ namespace Ugit
         public void CommitHistoryTest()
         {
             string commitMessage1 = string.Join("\n", new[]
-{
+            {
                 "tree tree-oid",
                 "parent parent-oid",
                 "",
@@ -113,6 +113,56 @@ namespace Ugit
             var history = commitOperation.GetCommitHistory(new string[] { "foo-oid" });
             CollectionAssert.AreEqual(new string[] { "foo-oid", "parent-oid" }, history.ToArray());
             dataProvider.VerifyAll();
+        }
+
+        [TestMethod]
+        public void GetObjectHistroyTest()
+        {
+            string commitMessage1 = string.Join("\n", new[]
+            {
+                "tree tree2-oid",
+                "parent parent-oid",
+                "",
+                "this is second commit",
+            });
+
+            string commitMessage2 = string.Join("\n", new[]
+            {
+                "tree tree1-oid",
+                "",
+                "this is first commit",
+            });
+
+            this.dataProvider.Setup(d => d.GetObject("foo-oid", "commit")).Returns(commitMessage1.Encode());
+            this.dataProvider.Setup(d => d.GetObject("parent-oid", "commit")).Returns(
+                commitMessage2.Encode());
+            this.treeOperation.Setup(t => t.IterTreeEntry(It.IsAny<string>())).Returns<string>((oid)=>{
+                if (oid == "tree2-oid")
+                {
+                    return new []{
+                        ("tree", "sub-tree-oid", ""),
+                        ("blob", "foo.txt-oid", ""),
+                    };
+                }
+                if (oid == "sub-tree-oid")
+                {
+                    return new []{
+                        ("blob", "bar.txt-oid", "")
+                    };
+                }
+                if (oid == "tree1-oid")
+                {
+                    return new [] {
+                         ("blob", "bar.txt-oid", "")
+                    };
+                }
+                throw new System.Exception($"Unknow oid: {oid}");
+            });
+            string[] objects = commitOperation.GetObjectHistory(new []{ "foo-oid"}).ToArray();
+            CollectionAssert.AreEqual(new string[]{
+                "foo-oid", "tree2-oid", "sub-tree-oid", "bar.txt-oid", "foo.txt-oid", "parent-oid", "tree1-oid", "bar.txt-oid"},
+                 objects);
+            treeOperation.VerifyAll();
         }
     }
 }

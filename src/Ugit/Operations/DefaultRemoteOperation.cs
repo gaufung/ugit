@@ -13,11 +13,9 @@
         private static readonly string RemoteRefsBase = Path.Join(Constants.Refs, Constants.Heads);
         private static readonly string LocalRefsBase = Path.Join(Constants.Refs, Constants.Remote);
         private readonly IDataProvider localDataProvider;
-        private readonly ITreeOperation localTreeOperation;
         private readonly ICommitOperation localCommitOperation;
         private readonly IDataProvider remoteDataProvider;
         private readonly ICommitOperation remoteCommitOperation;
-        private readonly ITreeOperation remoteTreeOperation;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultRemoteOperation"/> class.
@@ -30,17 +28,13 @@
         /// <param name="remoteCommitOperation">remote commit operation.</param>
         public DefaultRemoteOperation(
             IDataProvider localDataProvider,
-            ITreeOperation localTreeOperation,
             ICommitOperation localCommitOpeartion,
             IDataProvider remoteDataProvider,
-            ITreeOperation remoteTreeOperation,
             ICommitOperation remoteCommitOperation)
         {
             this.localDataProvider = localDataProvider;
-            this.localTreeOperation = localTreeOperation;
             this.localCommitOperation = localCommitOpeartion;
             this.remoteDataProvider = remoteDataProvider;
-            this.remoteTreeOperation = remoteTreeOperation;
             this.remoteCommitOperation = remoteCommitOperation;
         }
 
@@ -48,8 +42,7 @@
         public void Fetch()
         {
             var refs = this.remoteDataProvider.GetRefsMapping(RemoteRefsBase);
-            foreach (var oid in this.IterObjectsInCommits(
-                this.remoteTreeOperation, this.remoteCommitOperation, refs.Values))
+            foreach (var oid in this.remoteCommitOperation.GetObjectHistory(refs.Values))
             {
                 this.FetchObjectIfMissing(oid);
             }
@@ -77,8 +70,8 @@
             }
 
             IEnumerable<string> knowRemoteRefs = remoteRefs.Values.Where(oid => this.localDataProvider.ObjectExist(oid));
-            HashSet<string> remoteObjects = new HashSet<string>(this.IterObjectsInCommits(this.localTreeOperation, this.localCommitOperation, knowRemoteRefs));
-            HashSet<string> localObjects = new HashSet<string>(this.IterObjectsInCommits(this.localTreeOperation, this.localCommitOperation, new[] { localRef }));
+            HashSet<string> remoteObjects = new HashSet<string>(this.localCommitOperation.GetObjectHistory(knowRemoteRefs));
+            HashSet<string> localObjects = new HashSet<string>(this.localCommitOperation.GetObjectHistory(new[] { localRef }));
             IEnumerable<string> objectsToPush = localObjects.Except(remoteObjects);
             foreach (var oid in objectsToPush)
             {
@@ -86,48 +79,6 @@
             }
 
             this.remoteDataProvider.UpdateRef(refName, RefValue.Create(false, localRef));
-        }
-
-        private IEnumerable<string> IterObjectsInCommits(ITreeOperation treeOpeation, ICommitOperation commitOpeartion, IEnumerable<string> oids)
-        {
-            HashSet<string> visited = new HashSet<string>();
-            IEnumerable<string> IterObjectsInTree(string oid)
-            {
-                visited.Add(oid);
-                yield return oid;
-
-                foreach (var (type, subOid, _) in treeOpeation.IterTreeEntry(oid))
-                {
-                    if (!visited.Contains(subOid))
-                    {
-                        if (type == Constants.Tree)
-                        {
-                            foreach (var val in IterObjectsInTree(subOid))
-                            {
-                                yield return val;
-                            }
-                        }
-                        else
-                        {
-                            visited.Add(subOid);
-                            yield return subOid;
-                        }
-                    }
-                }
-            }
-
-            foreach (var oid in commitOpeartion.GetCommitHistory(oids))
-            {
-                yield return oid;
-                var commit = commitOpeartion.GetCommit(oid);
-                if (!visited.Contains(commit.Tree))
-                {
-                    foreach (var val in IterObjectsInTree(commit.Tree))
-                    {
-                        yield return val;
-                    }
-                }
-            }
         }
 
         private void FetchObjectIfMissing(string oid)

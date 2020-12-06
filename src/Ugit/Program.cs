@@ -104,15 +104,12 @@
         private static int Push(PushOption o)
         {
             IDataProvider remoteDataProvider = new DefaultDataProvider(new FileSystem(), o.Remote);
-            ITreeOperation remoteTreeOperation = new DefaultTreeOperation(remoteDataProvider);
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, remoteTreeOperation);
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 DataProvider,
-                TreeOperation,
                 CommitOperation,
                 remoteDataProvider,
-                remoteTreeOperation,
                 remoteCommitOperation);
             string refName = Path.Join("refs", "heads", o.Branch);
             remoteOperation.Push(refName);
@@ -122,15 +119,12 @@
         private static int Fetch(FetchOption o)
         {
             IDataProvider remoteDataProvider = new DefaultDataProvider(new FileSystem(), o.Remote);
-            ITreeOperation remoteTreeOperation = new DefaultTreeOperation(remoteDataProvider);
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, remoteTreeOperation);
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 DataProvider,
-                TreeOperation,
                 CommitOperation,
                 remoteDataProvider,
-                remoteTreeOperation,
                 remoteCommitOperation);
             remoteOperation.Fetch();
             return 0;

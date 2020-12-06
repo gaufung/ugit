@@ -119,6 +119,46 @@
             }
         }
 
+        public IEnumerable<string> GetObjectHistory(IEnumerable<string> oids)
+        {
+            HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            
+            IEnumerable<string> IterObjectInTree(string oid)
+            {
+                visited.Add(oid);
+                yield return oid;
+
+                foreach (var (type, subOid, _) in this.treeOperation.IterTreeEntry(oid))
+                {
+                    if (type == Constants.Tree)
+                    {
+                        foreach(var val in IterObjectInTree(subOid))
+                        {
+                            yield return val;
+                        }
+                    }
+                    else
+                    {
+                        visited.Add(subOid);
+                        yield return subOid;
+                    }
+                }
+            }
+
+            foreach(var oid in GetCommitHistory(oids))
+            {
+                yield return oid;
+                var commit = GetCommit(oid);
+                if (!visited.Contains(commit.Tree))
+                {
+                    foreach(var val in IterObjectInTree(commit.Tree))
+                    {
+                        yield return val;
+                    }
+                }
+            }
+        }
+
         private void CommitValidate()
         {
             string HEAD = this.dataProvider.GetRef(Constants.HEAD).Value;
