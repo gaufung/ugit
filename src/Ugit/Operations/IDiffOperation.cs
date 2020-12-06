@@ -5,7 +5,7 @@
     /// <summary>
     /// Diff interface.
     /// </summary>
-    internal interface IDiff
+    internal interface IDiffOperation
     {
         /// <summary>
         /// Diff a tree.

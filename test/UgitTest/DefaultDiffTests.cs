@@ -10,17 +10,17 @@ namespace Ugit
     public class DefaultDiffTests
     {
 
-        private IDiff diff;
+        private IDiffOperation diff;
 
         private Mock<IDataProvider> dataproviderMock;
 
-        private Mock<IDiffProxy> diffProxyMock;
+        private Mock<IDiffProxyOperation> diffProxyMock;
 
         [TestInitialize]
         public void Init()
         {
             dataproviderMock = new Mock<IDataProvider>();
-            diffProxyMock = new Mock<IDiffProxy>();
+            diffProxyMock = new Mock<IDiffProxyOperation>();
             diff = new DefaultDiffOperation(dataproviderMock.Object, diffProxyMock.Object);
         }
 

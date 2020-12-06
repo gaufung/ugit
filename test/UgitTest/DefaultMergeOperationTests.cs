@@ -14,7 +14,7 @@ namespace Ugit
 
         private Mock<IDataProvider> dataProvider;
 
-        private Mock<IDiff> diff;
+        private Mock<IDiffOperation> diff;
 
         private Mock<ITreeOperation> treeOperation;
 
@@ -25,7 +25,7 @@ namespace Ugit
         {
             commitOperation = new Mock<ICommitOperation>();
             dataProvider = new Mock<IDataProvider>();
-            diff = new Mock<IDiff>();
+            diff = new Mock<IDiffOperation>();
             treeOperation = new Mock<ITreeOperation>();
             mergeOperation = new DefaultMergeOperation(dataProvider.Object,
                 commitOperation.Object, treeOperation.Object, diff.Object);

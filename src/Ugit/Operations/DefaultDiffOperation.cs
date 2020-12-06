@@ -5,13 +5,13 @@
     using System.Linq;
 
     /// <summary>
-    /// The default implemantation of <see cref="IDiff"/>.
+    /// The default implemantation of <see cref="IDiffOperation"/>.
     /// </summary>
-    internal class DefaultDiffOperation : IDiff
+    internal class DefaultDiffOperation : IDiffOperation
     {
         private readonly IDataProvider dataProvider;
 
-        private readonly IDiffProxy diffProxy;
+        private readonly IDiffProxyOperation diffProxy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDiffOperation"/> class.
@@ -19,7 +19,7 @@
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
         /// <param name="fileSystem">file system.</param>
-        public DefaultDiffOperation(IDataProvider dataProvider, IDiffProxy diffProxy)
+        public DefaultDiffOperation(IDataProvider dataProvider, IDiffProxyOperation diffProxy)
         {
             this.dataProvider = dataProvider;
             this.diffProxy = diffProxy;

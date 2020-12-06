@@ -11,7 +11,7 @@
     {
         private readonly ICommitOperation commitOperation;
         private readonly IDataProvider dataProvider;
-        private readonly IDiff diff;
+        private readonly IDiffOperation diff;
         private readonly ITreeOperation treeOperation;
 
         /// <summary>
@@ -25,7 +25,7 @@
             IDataProvider dataProvider,
             ICommitOperation commitOperation,
             ITreeOperation treeOperation,
-            IDiff diff)
+            IDiffOperation diff)
         {
             this.dataProvider = dataProvider;
             this.commitOperation = commitOperation;

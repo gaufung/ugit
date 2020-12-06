@@ -3,7 +3,7 @@
     /// <summary>
     /// The Diff command proxy.
     /// </summary>
-    internal interface IDiffProxy
+    internal interface IDiffProxyOperation
     {
         /// <summary>
         /// Execute diff command.

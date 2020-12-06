@@ -3,9 +3,9 @@
     using System.Diagnostics;
 
     /// <summary>
-    /// The implmentation of <see cref="IDiff"/>.
+    /// The implmentation of <see cref="IDiffOperation"/>.
     /// </summary>
-    public class DefaultDiffProxyOperation : IDiffProxy
+    public class DefaultDiffProxyOperation : IDiffProxyOperation
     {
         /// <inheritdoc/>
         public (int, string, string) Execute(string name, string arguments)

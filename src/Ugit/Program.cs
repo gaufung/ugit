@@ -20,7 +20,7 @@
 
         private static readonly IFileSystem FileSystem;
 
-        private static readonly IDiff Diff;
+        private static readonly IDiffOperation Diff;
 
         private static readonly ICommitOperation CommitOperation;
 
