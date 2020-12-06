@@ -29,7 +29,7 @@
             {
                 string path = entry.Key;
                 string oid = entry.Value;
-                this.dataProvider.WriteAllBytes(path, this.dataProvider.GetObject(oid, Constants.Blob));
+                this.dataProvider.Write(path, this.dataProvider.GetObject(oid, Constants.Blob));
             }
         }
 
@@ -121,7 +121,7 @@
                 }
 
                 string path = Path.GetRelativePath(".", filePath);
-                result[path] = this.dataProvider.HashObject(this.dataProvider.ReadAllBytes(path));
+                result[path] = this.dataProvider.HashObject(this.dataProvider.Read(path));
             }
 
             return result;

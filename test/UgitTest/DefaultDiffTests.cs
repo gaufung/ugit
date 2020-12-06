@@ -2,6 +2,7 @@
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using Ugit.Operations;
 
 namespace Ugit
 {
@@ -20,7 +21,7 @@ namespace Ugit
         {
             dataproviderMock = new Mock<IDataProvider>();
             diffProxyMock = new Mock<IDiffProxy>();
-            diff = new DefaultDiff(dataproviderMock.Object, diffProxyMock.Object);
+            diff = new DefaultDiffOperation(dataproviderMock.Object, diffProxyMock.Object);
         }
 
         [TestMethod]
@@ -66,7 +67,7 @@ namespace Ugit
                 { "hello.txt", "foo1" },
                 { "world.txt", "bar" },
             };
-            dataproviderMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
+            dataproviderMock.Setup(f => f.Write(It.IsAny<string>(), It.IsAny<byte[]>()));
             diffProxyMock.Setup(d => d.Execute("diff", It.IsAny<string>())).Returns<string, string>( (_, args) => 
             {
                 if (args.Contains("hello.txt"))
@@ -126,7 +127,7 @@ namespace Ugit
             dataproviderMock.Setup(d => d.GetObject("foo", "blob")).Returns("hello".Encode());
             dataproviderMock.Setup(d => d.GetObject("foo1", "blob")).Returns("Hello".Encode());
             dataproviderMock.Setup(d => d.HashObject(It.IsAny<byte[]>(), "blob")).Returns("foo");
-            dataproviderMock.Setup(f => f.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
+            dataproviderMock.Setup(f => f.Write(It.IsAny<string>(), It.IsAny<byte[]>()));
             diffProxyMock.Setup(d => d.Execute(It.IsAny<string>(), It.IsAny<string>())).Returns((0, "Hello", ""));
             var acutal = diff.MergeTree(headTree, otherTree);
             Assert.AreEqual("foo", acutal["hello.txt"]);

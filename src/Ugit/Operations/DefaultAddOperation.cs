@@ -52,7 +52,7 @@
             if (!this.dataProvider.IsIgnore(fileName))
             {
                 var normalFileName = Path.GetRelativePath(".", fileName);
-                byte[] data = this.dataProvider.ReadAllBytes(normalFileName);
+                byte[] data = this.dataProvider.Read(normalFileName);
                 string oid = this.dataProvider.HashObject(data);
                 index[normalFileName] = oid;
             }

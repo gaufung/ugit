@@ -3,7 +3,7 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Subset operation of file operator.
+    /// Subset operation of file operator no matter of local or remote file system.
     /// </summary>
     internal interface IFileOperator
     {
@@ -20,14 +20,20 @@
         /// </summary>
         /// <param name="path">the file path.</param>
         /// <param name="bytes">the byte array.</param>
-        void WriteAllBytes(string path, byte[] bytes);
+        void Write(string path, byte[] bytes);
 
         /// <summary>
         /// Read bytes from given file.
         /// </summary>
         /// <param name="path">the file path.</param>
         /// <returns>byte array that file contains.</returns>
-        byte[] ReadAllBytes(string path);
+        byte[] Read(string path);
+
+        /// <summary>
+        /// Delete a file.
+        /// </summary>
+        /// <param name="path">filePath.</param>
+        void Delete(string path);
 
         /// <summary>
         /// Walk in given directory path.
@@ -40,11 +46,5 @@
         /// Empty current directory.
         /// </summary>
         void EmptyCurrentDirectory();
-
-        /// <summary>
-        /// Delete a file.
-        /// </summary>
-        /// <param name="path">filePath.</param>
-        void Delete(string path);
     }
 }

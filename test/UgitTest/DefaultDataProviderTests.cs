@@ -360,7 +360,7 @@ namespace Ugit
             string path = Path.Join("sub", "hello.txt");
             direcotryMock.Setup(d => d.Exists("sub")).Returns(true);
             fileMock.Setup(d => d.WriteAllBytes(path, It.IsAny<byte[]>()));
-            dataProvider.WriteAllBytes(path, Array.Empty<byte>());
+            dataProvider.Write(path, Array.Empty<byte>());
             direcotryMock.VerifyAll();
             fileMock.VerifyAll();
         }
@@ -369,7 +369,7 @@ namespace Ugit
         public void ReadAllBytesTest()
         {
             this.fileMock.Setup(d => d.ReadAllBytes("test.txt")).Returns(Array.Empty<byte>());
-            CollectionAssert.AreEqual(Array.Empty<byte>(), dataProvider.ReadAllBytes("test.txt"));
+            CollectionAssert.AreEqual(Array.Empty<byte>(), dataProvider.Read("test.txt"));
             fileMock.VerifyAll();
         }
 

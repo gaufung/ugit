@@ -1,11 +1,11 @@
-﻿namespace Ugit
+﻿namespace Ugit.Operations
 {
     using System.Diagnostics;
 
     /// <summary>
     /// The implmentation of <see cref="IDiff"/>.
     /// </summary>
-    public class DefaultDiffProxy : IDiffProxy
+    public class DefaultDiffProxyOperation : IDiffProxy
     {
         /// <inheritdoc/>
         public (int, string, string) Execute(string name, string arguments)

@@ -38,7 +38,7 @@ namespace Ugit
             this.dataProvider.Setup(d => d.Exist(Path.Join(".", "sub"), false)).Returns(true);
 
             this.dataProvider.Setup(d => d.IsIgnore(It.IsAny<string>())).Returns<string>(s => s.Contains(".ugit"));
-            this.dataProvider.Setup(d => d.ReadAllBytes(It.IsAny<string>())).Returns(Array.Empty<byte>());
+            this.dataProvider.Setup(d => d.Read(It.IsAny<string>())).Returns(Array.Empty<byte>());
             this.dataProvider.Setup(d => d.Walk(Path.Join(".", "sub"))).Returns(new string[]{
                Path.Join(".", "sub", "foo.txt") 
             });

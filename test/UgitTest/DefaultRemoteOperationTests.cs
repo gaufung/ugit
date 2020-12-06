@@ -120,7 +120,7 @@ namespace Ugit
 
             this.localDataProviderMock.Setup(l => l.GitDirFullPath).Returns(Path.Join("local", "repo", ".ugit"));
             this.remoteDataProviderMock.Setup(l => l.GitDirFullPath).Returns(Path.Join("remote", "repo", ".ugit"));
-            this.remoteDataProviderMock.Setup(r => r.ReadAllBytes(It.IsAny<string>())).Returns<string>(path => {
+            this.remoteDataProviderMock.Setup(r => r.Read(It.IsAny<string>())).Returns<string>(path => {
                 if (path == Path.Join("remote", "repo", ".ugit", "objects", "hello-oid"))
                 {
                     return Array.Empty<byte>();
@@ -151,7 +151,7 @@ namespace Ugit
                 }
                 throw new Exception($"unknow path: {path}");
             });
-            this.localDataProviderMock.Setup(l => l.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
+            this.localDataProviderMock.Setup(l => l.Write(It.IsAny<string>(), It.IsAny<byte[]>()));
             this.localDataProviderMock.Setup(l => l.UpdateRef(Path.Join("refs", "remote", "master"), It.IsAny<RefValue>(), true));
 
             remoteOpetaion.Fetch();
@@ -279,8 +279,8 @@ namespace Ugit
             });
             this.localDataProviderMock.Setup(l => l.GitDirFullPath).Returns(Path.Join("local", "repo", ".ugit"));
             this.remoteDataProviderMock.Setup(l => l.GitDirFullPath).Returns(Path.Join("remote", "repo", ".ugit"));
-            this.localDataProviderMock.Setup(l => l.ReadAllBytes(It.IsAny<string>())).Returns(Array.Empty<byte>());
-            this.remoteDataProviderMock.Setup(r => r.WriteAllBytes(It.IsAny<string>(), It.IsAny<byte[]>()));
+            this.localDataProviderMock.Setup(l => l.Read(It.IsAny<string>())).Returns(Array.Empty<byte>());
+            this.remoteDataProviderMock.Setup(r => r.Write(It.IsAny<string>(), It.IsAny<byte[]>()));
             this.remoteDataProviderMock.Setup(r => r.UpdateRef(refName, It.IsAny<RefValue>(), true));
             remoteOpetaion.Push(refName);
             

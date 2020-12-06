@@ -57,8 +57,8 @@ namespace Ugit
             dataProvider.Setup(d => d.EmptyCurrentDirectory());
             dataProvider.Setup(d => d.GetObject("foo-oid", "blob")).Returns("Hello Foo".Encode());
             dataProvider.Setup(d => d.GetObject("bar-oid", "blob")).Returns("Hello bar".Encode());
-            dataProvider.Setup(d => d.WriteAllBytes("foo.txt", It.IsAny<byte[]>()));
-            dataProvider.Setup(d => d.WriteAllBytes("bar.txt", It.IsAny<byte[]>()));
+            dataProvider.Setup(d => d.Write("foo.txt", It.IsAny<byte[]>()));
+            dataProvider.Setup(d => d.Write("bar.txt", It.IsAny<byte[]>()));
             Dictionary<string, string> index = new Dictionary<string, string>()
             {
                 {"foo.txt", "foo-oid" },
@@ -93,9 +93,9 @@ namespace Ugit
             dataProvider.Setup(d => d.GetObject("a-oid", "blob")).Returns("Hello a".Encode());
             dataProvider.Setup(d => d.GetObject("b-oid", "blob")).Returns("Hello b".Encode());
             dataProvider.Setup(d => d.GetObject("c-oid", "blob")).Returns("Hello c".Encode());
-            dataProvider.Setup(d => d.WriteAllBytes("a.txt", It.IsAny<byte[]>()));
-            dataProvider.Setup(d => d.WriteAllBytes(Path.Join("bar", "b.txt"), It.IsAny<byte[]>()));
-            dataProvider.Setup(d => d.WriteAllBytes(Path.Join("bar", "c.md"), It.IsAny<byte[]>()));
+            dataProvider.Setup(d => d.Write("a.txt", It.IsAny<byte[]>()));
+            dataProvider.Setup(d => d.Write(Path.Join("bar", "b.txt"), It.IsAny<byte[]>()));
+            dataProvider.Setup(d => d.Write(Path.Join("bar", "c.md"), It.IsAny<byte[]>()));
 
             treeOpeartion.ReadTree("foo-oid", true);
             dataProvider.VerifyAll();
@@ -148,7 +148,7 @@ namespace Ugit
                 return false;
             });
 
-            dataProvider.Setup(d => d.ReadAllBytes(It.IsAny<string>())).Returns<string>(path =>
+            dataProvider.Setup(d => d.Read(It.IsAny<string>())).Returns<string>(path =>
             {
                 if(path == Path.Join("foo.txt") || path == Path.Join("sub", "bar.md"))
                 {

@@ -1,4 +1,4 @@
-﻿namespace Ugit
+﻿namespace Ugit.Operations
 {
     /// <summary>
     /// The Diff command proxy.

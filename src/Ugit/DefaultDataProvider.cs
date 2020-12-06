@@ -248,14 +248,14 @@
         }
 
         /// <inheritdoc/>
-        public void WriteAllBytes(string path, byte[] bytes)
+        public void Write(string path, byte[] bytes)
         {
             this.fileSystem.CreateParentDirectory(path);
             this.fileSystem.File.WriteAllBytes(path, bytes);
         }
 
         /// <inheritdoc/>
-        public byte[] ReadAllBytes(string path)
+        public byte[] Read(string path)
         {
             return this.fileSystem.File.ReadAllBytes(path);
         }

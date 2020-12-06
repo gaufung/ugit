@@ -1,4 +1,4 @@
-﻿namespace Ugit
+﻿namespace Ugit.Operations
 {
     using System.Collections.Generic;
 
