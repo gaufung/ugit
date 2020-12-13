@@ -19,7 +19,7 @@
 - ...
 
 # Prequirements 
-- .Net 5.0
+- .NET 5.x
 - diff command
   - diff.exe (Windows)
   - diff (*nix)
@@ -28,4 +28,4 @@
 - [1 Introudction](https://fenga.medium.com/implement-git-by-yourself-3-command-parameters-a8a7279f95d6)
 - [2 Data provider](https://fenga.medium.com/implement-git-by-yourself-2-data-provider-86c9fc07be0a)
 - [3 Command Parameters](https://fenga.medium.com/implement-git-by-yourself-3-command-parameters-a8a7279f95d6)
-- ...
+- [4 Operations](https://fenga.medium.com/implement-git-by-yourself-operations-d81133cc41ee)
