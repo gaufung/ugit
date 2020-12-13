@@ -30,5 +30,7 @@ namespace Ugit
         public static readonly string Parent = "parent";
 
         public static readonly string Master = "master";
+
+        public static readonly string GitDir = ".ugit";
     }
 }

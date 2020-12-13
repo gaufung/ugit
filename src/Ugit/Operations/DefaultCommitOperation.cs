@@ -119,10 +119,11 @@
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<string> GetObjectHistory(IEnumerable<string> oids)
         {
             HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            
+
             IEnumerable<string> IterObjectInTree(string oid)
             {
                 visited.Add(oid);
@@ -132,7 +133,7 @@
                 {
                     if (type == Constants.Tree)
                     {
-                        foreach(var val in IterObjectInTree(subOid))
+                        foreach (var val in IterObjectInTree(subOid))
                         {
                             yield return val;
                         }
@@ -145,13 +146,13 @@
                 }
             }
 
-            foreach(var oid in GetCommitHistory(oids))
+            foreach (var oid in this.GetCommitHistory(oids))
             {
                 yield return oid;
-                var commit = GetCommit(oid);
+                var commit = this.GetCommit(oid);
                 if (!visited.Contains(commit.Tree))
                 {
-                    foreach(var val in IterObjectInTree(commit.Tree))
+                    foreach (var val in IterObjectInTree(commit.Tree))
                     {
                         yield return val;
                     }
@@ -159,6 +160,7 @@
             }
         }
 
+        // Compare index and repo tree.
         private void CommitValidate()
         {
             string HEAD = this.dataProvider.GetRef(Constants.HEAD).Value;

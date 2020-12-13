@@ -46,6 +46,11 @@
         /// <returns>Index tree.</returns>
         Dictionary<string, string> GetIndexTree();
 
+        /// <summary>
+        /// Iterate tree entry (name, oid, type)
+        /// </summary>
+        /// <param name="oid">the tree oid.</param>
+        /// <returns>the tree component.</returns>
         IEnumerable<(string, string, string)> IterTreeEntry(string oid);
     }
 }

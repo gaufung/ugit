@@ -46,7 +46,7 @@
         }
 
         /// <inheritdoc/>
-        public string GitDir { get; } = ".ugit";
+        public string GitDir => Constants.GitDir;
 
         /// <inheritdoc/>
         public string GitDirFullPath =>
@@ -60,7 +60,7 @@
                 string path = Path.Join(this.GitDirFullPath, Constants.Index);
                 if (this.fileSystem.File.Exists(path))
                 {
-                    var data = this.fileSystem.File.ReadAllBytes(path);
+                    var data = this.Read(path);
                     return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
                 }
 
@@ -76,7 +76,7 @@
                     this.fileSystem.File.Delete(path);
                 }
 
-                this.fileSystem.File.WriteAllText(path, data);
+                this.Write(path, data.Encode());
             }
         }
 
@@ -84,9 +84,9 @@
         public byte[] GetObject(string oid, string expected = "blob")
         {
             string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
-            if (this.fileSystem.File.Exists(filePath))
+            if (this.Exist(filePath, true))
             {
-                var data = this.fileSystem.File.ReadAllBytes(filePath);
+                var data = this.Read(filePath);
                 var index = Array.IndexOf(data, this.typeSeparator);
                 if (!string.IsNullOrWhiteSpace(expected) && index > 0)
                 {
@@ -113,7 +113,7 @@
 
             string oid = data.Sha1HexDigest();
             string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
-            this.fileSystem.File.WriteAllBytes(filePath, data);
+            this.Write(filePath, data);
             return oid;
         }
 
@@ -150,7 +150,7 @@
 
             string filePath = Path.Join(this.GitDirFullPath, @ref);
             this.fileSystem.CreateParentDirectory(filePath);
-            this.fileSystem.File.WriteAllBytes(filePath, val.Encode());
+            this.Write(filePath, val.Encode());
         }
 
         /// <inheritdoc/>
@@ -179,7 +179,7 @@
             }
 
             string refDirectory = Path.Join(this.GitDirFullPath, "refs");
-            foreach (var filePath in this.fileSystem.Walk(refDirectory))
+            foreach (var filePath in this.Walk(refDirectory))
             {
                 string refName = Path.GetRelativePath(this.GitDirFullPath, filePath);
                 if (refName.StartsWith(prefix))

@@ -266,8 +266,7 @@ namespace Ugit
             string indexPath = Path.Join(".ugit", "index");
             fileMock.Setup(f => f.Exists(indexPath)).Returns(true);
             fileMock.Setup(f => f.Delete(indexPath));
-            string data = "{\"foo\":\"bar\"}";
-            fileMock.Setup(f => f.WriteAllText(indexPath, data));
+            fileMock.Setup(f => f.WriteAllBytes(indexPath, It.IsAny<byte[]>()));
             dataProvider.Index = new System.Collections.Generic.Dictionary<string, string>()
             {
                 { "foo", "bar"}

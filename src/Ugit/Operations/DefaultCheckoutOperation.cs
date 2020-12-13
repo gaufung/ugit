@@ -40,7 +40,6 @@
             string oid = this.dataProvider.GetOid(name);
             Commit commit = this.commitOperation.GetCommit(oid);
             this.treeOperation.ReadTree(commit.Tree, true);
-
             RefValue HEAD = this.branchOperation.IsBranch(name)
                 ? RefValue.Create(true, Path.Join(Constants.Refs, Constants.Heads, name))
                 : RefValue.Create(false, oid);

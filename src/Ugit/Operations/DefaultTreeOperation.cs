@@ -133,6 +133,7 @@
             return this.dataProvider.Index;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<(string, string, string)> IterTreeEntry(string oid)
         {
             if (string.IsNullOrWhiteSpace(oid))
@@ -163,12 +164,16 @@
                     string name = entry.Key;
                     entries.Add((name, oid, type));
                 }
-                else
+                else if (entry.Value is string)
                 {
                     string type = Constants.Blob;
                     string oid = entry.Value as string;
                     string name = entry.Key;
                     entries.Add((name, oid, type));
+                }
+                else
+                {
+                    throw new UgitException($"Unknow tree object type: {entry.Value.GetType()}");
                 }
             }
 
