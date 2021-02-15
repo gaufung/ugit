@@ -10,8 +10,8 @@
         /// <summary>
         /// Diff a tree.
         /// </summary>
-        /// <param name="fromTree">The first tree respents the snapshot. {filePath:oid}.</param>
-        /// <param name="toTree">The second tree respents the snapshot. {filePath:oid}.</param>
+        /// <param name="fromTree">The first tree represents the snapshot. {filePath:oid}.</param>
+        /// <param name="toTree">The second tree represents the snapshot. {filePath:oid}.</param>
         /// <returns>The difference.</returns>
         string DiffTrees(IDictionary<string, string> fromTree, IDictionary<string, string> toTree);
 
@@ -23,7 +23,7 @@
         IEnumerable<(string, IEnumerable<string>)> CompareTrees(params IDictionary<string, string>[] trees);
 
         /// <summary>
-        /// The differnce of two blob files.
+        /// The difference of two blob files.
         /// </summary>
         /// <param name="fromOid">The first file blob oid.</param>
         /// <param name="toOid">The second file blob oid.</param>
@@ -32,11 +32,11 @@
         string DiffBlob(string fromOid, string toOid, string path);
 
         /// <summary>
-        /// The two trees comparsion.
+        /// The two trees comparision.
         /// </summary>
         /// <param name="fromTree">The first tree.</param>
         /// <param name="toTree">The second tree.</param>
-        /// <returns>The differnce specification. {filepath: action}</returns>
+        /// <returns>The difference specification. {filepath: action}</returns>
         IEnumerable<(string, string)> IterChangedFiles(IDictionary<string, string> fromTree, IDictionary<string, string> toTree);
 
         /// <summary>

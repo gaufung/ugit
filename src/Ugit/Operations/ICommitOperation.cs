@@ -25,11 +25,11 @@
         /// Iter commits and parents.
         /// </summary>
         /// <param name="oids">oids.</param>
-        /// <returns>histrory oids.</returns>
+        /// <returns>history oids.</returns>
         IEnumerable<string> GetCommitHistory(IEnumerable<string> oids);
 
         /// <summary>
-        /// Get object histroy by given object id.
+        /// Get object history by given object id.
         /// </summary>
         /// <param name="oid">object id.</param>
         /// <returns>List of object id that belongs to this object id.</returns>

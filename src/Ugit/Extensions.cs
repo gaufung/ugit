@@ -138,9 +138,9 @@
 #else
             Dictionary<string, string> refs = new Dictionary<string, string>();
 #endif
-            foreach (var (refname, @ref) in dataProvider.GetAllRefs(prefix))
+            foreach (var (refName, @ref) in dataProvider.GetAllRefs(prefix))
             {
-                refs.Add(refname, @ref.Value);
+                refs.Add(refName, @ref.Value);
             }
 
             return refs;

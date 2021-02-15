@@ -45,7 +45,7 @@
             {
                 this.treeOperation.ReadTree(otherCommit.Tree, true);
                 this.dataProvider.UpdateRef("HEAD", RefValue.Create(false, other));
-                Console.WriteLine("Fast-forwad, no need to commit");
+                Console.WriteLine("Fast-forward, no need to commit");
                 return;
             }
 

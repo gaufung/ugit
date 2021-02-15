@@ -19,7 +19,7 @@
 
         /// <summary>
         /// Gets or sets Index.
-        /// <summary>
+        /// </summary>
         Dictionary<string, string> Index { get; set; }
 
         /// <summary>

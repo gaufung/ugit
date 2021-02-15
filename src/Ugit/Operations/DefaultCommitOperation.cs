@@ -6,7 +6,7 @@
     using Nito.Collections;
 
     /// <summary>
-    /// Default implmentation of <see cref="ICommitOperation"/>.
+    /// Default implementation of <see cref="ICommitOperation"/>.
     /// </summary>
     internal class DefaultCommitOperation : ICommitOperation
     {
@@ -18,7 +18,7 @@
         /// Initializes a new instance of the <see cref="DefaultCommitOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data Provider.</param>
-        /// <param name="treeOperation">The tree opeartion.</param>
+        /// <param name="treeOperation">The tree operation.</param>
         public DefaultCommitOperation(IDataProvider dataProvider, ITreeOperation treeOperation)
         {
             this.dataProvider = dataProvider;
@@ -188,11 +188,13 @@
                         break;
                     }
 
-                    if (indexTree[headTreeEntry.Key] != headTree[headTreeEntry.Key])
+                    if (indexTree[headTreeEntry.Key] == headTree[headTreeEntry.Key])
                     {
-                        isSame = false;
-                        break;
+                        continue;
                     }
+
+                    isSame = false;
+                    break;
                 }
             }
 

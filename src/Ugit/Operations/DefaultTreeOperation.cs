@@ -164,10 +164,9 @@
                     string name = entry.Key;
                     entries.Add((name, oid, type));
                 }
-                else if (entry.Value is string)
+                else if (entry.Value is string oid)
                 {
                     string type = Constants.Blob;
-                    string oid = entry.Value as string;
                     string name = entry.Key;
                     entries.Add((name, oid, type));
                 }

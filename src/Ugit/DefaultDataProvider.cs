@@ -27,14 +27,9 @@
         public DefaultDataProvider(IFileSystem fileSystem, string repoPath = "")
         {
             this.fileSystem = fileSystem;
-            if (string.IsNullOrWhiteSpace(repoPath))
-            {
-                this.repoPath = this.fileSystem.Directory.GetCurrentDirectory();
-            }
-            else
-            {
-                this.repoPath = repoPath;
-            }
+            this.repoPath = string.IsNullOrWhiteSpace(repoPath) ?
+                this.fileSystem.Directory.GetCurrentDirectory() :
+                repoPath;
         }
 
         /// <summary>
@@ -58,13 +53,13 @@
             get
             {
                 string path = Path.Join(this.GitDirFullPath, Constants.Index);
-                if (this.fileSystem.File.Exists(path))
+                if (!this.fileSystem.File.Exists(path))
                 {
-                    var data = this.Read(path);
-                    return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
+                    return new Dictionary<string, string>();
                 }
 
-                return new Dictionary<string, string>();
+                var data = this.Read(path);
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
             }
 
             set
@@ -84,23 +79,25 @@
         public byte[] GetObject(string oid, string expected = "blob")
         {
             string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
-            if (this.Exist(filePath, true))
+            if (!this.Exist(filePath, true))
             {
-                var data = this.Read(filePath);
-                var index = Array.IndexOf(data, this.typeSeparator);
-                if (!string.IsNullOrWhiteSpace(expected) && index > 0)
-                {
-                    var type = data.Take(index).ToArray().Decode();
-                    if (!string.Equals(expected, type, StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new UgitException($"Unknow object type, got {type}");
-                    }
-
-                    return data.TakeLast(data.Length - index - 1).ToArray();
-                }
+                return Array.Empty<byte>();
             }
 
-            return Array.Empty<byte>();
+            var data = this.Read(filePath);
+            var index = Array.IndexOf(data, this.typeSeparator);
+            if (string.IsNullOrWhiteSpace(expected) || index <= 0)
+            {
+                return Array.Empty<byte>();
+            }
+
+            var type = data.Take(index).ToArray().Decode();
+            if (!string.Equals(expected, type, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UgitException($"Unknown object type, got {type}");
+            }
+
+            return data.TakeLast(data.Length - index - 1).ToArray();
         }
 
         /// <inheritdoc/>
@@ -138,16 +135,7 @@
                 throw new ArgumentException("ref value could be null or empty");
             }
 
-            string val;
-            if (value.Symbolic)
-            {
-                val = $"ref: {value.Value}";
-            }
-            else
-            {
-                val = value.Value;
-            }
-
+            var val = value.Symbolic ? $"ref: {value.Value}" : value.Value;
             string filePath = Path.Join(this.GitDirFullPath, @ref);
             this.fileSystem.CreateParentDirectory(filePath);
             this.Write(filePath, val.Encode());
@@ -178,17 +166,19 @@
                 }
             }
 
-            string refDirectory = Path.Join(this.GitDirFullPath, "refs");
+            string refDirectory = Path.Join(this.GitDirFullPath, Constants.Refs);
             foreach (var filePath in this.Walk(refDirectory))
             {
                 string refName = Path.GetRelativePath(this.GitDirFullPath, filePath);
-                if (refName.StartsWith(prefix))
+                if (!refName.StartsWith(prefix))
                 {
-                    var @ref = this.GetRef(refName, deref);
-                    if (!string.IsNullOrEmpty(@ref.Value))
-                    {
-                        yield return (refName, @ref);
-                    }
+                    continue;
+                }
+
+                var @ref = this.GetRef(refName, deref);
+                if (!string.IsNullOrEmpty(@ref.Value))
+                {
+                    yield return (refName, @ref);
                 }
             }
         }
@@ -237,14 +227,9 @@
         /// <inheritdoc/>
         public bool Exist(string path, bool isFile = true)
         {
-            if (isFile)
-            {
-                return this.fileSystem.File.Exists(path);
-            }
-            else
-            {
-                return this.fileSystem.Directory.Exists(path);
-            }
+            return isFile ?
+                this.fileSystem.File.Exists(path) :
+                this.fileSystem.Directory.Exists(path);
         }
 
         /// <inheritdoc/>
@@ -318,16 +303,15 @@
             }
 
             bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");
-            if (symbolic)
+            if (!symbolic)
             {
-                value = value.Split(":")[1].Trim();
-                if (deref)
-                {
-                    return this.GetRefInternal(value, true);
-                }
+                return ValueTuple.Create(@ref, RefValue.Create(false, value));
             }
 
-            return ValueTuple.Create(@ref, RefValue.Create(symbolic, value));
+            value = value.Split(":")[1].Trim();
+            return deref ?
+                this.GetRefInternal(value, true) :
+                ValueTuple.Create(@ref, RefValue.Create(true, value));
         }
     }
 }

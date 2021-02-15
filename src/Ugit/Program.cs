@@ -5,10 +5,9 @@
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Abstractions;
-    using System.Runtime.CompilerServices;
     using CommandLine;
-    using Ugit.Operations;
-    using Ugit.Options;
+    using Operations;
+    using Options;
 
     /// <summary>
     /// The console program.
@@ -111,7 +110,7 @@
                 CommitOperation,
                 remoteDataProvider,
                 remoteCommitOperation);
-            string refName = Path.Join("refs", "heads", o.Branch);
+            string refName = Path.Join(Constants.Refs, Constants.Heads, o.Branch);
             remoteOperation.Push(refName);
             return 0;
         }

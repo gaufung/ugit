@@ -18,7 +18,7 @@
         public List<string> Parents { get; set; }
 
         /// <summary>
-        /// Gets or sets the commit messge.
+        /// Gets or sets the commit message.
         /// </summary>
         public string Message { get; set; }
     }

@@ -3,7 +3,7 @@
     using System.Diagnostics;
 
     /// <summary>
-    /// The implmentation of <see cref="IDiffOperation"/>.
+    /// The implementation of <see cref="IDiffOperation"/>.
     /// </summary>
     public class DefaultDiffProxyOperation : IDiffProxyOperation
     {

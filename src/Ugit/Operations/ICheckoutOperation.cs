@@ -1,7 +1,7 @@
 ﻿namespace Ugit.Operations
 {
     /// <summary>
-    /// Checkout opeartion.
+    /// Checkout operation.
     /// </summary>
     internal interface ICheckoutOperation
     {

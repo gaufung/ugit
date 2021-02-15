@@ -1,7 +1,7 @@
 ﻿namespace Ugit.Operations
 {
     /// <summary>
-    /// Default reset opeartion.
+    /// Default reset operation.
     /// </summary>
     internal class DefaultResetOperation : IResetOperation
     {

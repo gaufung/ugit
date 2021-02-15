@@ -48,13 +48,15 @@
 
         private void AddFile(IDictionary<string, string> index, string fileName)
         {
-            if (!this.dataProvider.IsIgnore(fileName))
+            if (this.dataProvider.IsIgnore(fileName))
             {
-                var normalFileName = Path.GetRelativePath(".", fileName);
-                byte[] data = this.dataProvider.Read(normalFileName);
-                string oid = this.dataProvider.HashObject(data);
-                index[normalFileName] = oid;
+                return;
             }
+
+            var normalFileName = Path.GetRelativePath(".", fileName);
+            byte[] data = this.dataProvider.Read(normalFileName);
+            string oid = this.dataProvider.HashObject(data);
+            index[normalFileName] = oid;
         }
     }
 }

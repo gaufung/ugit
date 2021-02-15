@@ -19,7 +19,7 @@
         /// Initializes a new instance of the <see cref="DefaultCheckoutOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        /// <param name="treeOperation">The tree opeartion.</param>
+        /// <param name="treeOperation">The tree operation.</param>
         /// <param name="commitOperation">The commit operation.</param>
         /// <param name="branchOperation">The branch operation.</param>
         public DefaultCheckoutOperation(

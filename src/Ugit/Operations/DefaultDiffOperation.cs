@@ -5,7 +5,7 @@
     using System.Linq;
 
     /// <summary>
-    /// The default implemantation of <see cref="IDiffOperation"/>.
+    /// The default implementation of <see cref="IDiffOperation"/>.
     /// </summary>
     internal class DefaultDiffOperation : IDiffOperation
     {
@@ -18,7 +18,6 @@
         /// </summary>
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
-        /// <param name="fileSystem">file system.</param>
         public DefaultDiffOperation(IDataProvider dataProvider, IDiffProxyOperation diffProxy)
         {
             this.dataProvider = dataProvider;
@@ -68,6 +67,7 @@
             return output;
         }
 
+        /// <inheritdoc/>
         public string DiffTrees(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
         {
             return string.Join(

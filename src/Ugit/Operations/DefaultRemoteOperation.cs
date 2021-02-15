@@ -21,19 +21,17 @@
         /// Initializes a new instance of the <see cref="DefaultRemoteOperation"/> class.
         /// </summary>
         /// <param name="localDataProvider">local data provider.</param>
-        /// <param name="localTreeOperation">local tree operation.</param>
-        /// <param name="localCommitOpeartion">local commit operation.</param>
-        /// <param name="remoteDataProvider">remote data provder.</param>
-        /// <param name="remoteTreeOperation">remote tree operation.</param>
+        /// <param name="localCommitOperation">local tree operation.</param>
+        /// <param name="remoteDataProvider">remote data provider.</param>
         /// <param name="remoteCommitOperation">remote commit operation.</param>
         public DefaultRemoteOperation(
             IDataProvider localDataProvider,
-            ICommitOperation localCommitOpeartion,
+            ICommitOperation localCommitOperation,
             IDataProvider remoteDataProvider,
             ICommitOperation remoteCommitOperation)
         {
             this.localDataProvider = localDataProvider;
-            this.localCommitOperation = localCommitOpeartion;
+            this.localCommitOperation = localCommitOperation;
             this.remoteDataProvider = remoteDataProvider;
             this.remoteCommitOperation = remoteCommitOperation;
         }
