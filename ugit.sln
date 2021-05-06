@@ -3,13 +3,39 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ugit", "src\Ugit\Ugit.csproj", "{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UgitTest", "test\UgitTest\UgitTest.csproj", "{A11729C8-0335-4C6D-8B74-A2385FB153BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tindo.UgitCore.Test", "test\Tindo.UgitCore.Test\Tindo.UgitCore.Test.csproj", "{A11729C8-0335-4C6D-8B74-A2385FB153BF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tindo.UgitCore", "src\Tindo.UgitCore\Tindo.UgitCore.csproj", "{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tindo.UgitCLI", "src\Tindo.UgitCLI\Tindo.UgitCLI.csproj", "{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tindo.UgitServer", "src\Tindo.UgitServer\Tindo.UgitServer.csproj", "{E625806C-1766-4428-8585-DB239293D287}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tindo.UgitCLI.Functional.Test", "Tindo.UgitCLI.Functional.Test", "{7166ED51-B64A-4B3A-AC2F-CE10D9F0D5CB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{5BCE3BAB-626F-4F41-8162-01C46AE4B522}"
+ProjectSection(SolutionItems) = preProject
+	test\Tindo.UgitCLI.Function.Test\data\dev.md = test\Tindo.UgitCLI.Function.Test\data\dev.md
+	test\Tindo.UgitCLI.Function.Test\data\hello.txt = test\Tindo.UgitCLI.Function.Test\data\hello.txt
+	test\Tindo.UgitCLI.Function.Test\data\remote.md = test\Tindo.UgitCLI.Function.Test\data\remote.md
+	test\Tindo.UgitCLI.Function.Test\data\ugit.txt = test\Tindo.UgitCLI.Function.Test\data\ugit.txt
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "script", "script", "{975E11BD-260A-4AB8-BCEE-B2136F172FCE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "windows", "windows", "{4CD16867-21A2-4AA7-8E9F-2C0DEF2259BB}"
+ProjectSection(SolutionItems) = preProject
+	test\Tindo.UgitCLI.Function.Test\script\windows\Test-Ugit.ps1 = test\Tindo.UgitCLI.Function.Test\script\windows\Test-Ugit.ps1
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linux", "linux", "{97CDCDA0-8B47-411B-98AE-4EA2E16DE8C1}"
+ProjectSection(SolutionItems) = preProject
+	test\Tindo.UgitCLI.Function.Test\script\linux\test_ugit.sh = test\Tindo.UgitCLI.Function.Test\script\linux\test_ugit.sh
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,21 +43,36 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E625806C-1766-4428-8585-DB239293D287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E625806C-1766-4428-8585-DB239293D287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E625806C-1766-4428-8585-DB239293D287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E625806C-1766-4428-8585-DB239293D287}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF} = {8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
+		{E625806C-1766-4428-8585-DB239293D287} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
+		{7166ED51-B64A-4B3A-AC2F-CE10D9F0D5CB} = {8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}
+		{5BCE3BAB-626F-4F41-8162-01C46AE4B522} = {7166ED51-B64A-4B3A-AC2F-CE10D9F0D5CB}
+		{975E11BD-260A-4AB8-BCEE-B2136F172FCE} = {7166ED51-B64A-4B3A-AC2F-CE10D9F0D5CB}
+		{4CD16867-21A2-4AA7-8E9F-2C0DEF2259BB} = {975E11BD-260A-4AB8-BCEE-B2136F172FCE}
+		{97CDCDA0-8B47-411B-98AE-4EA2E16DE8C1} = {975E11BD-260A-4AB8-BCEE-B2136F172FCE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9BD04BF7-1070-4A04-AE94-1164C8722646}
