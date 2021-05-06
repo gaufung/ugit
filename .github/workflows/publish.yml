@@ -35,7 +35,7 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="ugit-$tag-${{ matrix.target }}"
-          dotnet publish src/Ugit/Ugit.csproj --framework net5.0 --runtime "${{ matrix.target }}" -c Release -o "$release_name" -p:PublishSingleFile=true --self-contained true
+          dotnet publish src/Tindo.UgitCLI/Tindo.UgitCLI.csproj --framework net5.0 --runtime "${{ matrix.target }}" -c Release -o "$release_name" -p:PublishSingleFile=true --self-contained true
           if [ "${{ matrix.taget }}" == "win-x64" ]; then
             7z a -tzip "${release_name}.zip" "./${release_name}/*"
           else  

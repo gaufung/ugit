@@ -6,7 +6,8 @@ namespace Ugit
     using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using Ugit.Operations;
+    using Tindo.UgitCore.Operations;
+    using Tindo.UgitCore;
 
     [TestClass]
     public class DefaultRemoteOperationTests

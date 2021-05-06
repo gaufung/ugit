@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ugit", "src\Ugit\Ugit.csproj", "{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UgitTest", "test\UgitTest\UgitTest.csproj", "{A11729C8-0335-4C6D-8B74-A2385FB153BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tindo.UgitCore.Test", "test\Tindo.UgitCore.Test\Tindo.UgitCore.Test.csproj", "{A11729C8-0335-4C6D-8B74-A2385FB153BF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tindo.UgitCore", "src\Tindo.UgitCore\Tindo.UgitCore.csproj", "{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tindo.UgitCLI", "src\Tindo.UgitCLI\Tindo.UgitCLI.csproj", "{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tindo.UgitServer", "src\Tindo.UgitServer\Tindo.UgitServer.csproj", "{E625806C-1766-4428-8585-DB239293D287}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,21 +21,31 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E625806C-1766-4428-8585-DB239293D287}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E625806C-1766-4428-8585-DB239293D287}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E625806C-1766-4428-8585-DB239293D287}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E625806C-1766-4428-8585-DB239293D287}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF} = {8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}
+		{DBF138C0-B7B8-4034-B0B0-F582B1B40C43} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
+		{2724C10E-3C06-4B5D-9A7C-AD4C1E174F3F} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
+		{E625806C-1766-4428-8585-DB239293D287} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9BD04BF7-1070-4A04-AE94-1164C8722646}

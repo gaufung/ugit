@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Ugit.Operations;
+using Tindo.UgitCore.Operations;
+using Tindo.UgitCore;
 
 namespace Ugit
 {

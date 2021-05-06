@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using Tindo.UgitCore.Operations;
+using Tindo.UgitCore;
 
 namespace Ugit
 {
