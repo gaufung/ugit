@@ -35,7 +35,7 @@
             this.dataProvider.Index = index;
         }
 
-        private void AddDirectory(IDictionary<string, string> index, string directoryName)
+        private void AddDirectory(Tree index, string directoryName)
         {
             foreach (var fileName in this.dataProvider.Walk(directoryName))
             {
@@ -43,7 +43,7 @@
             }
         }
 
-        private void AddFile(IDictionary<string, string> index, string fileName)
+        private void AddFile(Tree index, string fileName)
         {
             if (this.dataProvider.IsIgnore(fileName))
             {

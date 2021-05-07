@@ -101,7 +101,7 @@
 
         private bool IsAncestorOf(string commit, string maybeAncestor)
         {
-            return this.localCommitOperation.GetCommitHistory(new[] { commit }).Contains(maybeAncestor);
+            return this.localCommitOperation.GetHistory(new[] { commit }).Contains(maybeAncestor);
         }
     }
 }

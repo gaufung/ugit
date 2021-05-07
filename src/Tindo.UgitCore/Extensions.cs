@@ -59,6 +59,14 @@
             }
         }
 
+        public static void Update(this Tree tree, Tree other)
+        {
+            foreach (var entry in other)
+            {
+                tree[entry.Key] = entry.Value;
+            }
+        }
+
         /// <summary>
         /// Create parent directionary for given filepath.
         /// </summary>
@@ -89,7 +97,7 @@
         }
 
         /// <summary>
-        /// Walk through a dicrionary recursively.
+        /// Walk through a directory recursively.
         /// </summary>
         /// <param name="fileSystem">The file system.</param>
         /// <param name="directory">The directory.</param>

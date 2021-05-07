@@ -38,7 +38,7 @@ namespace Ugit
         public void ChecoutBranchTest()
         {
             dataProvider.Setup(d => d.GetOid("dev")).Returns("dev-oid");
-            commitOperation.Setup(c => c.GetCommit("dev-oid")).Returns(new Commit
+            commitOperation.Setup(c => c.Get("dev-oid")).Returns(new Commit
             {
                 Tree = "dev-tree-oid"
             });
@@ -56,7 +56,7 @@ namespace Ugit
         public void CheckoutOidTest()
         {
             dataProvider.Setup(d => d.GetOid("feature-oid")).Returns("feature-oid");
-            commitOperation.Setup(c => c.GetCommit("feature-oid")).Returns(new Commit
+            commitOperation.Setup(c => c.Get("feature-oid")).Returns(new Commit
             {
                 Tree = "feature-tree-oid"
             });

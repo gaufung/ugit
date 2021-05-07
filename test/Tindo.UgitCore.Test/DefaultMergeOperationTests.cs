@@ -36,17 +36,17 @@ namespace Ugit
         public void FastwardMergeTest()
         {
             dataProvider.Setup(d => d.GetRef("HEAD", true)).Returns(RefValue.Create(false, "head-tree-oid"));
-            commitOperation.Setup(c => c.GetCommit("head-tree-oid")).Returns(new Commit
+            commitOperation.Setup(c => c.Get("head-tree-oid")).Returns(new Commit
             {
                 Tree = "head-tree-oid",
             });
 
-            commitOperation.Setup(c => c.GetCommit("other-oid")).Returns(new Commit
+            commitOperation.Setup(c => c.Get("other-oid")).Returns(new Commit
             {
                 Tree = "other-tree-oid",
             });
 
-            commitOperation.Setup(c => c.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>((oids) =>
+            commitOperation.Setup(c => c.GetHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>((oids) =>
             {
                 if (oids.ToArray()[0] == "other-oid")
                 {
@@ -71,17 +71,17 @@ namespace Ugit
         public void MergeTest()
         {
             dataProvider.Setup(d => d.GetRef("HEAD", true)).Returns(RefValue.Create(false, "head-tree-oid"));
-            commitOperation.Setup(c => c.GetCommit("head-tree-oid")).Returns(new Commit
+            commitOperation.Setup(c => c.Get("head-tree-oid")).Returns(new Commit
             {
                 Tree = "head-tree-oid",
             });
 
-            commitOperation.Setup(c => c.GetCommit("other-oid")).Returns(new Commit
+            commitOperation.Setup(c => c.Get("other-oid")).Returns(new Commit
             {
                 Tree = "other-tree-oid",
             });
 
-            commitOperation.Setup(c => c.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>((oids) =>
+            commitOperation.Setup(c => c.GetHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>((oids) =>
             {
                 if (oids.ToArray()[0] == "other-oid")
                 {
@@ -95,20 +95,20 @@ namespace Ugit
             });
 
             this.dataProvider.Setup(d => d.UpdateRef("MERGE_HEAD", It.Is<RefValue>(r => !r.Symbolic && r.Value == "other-oid"), true));
-            this.dataProvider.Setup(d => d.Index).Returns(new Dictionary<string, string>());
+            this.dataProvider.Setup(d => d.Index).Returns(new Tree());
             this.treeOperation.Setup(d => d.GetTree("head-tree-oid", "")).Returns(
-                new Dictionary<string, string>()
+                new Tree
                 {
                     { "foo.txt", "foo-oid"},
                     { "bar.txt", "bar-oid" }
                 });
             this.treeOperation.Setup(d => d.GetTree("other-tree-oid", "")).Returns(
-                new Dictionary<string, string>()
+                new Tree
                 {
                     { "foo.txt", "foo-oid"},
                 });
-            this.diff.Setup(d => d.MergeTree(It.IsAny<IDictionary<string, string>>(),
-                It.IsAny<IDictionary<string, string>>())).Returns<IDictionary<string, string>, IDictionary<string, string>>((tree1, tree2) =>
+            this.diff.Setup(d => d.MergeTree(It.IsAny<Tree>(),
+                It.IsAny<Tree>())).Returns<Tree, Tree>((tree1, tree2) =>
                 {
                     if(tree1.Count==2 && 
                         tree1.ContainsKey("foo.txt") &&
@@ -116,7 +116,7 @@ namespace Ugit
                         tree2.Count == 1 &&
                         tree2.ContainsKey("foo.txt"))
                     {
-                        return new Dictionary<string, string>()
+                        return new Tree
                         {
                             { "foo.txt", "foo-oid" },
                             { "bar.txt", "bar-oid" }

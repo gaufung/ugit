@@ -20,7 +20,7 @@
         /// <summary>
         /// Gets or sets Index.
         /// </summary>
-        Dictionary<string, string> Index { get; set; }
+        Tree Index { get; set; }
 
         /// <summary>
         /// Initialize the git directory.

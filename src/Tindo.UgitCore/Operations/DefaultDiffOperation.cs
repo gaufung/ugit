@@ -25,7 +25,7 @@
         }
 
         /// <inheritdoc/>
-        public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params IDictionary<string, string>[] trees)
+        public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params Tree[] trees)
         {
 #if NET5_0
             Dictionary<string, string[]> entries = new ();
@@ -34,7 +34,7 @@
 #endif
             for (int i = 0; i < trees.Length; i++)
             {
-                IDictionary<string, string> tree = trees[i];
+                Tree tree = trees[i];
                 foreach (var entry in tree)
                 {
                     string path = entry.Key;
@@ -68,7 +68,7 @@
         }
 
         /// <inheritdoc/>
-        public string DiffTrees(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
+        public string DiffTrees(Tree fromTree, Tree toTree)
         {
             return string.Join(
                 "\n",
@@ -78,7 +78,7 @@
         }
 
         /// <inheritdoc/>
-        public IEnumerable<(string, string)> IterChangedFiles(IDictionary<string, string> fromTree, IDictionary<string, string> toTree)
+        public IEnumerable<(string, string)> IterChangedFiles(Tree fromTree, Tree toTree)
         {
             foreach (var entry in this.CompareTrees(fromTree, toTree))
             {
@@ -119,10 +119,10 @@
         }
 
         /// <inheritdoc/>
-        public IDictionary<string, string> MergeTree(IDictionary<string, string> headTree, IDictionary<string, string> otherTree)
+        public Tree MergeTree(Tree headTree, Tree otherTree)
         {
 #if NET5_0
-            Dictionary<string, string> tree = new ();
+            Tree tree = new ();
 #else
             Dictionary<string, string> tree = new Dictionary<string, string>();
 #endif

@@ -23,7 +23,7 @@
         }
 
         /// <inheritdoc/>
-        public string CreateCommit(string message)
+        public string Create(string message)
         {
             this.CommitValidate();
             string commit = $"tree {this.treeOperation.WriteTree()}\n";
@@ -48,7 +48,7 @@
         }
 
         /// <inheritdoc/>
-        public Commit GetCommit(string oid)
+        public Commit Get(string oid)
         {
 #if NET5_0
             List<string> parents = new ();
@@ -89,7 +89,7 @@
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> GetCommitHistory(IEnumerable<string> oids)
+        public IEnumerable<string> GetHistory(IEnumerable<string> oids)
         {
             Deque<string> oidQueue = new Deque<string>(oids);
             HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -105,7 +105,7 @@
                 visited.Add(oid);
                 yield return oid;
 
-                var commit = this.GetCommit(oid);
+                var commit = this.Get(oid);
                 oidQueue.AddToFront(commit.Parents.FirstOrDefault());
                 if (commit.Parents.Count > 1)
                 {
@@ -143,10 +143,10 @@
                 }
             }
 
-            foreach (var oid in this.GetCommitHistory(oids))
+            foreach (var oid in this.GetHistory(oids))
             {
                 yield return oid;
-                var commit = this.GetCommit(oid);
+                var commit = this.Get(oid);
                 if (!visited.Contains(commit.Tree))
                 {
                     foreach (var val in IterObjectInTree(commit.Tree))
@@ -161,14 +161,14 @@
         private void CommitValidate()
         {
             string HEAD = this.dataProvider.GetRef(Constants.HEAD).Value;
-            IDictionary<string, string> headTree = new Dictionary<string, string>();
+            Tree headTree = new Tree();
             if (!string.IsNullOrWhiteSpace(HEAD))
             {
-                Commit commit = this.GetCommit(HEAD);
+                Commit commit = this.Get(HEAD);
                 headTree = this.treeOperation.GetTree(commit.Tree);
             }
 
-            IDictionary<string, string> indexTree = this.treeOperation.GetIndexTree();
+            Tree indexTree = this.treeOperation.GetIndexTree();
             bool isSame = true;
 
             if (headTree.Count != indexTree.Count)

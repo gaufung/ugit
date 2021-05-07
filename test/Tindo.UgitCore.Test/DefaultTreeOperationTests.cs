@@ -60,7 +60,7 @@ namespace Ugit
             dataProvider.Setup(d => d.GetObject("bar-oid", "blob")).Returns("Hello bar".Encode());
             dataProvider.Setup(d => d.Write("foo.txt", It.IsAny<byte[]>()));
             dataProvider.Setup(d => d.Write("bar.txt", It.IsAny<byte[]>()));
-            Dictionary<string, string> index = new Dictionary<string, string>()
+            Tree index = new Tree
             {
                 {"foo.txt", "foo-oid" },
                 {"bar.txt", "bar-oid" }
@@ -72,7 +72,7 @@ namespace Ugit
         [TestMethod]
         public void ReadTreeTest()
         {
-            dataProvider.Setup(d => d.Index).Returns(new Dictionary<string, string>()
+            dataProvider.Setup(d => d.Index).Returns(new Tree()
             {
             });
 
@@ -105,7 +105,7 @@ namespace Ugit
         [TestMethod]
         public void WriteTreeTest()
         {
-            dataProvider.Setup(d => d.Index).Returns(new Dictionary<string, string>()
+            dataProvider.Setup(d => d.Index).Returns(new Tree
             {
                 { Path.Join("foo.txt"), "foo-oid" },
                 { Path.Join("sub", "bar.md"), "bar-oid" }

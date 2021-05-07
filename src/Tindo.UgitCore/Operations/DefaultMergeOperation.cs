@@ -37,9 +37,9 @@
         public void Merge(string other)
         {
             string head = this.dataProvider.GetRef("HEAD").Value;
-            var headCommit = this.commitOperation.GetCommit(head);
+            var headCommit = this.commitOperation.Get(head);
             string mergeBase = this.GetMergeBase(other, head);
-            var otherCommit = this.commitOperation.GetCommit(other);
+            var otherCommit = this.commitOperation.Get(other);
 
             if (mergeBase == head)
             {
@@ -56,8 +56,8 @@
 
         private string GetMergeBase(string oid1, string oid2)
         {
-            IEnumerable<string> parents = this.commitOperation.GetCommitHistory(new[] { oid1 });
-            foreach (var oid in this.commitOperation.GetCommitHistory(new[] { oid2 }))
+            IEnumerable<string> parents = this.commitOperation.GetHistory(new[] { oid1 });
+            foreach (var oid in this.commitOperation.GetHistory(new[] { oid2 }))
             {
                 if (parents.Contains(oid))
                 {

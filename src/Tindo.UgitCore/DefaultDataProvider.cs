@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Abstractions;
     using System.Linq;
@@ -48,24 +47,28 @@
             Path.Join(this.repoPath, this.GitDir);
 
         /// <inheritdoc/>
-        public Dictionary<string, string> Index
+        public Tree Index
         {
             get
             {
                 string path = Path.Join(this.GitDirFullPath, Constants.Index);
                 if (!this.fileSystem.File.Exists(path))
                 {
-                    return new Dictionary<string, string>();
+                    return new();
                 }
 
                 var data = this.Read(path);
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
+                var options = new JsonSerializerOptions();
+                options.Converters.Add(new TreeJsonConverter());
+                return JsonSerializer.Deserialize<Tree>(data, options);
             }
 
             set
             {
                 string path = Path.Join(this.GitDirFullPath, Constants.Index);
-                string data = JsonSerializer.Serialize(value);
+                var options = new JsonSerializerOptions();
+                options.Converters.Add(new TreeJsonConverter());
+                string data = JsonSerializer.Serialize(value, options);
                 if (this.fileSystem.File.Exists(path))
                 {
                     this.fileSystem.File.Delete(path);

@@ -25,7 +25,7 @@ namespace Ugit
         [TestMethod]
         public void AddTest()
         {
-            this.dataProvider.Setup(d => d.Index).Returns(new Dictionary<string, string>());
+            this.dataProvider.Setup(d => d.Index).Returns(new Tree());
             string[] fileNames = new string[]
             {
                 Path.Join(".", "hello.txt"),

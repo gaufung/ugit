@@ -38,7 +38,7 @@
         public void Checkout(string name)
         {
             string oid = this.dataProvider.GetOid(name);
-            Commit commit = this.commitOperation.GetCommit(oid);
+            Commit commit = this.commitOperation.Get(oid);
             this.treeOperation.ReadTree(commit.Tree, true);
             RefValue HEAD = this.branchOperation.IsBranch(name)
                 ? RefValue.Create(true, Path.Join(Constants.Refs, Constants.Heads, name))

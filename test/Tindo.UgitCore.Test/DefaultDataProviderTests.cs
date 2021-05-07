@@ -269,7 +269,7 @@ namespace Ugit
             fileMock.Setup(f => f.Exists(indexPath)).Returns(true);
             fileMock.Setup(f => f.Delete(indexPath));
             fileMock.Setup(f => f.WriteAllBytes(indexPath, It.IsAny<byte[]>()));
-            dataProvider.Index = new System.Collections.Generic.Dictionary<string, string>()
+            dataProvider.Index = new Tree()
             {
                 { "foo", "bar"}
             };

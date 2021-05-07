@@ -22,7 +22,7 @@
         }
 
         /// <inheritdoc/>
-        public void CheckoutIndex(Dictionary<string, string> index)
+        public void CheckoutIndex(Tree index)
         {
             this.dataProvider.EmptyCurrentDirectory();
             foreach (var entry in index)
@@ -34,9 +34,9 @@
         }
 
         /// <inheritdoc/>
-        public IDictionary<string, string> GetTree(string treeOid, string basePath = "")
+        public Tree GetTree(string treeOid, string basePath = "")
         {
-            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var result = new Tree();
             foreach (var (type, oid, name) in this.IterTreeEntry(treeOid))
             {
                 string path = Path.Join(basePath, name);
@@ -75,7 +75,7 @@
         public string WriteTree()
         {
             IDictionary<string, object> indexAsTree = new Dictionary<string, object>();
-            Dictionary<string, string> index = this.dataProvider.Index;
+            Tree index = this.dataProvider.Index;
             foreach (var entry in index)
             {
                 string path = entry.Key;
@@ -110,9 +110,9 @@
         }
 
         /// <inheritdoc/>
-        public IDictionary<string, string> GetWorkingTree()
+        public Tree GetWorkingTree()
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
+            Tree result = new ();
             foreach (var filePath in this.dataProvider.Walk("."))
             {
                 if (this.dataProvider.IsIgnore(filePath))
@@ -128,7 +128,7 @@
         }
 
         /// <inheritdoc/>
-        public Dictionary<string, string> GetIndexTree()
+        public Tree GetIndexTree()
         {
             return this.dataProvider.Index;
         }

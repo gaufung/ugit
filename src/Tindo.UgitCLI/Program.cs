@@ -148,7 +148,7 @@ namespace Tindo.UgitCLI
         private static int Different(DiffOption o)
         {
             var commit = OidConverter(o.Commit);
-            var tree = CommitOperation.GetCommit(commit).Tree;
+            var tree = CommitOperation.Get(commit).Tree;
             var result = Diff.DiffTrees(TreeOperation.GetTree(tree), TreeOperation.GetWorkingTree());
             Console.WriteLine(result);
             return 0;
@@ -162,12 +162,12 @@ namespace Tindo.UgitCLI
                 return 0;
             }
 
-            var commit = CommitOperation.GetCommit(oid);
+            var commit = CommitOperation.Get(oid);
 
             string parentTree = null;
             if (commit.Parents.Count > 0)
             {
-                parentTree = CommitOperation.GetCommit(commit.Parents[0]).Tree;
+                parentTree = CommitOperation.Get(commit.Parents[0]).Tree;
             }
 
             PrintCommit(oid, commit);
@@ -210,7 +210,7 @@ namespace Tindo.UgitCLI
                 Console.WriteLine($"Merging with {mergeHead.Substring(0, 10)}");
             }
 
-            string headTree = CommitOperation.GetCommit(head).Tree;
+            string headTree = CommitOperation.Get(head).Tree;
             bool section = false;
             foreach (var (path, action) in Diff.IterChangedFiles(TreeOperation.GetTree(headTree), TreeOperation.GetIndexTree()))
             {
@@ -301,7 +301,7 @@ namespace Tindo.UgitCLI
         {
             try
             {
-                Console.WriteLine(CommitOperation.CreateCommit(o.Message));
+                Console.WriteLine(CommitOperation.Create(o.Message));
             }
             catch (UgitException e)
             {
@@ -328,9 +328,9 @@ namespace Tindo.UgitCLI
                 }
             }
 
-            foreach (var objectId in CommitOperation.GetCommitHistory(new string[] { oid }))
+            foreach (var objectId in CommitOperation.GetHistory(new string[] { oid }))
             {
-                var commit = CommitOperation.GetCommit(objectId);
+                var commit = CommitOperation.Get(objectId);
                 PrintCommit(objectId, commit, refs.ContainsKey(objectId) ? refs[objectId] : null);
             }
 

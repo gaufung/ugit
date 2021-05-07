@@ -10,7 +10,7 @@
         /// <param name="oid">Tree object id.</param>
         /// <param name="basePath">The base path.</param>
         /// <returns>The tree. {filePath : object id}.</returns>
-        IDictionary<string, string> GetTree(string oid, string basePath = "");
+        Tree GetTree(string oid, string basePath = "");
 
         /// <summary>
         /// Read the tree to index.
@@ -29,19 +29,19 @@
         /// Write index to the current working.
         /// </summary>
         /// <param name="index">The index value.</param>
-        void CheckoutIndex(Dictionary<string, string> index);
+        void CheckoutIndex(Tree index);
 
         /// <summary>
         /// Get working tree.
         /// </summary>
         /// <returns>The working tree. {filepath: oid}.</returns>
-        IDictionary<string, string> GetWorkingTree();
+        Tree GetWorkingTree();
 
         /// <summary>
         /// Get Index Tree.
         /// </summary>
         /// <returns>Index tree.</returns>
-        Dictionary<string, string> GetIndexTree();
+        Tree GetIndexTree();
 
         /// <summary>
         /// Iterate tree entry (name, oid, type)

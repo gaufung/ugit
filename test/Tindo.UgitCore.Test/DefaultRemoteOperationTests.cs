@@ -121,7 +121,7 @@ namespace Ugit
 
             string refName = Path.Join("refs", "heads", "master");
             this.localDataProviderMock.Setup(l => l.GetRef(refName, true)).Returns(RefValue.Create(false, "first-commit-oid"));
-            this.localCommitOperationMock.Setup(l => l.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids =>{
+            this.localCommitOperationMock.Setup(l => l.GetHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids =>{
                 if (oids != null && oids.Count() == 1 && oids.First() == "first-commit-oid")
                 {
                     return Array.Empty<string>();
@@ -172,7 +172,7 @@ namespace Ugit
                 }
                 return Array.Empty<string>();
             });
-            this.localCommitOperationMock.Setup(l => l.GetCommitHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids => {
+            this.localCommitOperationMock.Setup(l => l.GetHistory(It.IsAny<IEnumerable<string>>())).Returns<IEnumerable<string>>(oids => {
                 if (oids!=null && oids.Count()== 1 && oids.First() == "second-commit-oid")
                 {
                     return new []{

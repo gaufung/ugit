@@ -1,8 +1,6 @@
 ﻿namespace Tindo.UgitCore.Operations
 {
     using System.Collections.Generic;
-    
-    
     public interface ITagOperation
     {
         /// <summary>
