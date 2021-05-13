@@ -32,5 +32,7 @@
         public static readonly string Master = "master";
 
         public static readonly string GitDir = ".ugit";
+
+        public static readonly string Config = "config";
     }
 }

@@ -94,5 +94,7 @@
         /// <param name="oid">object Id.</param>
         /// <returns>True if existing.</returns>
         bool ObjectExist(string oid);
+        
+        Config Config { get; set; }
     }
 }

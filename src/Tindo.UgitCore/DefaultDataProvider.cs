@@ -294,6 +294,32 @@
             return this.fileSystem.File.Exists(Path.Join(this.GitDirFullPath, Constants.Objects, oid));
         }
 
+        public Config Config
+        {
+            get
+            {
+                string path = Path.Join(this.GitDirFullPath, Constants.Config);
+                if (!this.fileSystem.File.Exists(path))
+                {
+                    return new();
+                }
+
+                var data = this.Read(path);
+                return JsonSerializer.Deserialize<Config>(data);
+            }
+
+            set
+            {
+                string path = Path.Join(this.GitDirFullPath, Constants.Config);
+                string data = JsonSerializer.Serialize(value);
+                if (this.fileSystem.File.Exists(path))
+                {
+                    this.fileSystem.File.Delete(path);
+                }
+                this.Write(path, data.Encode());
+            }
+        }
+
         private (string, RefValue) GetRefInternal(string @ref, bool deref)
         {
             var refPath = Path.Join(this.GitDirFullPath, @ref);
