@@ -21,5 +21,10 @@
         /// Gets or sets the commit message.
         /// </summary>
         public string Message { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the Author.
+        /// </summary>
+        public Author Author { get; set; }
     }
 }

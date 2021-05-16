@@ -2,8 +2,8 @@
 {
     public class Config
     {
-        public User User { get; set; }
+        public Author? Author { get; set; }
         
-        public Remote Remote { get; set; }
+        public Remote? Remote { get; set; }
     }
 }

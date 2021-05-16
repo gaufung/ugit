@@ -92,7 +92,7 @@ namespace Tindo.UgitCore
     /// </summary>
     internal class TreeJsonConverter : JsonConverter<Tree>
     {
-        public override Tree? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override Tree Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             Tree tree = new Tree();
             string key = string.Empty;

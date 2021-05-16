@@ -5,6 +5,8 @@
     /// </summary>
     public static class Constants
     {
+        public static readonly string Whitespace = " ";
+        
         public static readonly string Commit = "commit";
 
         public static readonly string Blob = "blob";
@@ -34,5 +36,7 @@
         public static readonly string GitDir = ".ugit";
 
         public static readonly string Config = "config";
+
+        public static readonly string Author = "Author";
     }
 }

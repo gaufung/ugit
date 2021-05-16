@@ -39,6 +39,15 @@
                 commit += $"parent {mergeHead}\n";
                 this.dataProvider.DeleteRef(Constants.MergeHEAD, false);
             }
+            
+            if (dataProvider.Config.Author.HasValue)
+            {
+                commit += $"{Constants.Author}{Constants.Whitespace}{dataProvider.Config.Author.Value}\n";
+            }
+            else
+            {
+                commit += $"{Constants.Author}{Constants.Whitespace}{Author.DefaultAuthor}\n";
+            }
 
             commit += "\n";
             commit += $"{message}\n";
@@ -50,15 +59,12 @@
         /// <inheritdoc/>
         public Commit Get(string oid)
         {
-#if NET5_0
             List<string> parents = new ();
-#else
-            List<string> parents = new List<string>();
-#endif
             var commit = this.dataProvider.GetObject(oid, Constants.Commit).Decode();
             string[] lines = commit.Split("\n");
             string tree = null;
             int index;
+            Author author = default;
             for (index = 0; index < lines.Length; index++)
             {
                 string line = lines[index];
@@ -77,14 +83,20 @@
                 {
                     parents.Add(tokens[1]);
                 }
-            }
 
+                if (tokens[0].Equals(Constants.Author))
+                {
+                    Author.Parse(string.Join("", tokens.TakeLast(tokens.Length-1)), ref author);
+                }
+            }
+            
             string message = string.Join("\n", lines.TakeLast(lines.Length - index - 1));
             return new Commit
             {
                 Tree = tree,
                 Parents = parents,
                 Message = message,
+                Author =  author
             };
         }
 

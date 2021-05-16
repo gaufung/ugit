@@ -81,7 +81,8 @@ namespace Tindo.UgitCLI
                 MergeBaseOption,
                 AddOption,
                 FetchOption,
-                PushOption>(args).MapResult(
+                PushOption,
+                ConfigOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -99,8 +100,17 @@ namespace Tindo.UgitCLI
                 (AddOption o) => Add(o),
                 (FetchOption o) => Fetch(o),
                 (PushOption o) => Push(o),
+                (ConfigOption o) => Config(o),
                 errors => 1);
             return exitCode;
+        }
+
+        private static int Config(ConfigOption o)
+        {
+            var config = DataProvider.Config;
+            config.Author = new Author() { Email = o.Email, Name = o.Name };
+            DataProvider.Config = config;
+            return 0;
         }
 
         private static int Push(PushOption o)
@@ -179,7 +189,8 @@ namespace Tindo.UgitCLI
         private static void PrintCommit(string oid, Commit commit, IEnumerable<string> @ref = null)
         {
             string refStr = @ref != null ? $"({string.Join(',', @ref)})" : string.Empty;
-            Console.WriteLine($"commit {oid}{refStr}\n");
+            Console.WriteLine($"commit {oid}{refStr}");
+            Console.WriteLine($"Author {commit.Author}\n");
             Console.WriteLine($"{commit.Message}     ");
             Console.WriteLine(string.Empty);
         }
