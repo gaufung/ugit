@@ -37,6 +37,6 @@
 
         public static readonly string Config = "config";
 
-        public static readonly string Author = "Author";
+        public static readonly string Author = "author";
     }
 }

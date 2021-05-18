@@ -37,6 +37,10 @@ ProjectSection(SolutionItems) = preProject
 	test\Tindo.UgitCLI.Function.Test\script\linux\test_ugit.sh = test\Tindo.UgitCLI.Function.Test\script\linux\test_ugit.sh
 EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Internal", "Internal", "{E657328B-813F-4480-B33C-43114BC86643}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArgumentGenerator", "src\Tindo.Internal\ArgumentGenerator\ArgumentGenerator.csproj", "{F913841B-ED9F-4D84-BD66-6EB69CB6496A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +63,10 @@ Global
 		{E625806C-1766-4428-8585-DB239293D287}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E625806C-1766-4428-8585-DB239293D287}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E625806C-1766-4428-8585-DB239293D287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F913841B-ED9F-4D84-BD66-6EB69CB6496A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F913841B-ED9F-4D84-BD66-6EB69CB6496A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F913841B-ED9F-4D84-BD66-6EB69CB6496A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F913841B-ED9F-4D84-BD66-6EB69CB6496A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +81,8 @@ Global
 		{975E11BD-260A-4AB8-BCEE-B2136F172FCE} = {7166ED51-B64A-4B3A-AC2F-CE10D9F0D5CB}
 		{4CD16867-21A2-4AA7-8E9F-2C0DEF2259BB} = {975E11BD-260A-4AB8-BCEE-B2136F172FCE}
 		{97CDCDA0-8B47-411B-98AE-4EA2E16DE8C1} = {975E11BD-260A-4AB8-BCEE-B2136F172FCE}
+		{E657328B-813F-4480-B33C-43114BC86643} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
+		{F913841B-ED9F-4D84-BD66-6EB69CB6496A} = {E657328B-813F-4480-B33C-43114BC86643}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9BD04BF7-1070-4A04-AE94-1164C8722646}

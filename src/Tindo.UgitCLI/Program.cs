@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Tindo.UgitCLI
+﻿namespace Tindo.UgitCLI
 {
     using System;
     using System.Collections.Generic;
@@ -8,9 +6,10 @@ namespace Tindo.UgitCLI
     using System.IO;
     using System.IO.Abstractions;
     using CommandLine;
-    using Tindo.UgitCore.Operations;
-    using Tindo.UgitCore;
+    using UgitCore.Operations;
+    using UgitCore;
     using Options;
+
 
     /// <summary>
     /// The console program.
@@ -44,6 +43,7 @@ namespace Tindo.UgitCLI
 
         private static readonly Func<string, string> OidConverter;
 
+        
         static Program()
         {
             FileSystem = new FileSystem();
@@ -78,7 +78,6 @@ namespace Tindo.UgitCLI
                 ShowOption,
                 DiffOption,
                 MergeOption,
-                MergeBaseOption,
                 AddOption,
                 FetchOption,
                 PushOption,
@@ -190,7 +189,7 @@ namespace Tindo.UgitCLI
         {
             string refStr = @ref != null ? $"({string.Join(',', @ref)})" : string.Empty;
             Console.WriteLine($"commit {oid}{refStr}");
-            Console.WriteLine($"Author {commit.Author}\n");
+            Console.WriteLine($"Author: {commit.Author}\n");
             Console.WriteLine($"{commit.Message}     ");
             Console.WriteLine(string.Empty);
         }
