@@ -107,6 +107,15 @@
         private static int Config(ConfigOption o)
         {
             var config = DataProvider.Config;
+            if (string.IsNullOrEmpty(o.Email) && string.IsNullOrWhiteSpace(o.Name))
+            {
+                if (config.Author.HasValue)
+                {
+                    Console.WriteLine($"{config.Author.Value.Name}\n{config.Author.Value.Email}");
+                }
+
+                return 0;
+            }
             config.Author = new Author() { Email = o.Email, Name = o.Name };
             DataProvider.Config = config;
             return 0;
