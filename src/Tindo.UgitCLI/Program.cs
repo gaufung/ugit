@@ -47,7 +47,7 @@
         static Program()
         {
             FileSystem = new FileSystem();
-            DataProvider = new DefaultDataProvider();
+            DataProvider = new LocalDataProvider();
             Diff = new DefaultDiffOperation(DataProvider, new DefaultDiffProxyOperation());
             TreeOperation = new DefaultTreeOperation(DataProvider);
             CommitOperation = new DefaultCommitOperation(DataProvider, TreeOperation);
@@ -123,7 +123,7 @@
 
         private static int Push(PushOption o)
         {
-            IDataProvider remoteDataProvider = new DefaultDataProvider(new FileSystem(), o.Remote);
+            IDataProvider remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
             ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
@@ -138,7 +138,7 @@
 
         private static int Fetch(FetchOption o)
         {
-            IDataProvider remoteDataProvider = new DefaultDataProvider(new FileSystem(), o.Remote);
+            IDataProvider remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
             ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(

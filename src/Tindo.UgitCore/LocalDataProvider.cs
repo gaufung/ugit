@@ -10,7 +10,7 @@
     /// <summary>
     /// Default implementation of <see cref="IDataProvider"/>.
     /// </summary>
-    public class DefaultDataProvider : IDataProvider
+    public class LocalDataProvider : IDataProvider
     {
         private readonly byte typeSeparator = 0;
 
@@ -19,11 +19,11 @@
         private readonly string repoPath;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultDataProvider"/> class.
+        /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
         /// </summary>
         /// <param name="fileSystem">The file system.</param>
         /// <param name="repoPath">repo path.</param>
-        public DefaultDataProvider(IFileSystem fileSystem, string repoPath = "")
+        public LocalDataProvider(IFileSystem fileSystem, string repoPath = "")
         {
             this.fileSystem = fileSystem;
             this.repoPath = string.IsNullOrWhiteSpace(repoPath) ?
@@ -32,9 +32,9 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultDataProvider"/> class.
+        /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
         /// </summary>
-        public DefaultDataProvider()
+        public LocalDataProvider()
             : this(new FileSystem())
         {
         }

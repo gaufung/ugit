@@ -29,7 +29,7 @@ namespace Ugit
             fileSystemMock = new Mock<IFileSystem>(MockBehavior.Loose);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
-            dataProvider = new DefaultDataProvider(fileSystemMock.Object);
+            dataProvider = new LocalDataProvider(fileSystemMock.Object);
         }
 
         [TestMethod]
@@ -395,7 +395,7 @@ namespace Ugit
         {
             this.direcotryMock.Setup(d => d.SetCurrentDirectory(Path.Join("foo", "bar")));
             this.direcotryMock.Setup(d => d.GetCurrentDirectory()).Returns(Path.Join("foo", "bar"));
-            this.dataProvider = new DefaultDataProvider(this.fileSystemMock.Object, Path.Join("foo", "bar"));
+            this.dataProvider = new LocalDataProvider(this.fileSystemMock.Object, Path.Join("foo", "bar"));
             Assert.AreEqual(Path.Join("foo", "bar", ".ugit"), this.dataProvider.GitDirFullPath);
         }
     }
