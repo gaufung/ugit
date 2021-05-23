@@ -1,5 +1,7 @@
 ﻿namespace Tindo.UgitCLI
 {
+    using System.Net.Http;
+    using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -10,14 +12,13 @@
     using UgitCore;
     using Options;
 
-
     /// <summary>
     /// The console program.
     /// </summary>
     [ExcludeFromCodeCoverage]
     internal class Program
     {
-        private static readonly IDataProvider DataProvider;
+        private static readonly IDataProvider LocalDataProvider;
 
         private static readonly IFileSystem FileSystem;
 
@@ -43,22 +44,26 @@
 
         private static readonly Func<string, string> OidConverter;
 
+        private static IServiceProvider serviceProvider;
+
         
         static Program()
         {
             FileSystem = new FileSystem();
-            DataProvider = new LocalDataProvider();
-            Diff = new DefaultDiffOperation(DataProvider, new DefaultDiffProxyOperation());
-            TreeOperation = new DefaultTreeOperation(DataProvider);
-            CommitOperation = new DefaultCommitOperation(DataProvider, TreeOperation);
-            TagOperation = new DefaultTagOperation(DataProvider);
-            ResetOperation = new DefaultResetOperation(DataProvider);
-            MergeOperation = new DefaultMergeOperation(DataProvider, CommitOperation, TreeOperation, Diff);
-            InitOperation = new DefaultInitOperation(DataProvider);
-            BranchOperation = new DefaultBranchOperation(DataProvider);
-            CheckoutOperation = new DefaultCheckoutOperation(DataProvider, TreeOperation, CommitOperation, BranchOperation);
-            AddOperation = new DefaultAddOperation(DataProvider);
-            OidConverter = DataProvider.GetOid;
+            LocalDataProvider = new LocalDataProvider();
+            Diff = new DefaultDiffOperation(LocalDataProvider, new DefaultDiffProxyOperation());
+            TreeOperation = new DefaultTreeOperation(LocalDataProvider);
+            CommitOperation = new DefaultCommitOperation(LocalDataProvider, TreeOperation);
+            TagOperation = new DefaultTagOperation(LocalDataProvider);
+            ResetOperation = new DefaultResetOperation(LocalDataProvider);
+            MergeOperation = new DefaultMergeOperation(LocalDataProvider, CommitOperation, TreeOperation, Diff);
+            InitOperation = new DefaultInitOperation(LocalDataProvider);
+            BranchOperation = new DefaultBranchOperation(LocalDataProvider);
+            CheckoutOperation = new DefaultCheckoutOperation(LocalDataProvider, TreeOperation, CommitOperation, BranchOperation);
+            AddOperation = new DefaultAddOperation(LocalDataProvider);
+            OidConverter = LocalDataProvider.GetOid;
+            serviceProvider = new ServiceCollection()
+                .AddHttpClient().BuildServiceProvider();
         }
 
         private static int Main(string[] args)
@@ -81,7 +86,8 @@
                 AddOption,
                 FetchOption,
                 PushOption,
-                ConfigOption>(args).MapResult(
+                ConfigOption,
+            RemoteUrlOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -100,13 +106,23 @@
                 (FetchOption o) => Fetch(o),
                 (PushOption o) => Push(o),
                 (ConfigOption o) => Config(o),
+                (RemoteUrlOption o) => SetUrlConfig(o),
                 errors => 1);
             return exitCode;
         }
 
+        private static int SetUrlConfig(RemoteUrlOption o)
+        {
+            Remote remote = new Remote() {Name = o.Name, Url = o.Url};
+            var config = LocalDataProvider.Config;
+            config.Remote = remote;
+            LocalDataProvider.Config = config;
+            return 0;
+        }
+
         private static int Config(ConfigOption o)
         {
-            var config = DataProvider.Config;
+            var config = LocalDataProvider.Config;
             if (string.IsNullOrEmpty(o.Email) && string.IsNullOrWhiteSpace(o.Name))
             {
                 if (config.Author.HasValue)
@@ -117,17 +133,29 @@
                 return 0;
             }
             config.Author = new Author() { Email = o.Email, Name = o.Name };
-            DataProvider.Config = config;
+            LocalDataProvider.Config = config;
             return 0;
         }
 
         private static int Push(PushOption o)
         {
-            IDataProvider remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
+            IDataProvider remoteDataProvider;
+            var config = LocalDataProvider.Config;
+            if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote, 
+                StringComparison.OrdinalIgnoreCase))
+            {
+                remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url, 
+                    serviceProvider.GetRequiredService<IHttpClientFactory>());
+            }
+            else
+            {
+                remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
+            }
+            
             ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
-                DataProvider,
+                LocalDataProvider,
                 CommitOperation,
                 remoteDataProvider,
                 remoteCommitOperation);
@@ -138,11 +166,23 @@
 
         private static int Fetch(FetchOption o)
         {
-            IDataProvider remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
+            IDataProvider remoteDataProvider;
+            var config = LocalDataProvider.Config;
+            if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote, 
+                StringComparison.OrdinalIgnoreCase))
+            {
+                remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url, 
+                    serviceProvider.GetRequiredService<IHttpClientFactory>());
+            }
+            else
+            {
+                remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
+            }
+            
             ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
-                DataProvider,
+                LocalDataProvider,
                 CommitOperation,
                 remoteDataProvider,
                 remoteCommitOperation);
@@ -223,7 +263,7 @@
                 Console.WriteLine($"On branch {branch}");
             }
 
-            string mergeHead = DataProvider.GetRef("MERGE_HEAD").Value;
+            string mergeHead = LocalDataProvider.GetRef("MERGE_HEAD").Value;
             if (!string.IsNullOrEmpty(mergeHead))
             {
                 Console.WriteLine($"Merging with {mergeHead.Substring(0, 10)}");
@@ -288,20 +328,20 @@
         private static int Init(InitOption _)
         {
             InitOperation.Init();
-            Console.WriteLine($"Initialized empty ugit repository in {DataProvider.GitDirFullPath}");
+            Console.WriteLine($"Initialized empty ugit repository in {LocalDataProvider.GitDirFullPath}");
             return 0;
         }
 
         private static int HashObject(HashObjectOption o)
         {
             byte[] data = FileSystem.File.ReadAllBytes(o.File);
-            Console.WriteLine(DataProvider.HashObject(data));
+            Console.WriteLine(LocalDataProvider.HashObject(data));
             return 0;
         }
 
         private static int CatFile(CatFileOption o)
         {
-            byte[] data = DataProvider.GetObject(OidConverter(o.Object));
+            byte[] data = LocalDataProvider.GetObject(OidConverter(o.Object));
             if (data.Length > 0)
             {
                 Console.WriteLine(data.Decode());
@@ -335,7 +375,7 @@
             string oid = OidConverter(o.Oid);
 
             IDictionary<string, IList<string>> refs = new Dictionary<string, IList<string>>();
-            foreach (var (refname, @ref) in DataProvider.GetAllRefs())
+            foreach (var (refname, @ref) in LocalDataProvider.GetAllRefs())
             {
                 if (refs.ContainsKey(@ref.Value))
                 {

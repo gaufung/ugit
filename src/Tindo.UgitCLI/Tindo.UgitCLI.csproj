@@ -12,12 +12,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Tindo.Internal\ArgumentGenerator\ArgumentGenerator.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+      <ProjectReference Include="..\Tindo.Internal\ArgumentGenerator\ArgumentGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
       <ProjectReference Include="..\Tindo.UgitCore\Tindo.UgitCore.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="CommandLineParser" Version="2.8.0" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     </ItemGroup>
 
 </Project>
