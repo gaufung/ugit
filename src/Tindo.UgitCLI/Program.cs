@@ -44,7 +44,7 @@
 
         private static readonly Func<string, string> OidConverter;
 
-        private static IServiceProvider serviceProvider;
+        private static readonly IServiceProvider ServiceProvider;
 
         
         static Program()
@@ -62,7 +62,7 @@
             CheckoutOperation = new DefaultCheckoutOperation(LocalDataProvider, TreeOperation, CommitOperation, BranchOperation);
             AddOperation = new DefaultAddOperation(LocalDataProvider);
             OidConverter = LocalDataProvider.GetOid;
-            serviceProvider = new ServiceCollection()
+            ServiceProvider = new ServiceCollection()
                 .AddHttpClient().BuildServiceProvider();
         }
 
@@ -145,7 +145,7 @@
                 StringComparison.OrdinalIgnoreCase))
             {
                 remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url, 
-                    serviceProvider.GetRequiredService<IHttpClientFactory>());
+                    ServiceProvider.GetRequiredService<IHttpClientFactory>());
             }
             else
             {
@@ -172,7 +172,7 @@
                 StringComparison.OrdinalIgnoreCase))
             {
                 remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url, 
-                    serviceProvider.GetRequiredService<IHttpClientFactory>());
+                    ServiceProvider.GetRequiredService<IHttpClientFactory>());
             }
             else
             {
