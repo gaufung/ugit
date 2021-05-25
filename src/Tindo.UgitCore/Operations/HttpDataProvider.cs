@@ -99,7 +99,7 @@ namespace Tindo.UgitCore
         public byte[] GetObject(string oid, string expected = "blob")
         {
             var httpClient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = this.remoteUrl + $"/{Constants.Blob}/{oid}?expected={expected}";
+            string url = this.remoteUrl + $"/{Constants.Objects}/{oid}/expect/{expected}";
             var requestMessage = new HttpRequestMessage()
             {
                 Method = HttpMethod.Get,
@@ -120,7 +120,7 @@ namespace Tindo.UgitCore
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
             var httpclient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = this.remoteUrl + $"/ref/{@ref}?deref={deref.ToString()}";
+            string url = this.remoteUrl + $"/refs/{@ref}?deref={deref.ToString()}";
             string body = JsonSerializer.Serialize(value);
             HttpRequestMessage requestMessage = new HttpRequestMessage()
             {
