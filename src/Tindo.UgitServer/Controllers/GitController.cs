@@ -51,6 +51,7 @@ namespace Tindo.UgitServer.Controllers
         {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
             IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath);
+            prefix = Path.Join("refs", prefix);
             return dataProvider.GetAllRefs(prefix, deref)
                 .ToDictionary(kv => kv.Item1, kv => kv.Item2);
         }

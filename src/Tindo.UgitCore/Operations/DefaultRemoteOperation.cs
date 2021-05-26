@@ -1,4 +1,6 @@
-﻿namespace Tindo.UgitCore.Operations
+﻿using System;
+
+namespace Tindo.UgitCore.Operations
 {
     using System.Collections.Generic;
     using System.IO;

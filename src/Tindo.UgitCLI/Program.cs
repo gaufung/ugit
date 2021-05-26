@@ -1,4 +1,6 @@
-﻿namespace Tindo.UgitCLI
+﻿using Microsoft.Extensions.Logging;
+
+namespace Tindo.UgitCLI
 {
     using System.Net.Http;
     using Microsoft.Extensions.DependencyInjection;
@@ -63,7 +65,10 @@
             AddOperation = new DefaultAddOperation(LocalDataProvider);
             OidConverter = LocalDataProvider.GetOid;
             ServiceProvider = new ServiceCollection()
-                .AddHttpClient().BuildServiceProvider();
+                .AddHttpClient()
+                .AddLogging(
+                    builder => builder.AddConsole())
+                .BuildServiceProvider();
         }
 
         private static int Main(string[] args)
@@ -145,7 +150,8 @@
                 StringComparison.OrdinalIgnoreCase))
             {
                 remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url, 
-                    ServiceProvider.GetRequiredService<IHttpClientFactory>());
+                    ServiceProvider.GetRequiredService<IHttpClientFactory>(),
+                    ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             else
             {
@@ -172,14 +178,16 @@
                 StringComparison.OrdinalIgnoreCase))
             {
                 remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url, 
-                    ServiceProvider.GetRequiredService<IHttpClientFactory>());
+                    ServiceProvider.GetRequiredService<IHttpClientFactory>(),
+                    ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             else
             {
                 remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
             }
             
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, 
+                new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 LocalDataProvider,

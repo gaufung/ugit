@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Tindo.UgitCore
 {
@@ -20,10 +21,14 @@ namespace Tindo.UgitCore
 
         private readonly IHttpClientFactory httpClientFactory;
 
-        public HttpDataProvider(string remoteUrl, IHttpClientFactory httpClientFactory)
+        private readonly ILogger<HttpDataProvider> logger;
+
+        public HttpDataProvider(string remoteUrl, IHttpClientFactory httpClientFactory
+        , ILoggerFactory loggerFactory)
         {
             this.remoteUrl = remoteUrl;
             this.httpClientFactory = httpClientFactory;
+            this.logger = loggerFactory.CreateLogger<HttpDataProvider>();
         }
         
         public bool Exist(string path, bool isFile = true)
@@ -34,7 +39,8 @@ namespace Tindo.UgitCore
         public void Write(string path, byte[] bytes)
         {
             var httpclient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = path.Replace(Path.PathSeparator, '/');
+            string url = path.Replace(Path.DirectorySeparatorChar, '/');
+            this.logger.LogInformation($"Write: url: {url}");
             HttpRequestMessage requestMessage = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
@@ -52,7 +58,8 @@ namespace Tindo.UgitCore
         public byte[] Read(string path)
         {
             var httpClient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = path.Replace(Path.PathSeparator, '/');
+            string url = path.Replace(Path.DirectorySeparatorChar, '/');
+            this.logger.LogInformation($"Read, url: {url}");
             HttpRequestMessage requestMessage = new HttpRequestMessage()
             {
                 Method = HttpMethod.Get,
@@ -100,6 +107,7 @@ namespace Tindo.UgitCore
         {
             var httpClient = this.httpClientFactory.CreateClient(this.remoteUrl);
             string url = this.remoteUrl + $"/{Constants.Objects}/{oid}/expect/{expected}";
+            this.logger.LogInformation($"GetObject, url: {url}");
             var requestMessage = new HttpRequestMessage()
             {
                 Method = HttpMethod.Get,
@@ -121,6 +129,7 @@ namespace Tindo.UgitCore
         {
             var httpclient = this.httpClientFactory.CreateClient(this.remoteUrl);
             string url = this.remoteUrl + $"/refs/{@ref}?deref={deref.ToString()}";
+            this.logger.LogInformation($"UpdateRef: {url}");
             string body = JsonSerializer.Serialize(value);
             HttpRequestMessage requestMessage = new HttpRequestMessage()
             {
@@ -146,7 +155,9 @@ namespace Tindo.UgitCore
         public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
         {
             var httpclient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = this.remoteUrl + $"/refs/{prefix}?deref={deref.ToString()}";
+            string url = this.remoteUrl + $"/{prefix}?deref={deref.ToString()}";
+            url = url.Replace(Path.DirectorySeparatorChar, '/');
+            this.logger.LogInformation($"Get all Refs: {url}");
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage()
             {
                 Method = HttpMethod.Get,
@@ -154,7 +165,7 @@ namespace Tindo.UgitCore
             };
             httpclient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var response = httpclient.Send(httpRequestMessage);
-            string body = response.Content.ToString();
+            string body = response.Content.ReadAsStringAsync().Result;
             if (!string.IsNullOrWhiteSpace(body))
             {
                 var refs = JsonSerializer.Deserialize<Dictionary<string, RefValue>>(body);
