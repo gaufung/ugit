@@ -51,11 +51,17 @@ namespace Tindo.UgitCLI
         
         static Program()
         {
+            ServiceProvider = new ServiceCollection()
+                .AddHttpClient()
+                .AddLogging(
+                    builder => builder.AddConsole())
+                .BuildServiceProvider();
+
             FileSystem = new FileSystem();
-            LocalDataProvider = new LocalDataProvider();
+            LocalDataProvider = new LocalDataProvider(ServiceProvider.GetRequiredService<ILoggerFactory>());
             Diff = new DefaultDiffOperation(LocalDataProvider, new DefaultDiffProxyOperation());
-            TreeOperation = new DefaultTreeOperation(LocalDataProvider);
-            CommitOperation = new DefaultCommitOperation(LocalDataProvider, TreeOperation);
+            TreeOperation = new DefaultTreeOperation(LocalDataProvider, ServiceProvider.GetRequiredService<ILoggerFactory>());
+            CommitOperation = new DefaultCommitOperation(LocalDataProvider, TreeOperation, ServiceProvider.GetRequiredService<ILoggerFactory>());
             TagOperation = new DefaultTagOperation(LocalDataProvider);
             ResetOperation = new DefaultResetOperation(LocalDataProvider);
             MergeOperation = new DefaultMergeOperation(LocalDataProvider, CommitOperation, TreeOperation, Diff);
@@ -64,11 +70,7 @@ namespace Tindo.UgitCLI
             CheckoutOperation = new DefaultCheckoutOperation(LocalDataProvider, TreeOperation, CommitOperation, BranchOperation);
             AddOperation = new DefaultAddOperation(LocalDataProvider);
             OidConverter = LocalDataProvider.GetOid;
-            ServiceProvider = new ServiceCollection()
-                .AddHttpClient()
-                .AddLogging(
-                    builder => builder.AddConsole())
-                .BuildServiceProvider();
+            
         }
 
         private static int Main(string[] args)
@@ -155,10 +157,10 @@ namespace Tindo.UgitCLI
             }
             else
             {
-                remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
+                remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote, ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, ServiceProvider.GetRequiredService<ILoggerFactory>()), ServiceProvider.GetRequiredService<ILoggerFactory>());
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 LocalDataProvider,
@@ -183,11 +185,11 @@ namespace Tindo.UgitCLI
             }
             else
             {
-                remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote);
+                remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote, ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             
             ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, 
-                new DefaultTreeOperation(remoteDataProvider));
+                new DefaultTreeOperation(remoteDataProvider, ServiceProvider.GetRequiredService<ILoggerFactory>()), ServiceProvider.GetRequiredService<ILoggerFactory>());
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 LocalDataProvider,

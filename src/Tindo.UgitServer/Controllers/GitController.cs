@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Tindo.UgitCore;
+using Microsoft.Extensions.Logging;
 
 namespace Tindo.UgitServer.Controllers
 {
@@ -16,10 +17,13 @@ namespace Tindo.UgitServer.Controllers
 
         private readonly IFileSystem fileSystem;
 
-        public GitController(IOptions<UgitServer> ugitServerOption, IFileSystem fileSystem)
+        private readonly ILoggerFactory loggerFactory;
+
+        public GitController(IOptions<UgitServer> ugitServerOption, IFileSystem fileSystem, ILoggerFactory loggerFactory)
         {
             this.ugitServer = ugitServerOption.Value;
             this.fileSystem = fileSystem;
+            this.loggerFactory = loggerFactory;
         }
 
         [HttpGet("{repo}/objects/{objectId}")]
@@ -33,7 +37,7 @@ namespace Tindo.UgitServer.Controllers
         public ActionResult<byte[]> GetObject(string repo, string objectId, string expected)
         {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
-            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath);
+            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath, loggerFactory);
             return dataProvider.GetObject(objectId, expected);
         }
 
@@ -50,7 +54,7 @@ namespace Tindo.UgitServer.Controllers
             [FromQuery] bool deref = true)
         {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
-            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath);
+            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath, loggerFactory);
             prefix = Path.Join("refs", prefix);
             return dataProvider.GetAllRefs(prefix, deref)
                 .ToDictionary(kv => kv.Item1, kv => kv.Item2);
@@ -60,7 +64,7 @@ namespace Tindo.UgitServer.Controllers
         public ActionResult UpdateRef(string repo, string @ref, [FromBody] RefValue refValue, [FromQuery]bool deref=true)
         {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
-            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath);
+            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath, loggerFactory);
             dataProvider.UpdateRef(@ref, refValue, deref);
             return Ok();
         }

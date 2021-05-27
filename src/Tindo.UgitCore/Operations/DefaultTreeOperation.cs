@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// The default implementation of ITreeOperation.
@@ -12,13 +13,16 @@
     {
         private readonly IDataProvider dataProvider;
 
+        private readonly ILogger<DefaultTreeOperation> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTreeOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultTreeOperation(IDataProvider dataProvider)
+        public DefaultTreeOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
         {
             this.dataProvider = dataProvider;
+            this.logger = loggerFactory.CreateLogger<DefaultTreeOperation>();
         }
 
         /// <inheritdoc/>

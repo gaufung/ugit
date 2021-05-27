@@ -4,22 +4,27 @@
     using System.Collections.Generic;
     using System.Linq;
     using Nito.Collections;
-    
+    using Microsoft.Extensions.Logging;
+
     public class DefaultCommitOperation : ICommitOperation
     {
         private readonly IDataProvider dataProvider;
 
         private readonly ITreeOperation treeOperation;
 
+        private readonly ILogger<DefaultCommitOperation> logger; 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultCommitOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data Provider.</param>
         /// <param name="treeOperation">The tree operation.</param>
-        public DefaultCommitOperation(IDataProvider dataProvider, ITreeOperation treeOperation)
+        public DefaultCommitOperation(IDataProvider dataProvider, ITreeOperation treeOperation,
+            ILoggerFactory loggerFactory)
         {
             this.dataProvider = dataProvider;
             this.treeOperation = treeOperation;
+            this.logger = loggerFactory.CreateLogger<DefaultCommitOperation>();
         }
 
         /// <inheritdoc/>

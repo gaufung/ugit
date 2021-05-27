@@ -6,6 +6,7 @@
     using System.IO.Abstractions;
     using System.Linq;
     using System.Text.Json;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Default implementation of <see cref="IDataProvider"/>.
@@ -18,24 +19,28 @@
 
         private readonly string repoPath;
 
+        private readonly ILogger<LocalDataProvider> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
         /// </summary>
         /// <param name="fileSystem">The file system.</param>
         /// <param name="repoPath">repo path.</param>
-        public LocalDataProvider(IFileSystem fileSystem, string repoPath = "")
+        public LocalDataProvider(IFileSystem fileSystem, string repoPath, ILoggerFactory loggerFactotry)
         {
             this.fileSystem = fileSystem;
             this.repoPath = string.IsNullOrWhiteSpace(repoPath) ?
                 this.fileSystem.Directory.GetCurrentDirectory() :
                 repoPath;
+            this.logger = loggerFactotry.CreateLogger<LocalDataProvider>();
+            
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
         /// </summary>
-        public LocalDataProvider()
-            : this(new FileSystem())
+        public LocalDataProvider(ILoggerFactory loggerFactory)
+            : this(new FileSystem(), "", loggerFactory)
         {
         }
 

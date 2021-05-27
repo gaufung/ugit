@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using Tindo.UgitCore.Operations;
 using Tindo.UgitCore;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ugit
 {
@@ -12,6 +15,7 @@ namespace Ugit
     {
         private Mock<IDataProvider> dataProvider;
         private Mock<ITreeOperation> treeOperation;
+        private IServiceProvider serviceProvider;
 
         private ICommitOperation commitOperation;
 
@@ -20,7 +24,10 @@ namespace Ugit
         {
             dataProvider = new Mock<IDataProvider>();
             treeOperation = new Mock<ITreeOperation>();
-            commitOperation = new DefaultCommitOperation(dataProvider.Object, treeOperation.Object);
+            serviceProvider = new ServiceCollection().AddLogging().BuildServiceProvider();
+
+            commitOperation = new DefaultCommitOperation(dataProvider.Object, treeOperation.Object,
+            serviceProvider.GetRequiredService<ILoggerFactory>());
         }
 
         [TestMethod]

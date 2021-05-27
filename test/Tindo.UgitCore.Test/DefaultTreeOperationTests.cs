@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using Tindo.UgitCore.Operations;
 using Tindo.UgitCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ugit
 {
@@ -15,11 +17,14 @@ namespace Ugit
 
         private ITreeOperation treeOpeartion;
 
+        private IServiceProvider serviceProvider;
+
         [TestInitialize]
         public void Init()
         {
             dataProvider = new Mock<IDataProvider>();
-            treeOpeartion = new DefaultTreeOperation(dataProvider.Object);
+            serviceProvider = new ServiceCollection().AddLogging().BuildServiceProvider();
+            treeOpeartion = new DefaultTreeOperation(dataProvider.Object, serviceProvider.GetRequiredService<ILoggerFactory>());
         }
 
         /// <summary>
