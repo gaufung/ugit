@@ -17,6 +17,8 @@ namespace Tindo.UgitCore.Operations
         private readonly ICommitOperation localCommitOperation;
         private readonly IDataProvider remoteDataProvider;
         private readonly ICommitOperation remoteCommitOperation;
+        private readonly IFileOperator localFileOperator;
+        private readonly IFileOperator remoteFileOperator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultRemoteOperation"/> class.
@@ -29,12 +31,16 @@ namespace Tindo.UgitCore.Operations
             IDataProvider localDataProvider,
             ICommitOperation localCommitOperation,
             IDataProvider remoteDataProvider,
-            ICommitOperation remoteCommitOperation)
+            ICommitOperation remoteCommitOperation,
+            IFileOperator localFileOperator,
+            IFileOperator remoteFileOperator)
         {
             this.localDataProvider = localDataProvider;
             this.localCommitOperation = localCommitOperation;
             this.remoteDataProvider = remoteDataProvider;
             this.remoteCommitOperation = remoteCommitOperation;
+            this.localFileOperator = localFileOperator;
+            this.remoteFileOperator = remoteFileOperator;
         }
 
         /// <inheritdoc/>
@@ -87,18 +93,18 @@ namespace Tindo.UgitCore.Operations
                 return;
             }
 
-            string localPath = Path.Join(this.localDataProvider.GitDirFullPath, Constants.Objects, oid);
-            string remotePath = Path.Join(this.remoteDataProvider.GitDirFullPath, Constants.Objects, oid);
-            byte[] bytes = this.remoteDataProvider.Read(remotePath);
-            this.localDataProvider.Write(localPath, bytes);
+            string localPath = Path.Join(this.localDataProvider.GitFilePath, Constants.Objects, oid);
+            string remotePath = Path.Join(this.remoteDataProvider.GitFilePath, Constants.Objects, oid);
+            byte[] bytes = this.remoteFileOperator.Read(remotePath);
+            this.localFileOperator.Write(localPath, bytes);
         }
 
         private void PushObject(string oid)
         {
-            string localPath = Path.Join(this.localDataProvider.GitDirFullPath, Constants.Objects, oid);
-            string remotePath = Path.Join(this.remoteDataProvider.GitDirFullPath, Constants.Objects, oid);
-            byte[] bytes = this.localDataProvider.Read(localPath);
-            this.remoteDataProvider.Write(remotePath, bytes);
+            string localPath = Path.Join(this.localDataProvider.GitFilePath, Constants.Objects, oid);
+            string remotePath = Path.Join(this.remoteDataProvider.GitFilePath, Constants.Objects, oid);
+            byte[] bytes = this.localFileOperator.Read(localPath);
+            this.remoteFileOperator.Write(remotePath, bytes);
         }
 
         private bool IsAncestorOf(string commit, string maybeAncestor)

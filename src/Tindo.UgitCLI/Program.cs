@@ -2,17 +2,17 @@
 
 namespace Tindo.UgitCLI
 {
-    using System.Net.Http;
+    using CommandLine;
     using Microsoft.Extensions.DependencyInjection;
+    using Options;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Abstractions;
-    using CommandLine;
-    using UgitCore.Operations;
+    using System.Net.Http;
     using UgitCore;
-    using Options;
+    using UgitCore.Operations;
 
     /// <summary>
     /// The console program.
@@ -24,25 +24,7 @@ namespace Tindo.UgitCLI
 
         private static readonly IFileSystem FileSystem;
 
-        private static readonly IDiffOperation Diff;
-
-        private static readonly ICommitOperation CommitOperation;
-
-        private static readonly ITreeOperation TreeOperation;
-
-        private static readonly ITagOperation TagOperation;
-
-        private static readonly IResetOperation ResetOperation;
-
-        private static readonly IMergeOperation MergeOperation;
-
-        private static readonly IInitOperation InitOperation;
-
-        private static readonly ICheckoutOperation CheckoutOperation;
-
-        private static readonly IBranchOperation BranchOperation;
-
-        private static readonly IAddOperation AddOperation;
+        private static readonly IFileOperator LocalPhysicalFileOperator;
 
         private static readonly Func<string, string> OidConverter;
 
@@ -58,17 +40,9 @@ namespace Tindo.UgitCLI
                 .BuildServiceProvider();
 
             FileSystem = new FileSystem();
-            LocalDataProvider = new LocalDataProvider(ServiceProvider.GetRequiredService<ILoggerFactory>());
-            Diff = new DefaultDiffOperation(LocalDataProvider, new DefaultDiffProxyOperation());
-            TreeOperation = new DefaultTreeOperation(LocalDataProvider, ServiceProvider.GetRequiredService<ILoggerFactory>());
-            CommitOperation = new DefaultCommitOperation(LocalDataProvider, TreeOperation, ServiceProvider.GetRequiredService<ILoggerFactory>());
-            TagOperation = new DefaultTagOperation(LocalDataProvider);
-            ResetOperation = new DefaultResetOperation(LocalDataProvider);
-            MergeOperation = new DefaultMergeOperation(LocalDataProvider, CommitOperation, TreeOperation, Diff);
-            InitOperation = new DefaultInitOperation(LocalDataProvider);
-            BranchOperation = new DefaultBranchOperation(LocalDataProvider);
-            CheckoutOperation = new DefaultCheckoutOperation(LocalDataProvider, TreeOperation, CommitOperation, BranchOperation);
-            AddOperation = new DefaultAddOperation(LocalDataProvider);
+            LocalPhysicalFileOperator = new PhysicalFileOperator(FileSystem);
+            LocalDataProvider = new LocalDataProvider(LocalPhysicalFileOperator, 
+                ServiceProvider.GetRequiredService<ILoggerFactory>());
             OidConverter = LocalDataProvider.GetOid;
             
         }
@@ -94,7 +68,7 @@ namespace Tindo.UgitCLI
                 FetchOption,
                 PushOption,
                 ConfigOption,
-            RemoteUrlOption>(args).MapResult(
+                RemoteUrlOption>(args).MapResult(
                 (InitOption o) => Init(o),
                 (HashObjectOption o) => HashObject(o),
                 (CatFileOption o) => CatFile(o),
@@ -147,6 +121,7 @@ namespace Tindo.UgitCLI
         private static int Push(PushOption o)
         {
             IDataProvider remoteDataProvider;
+            IFileOperator remoteFileOperator = null;
             var config = LocalDataProvider.Config;
             if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote, 
                 StringComparison.OrdinalIgnoreCase))
@@ -157,16 +132,18 @@ namespace Tindo.UgitCLI
             }
             else
             {
-                remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote, ServiceProvider.GetRequiredService<ILoggerFactory>());
+                remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote, ServiceProvider.GetRequiredService<ILoggerFactory>());;
+                remoteFileOperator = new PhysicalFileOperator(FileSystem);
             }
             
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, ServiceProvider.GetRequiredService<ILoggerFactory>()), ServiceProvider.GetRequiredService<ILoggerFactory>());
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, remoteFileOperator, ServiceProvider.GetRequiredService<ILoggerFactory>()), ServiceProvider.GetRequiredService<ILoggerFactory>());
+
+            ITreeOperation treeOperation = new DefaultTreeOperation(LocalDataProvider, LocalPhysicalFileOperator, ServiceProvider.GetRequiredService<ILoggerFactory>());
+            ICommitOperation localCommitOperation = new DefaultCommitOperation(LocalDataProvider, treeOperation,
+                ServiceProvider.GetRequiredService<ILoggerFactory>());
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
-                LocalDataProvider,
-                CommitOperation,
-                remoteDataProvider,
-                remoteCommitOperation);
+                LocalDataProvider, localCommitOperation, remoteDataProvider, remoteCommitOperation, LocalPhysicalFileOperator, remoteFileOperator);
             string refName = Path.Join(Constants.Refs, Constants.Heads, o.Branch);
             remoteOperation.Push(refName);
             return 0;
@@ -175,49 +152,92 @@ namespace Tindo.UgitCLI
         private static int Fetch(FetchOption o)
         {
             IDataProvider remoteDataProvider;
+            IFileOperator remoteFileOperator = null;
             var config = LocalDataProvider.Config;
-            if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote, 
+            if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote,
                 StringComparison.OrdinalIgnoreCase))
             {
-                remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url, 
+                remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url,
                     ServiceProvider.GetRequiredService<IHttpClientFactory>(),
                     ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             else
             {
-                remoteDataProvider = new LocalDataProvider(new FileSystem(), o.Remote, ServiceProvider.GetRequiredService<ILoggerFactory>());
+                remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote, ServiceProvider.GetRequiredService<ILoggerFactory>()); ;
+                remoteFileOperator = new PhysicalFileOperator(FileSystem);
             }
-            
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, 
-                new DefaultTreeOperation(remoteDataProvider, ServiceProvider.GetRequiredService<ILoggerFactory>()), ServiceProvider.GetRequiredService<ILoggerFactory>());
+
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, remoteFileOperator, ServiceProvider.GetRequiredService<ILoggerFactory>()), ServiceProvider.GetRequiredService<ILoggerFactory>());
+
+            ITreeOperation treeOperation = new DefaultTreeOperation(LocalDataProvider, LocalPhysicalFileOperator, ServiceProvider.GetRequiredService<ILoggerFactory>());
+            ICommitOperation localCommitOperation = new DefaultCommitOperation(LocalDataProvider, treeOperation,
+                ServiceProvider.GetRequiredService<ILoggerFactory>());
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
-                LocalDataProvider,
-                CommitOperation,
-                remoteDataProvider,
-                remoteCommitOperation);
+                LocalDataProvider, localCommitOperation, remoteDataProvider, remoteCommitOperation, LocalPhysicalFileOperator, remoteFileOperator);
+
             remoteOperation.Fetch();
             return 0;
         }
 
         private static int Add(AddOption o)
         {
-            AddOperation.Add(o.Files);
+            new DefaultAddOperation(LocalDataProvider, LocalPhysicalFileOperator).Add(o.Files);
             return 0;
         }
 
         private static int Merge(MergeOption o)
         {
             var commit = OidConverter(o.Commit);
-            MergeOperation.Merge(commit);
+            new DefaultMergeOperation(
+                LocalDataProvider, 
+                new DefaultCommitOperation(
+                    LocalDataProvider, 
+                    new DefaultTreeOperation(
+                        LocalDataProvider, 
+                        LocalPhysicalFileOperator, 
+                        ServiceProvider.GetRequiredService<ILoggerFactory>()
+                        ), 
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    ),
+                new DefaultTreeOperation(
+                    LocalDataProvider,
+                    LocalPhysicalFileOperator,
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    ),
+                new DefaultDiffOperation(
+                    LocalDataProvider,
+                    new DefaultDiffProxyOperation(),
+                    LocalPhysicalFileOperator
+                    )
+                ).Merge(commit);
             return 0;
         }
 
         private static int Different(DiffOption o)
         {
             var commit = OidConverter(o.Commit);
-            var tree = CommitOperation.Get(commit).Tree;
-            var result = Diff.DiffTrees(TreeOperation.GetTree(tree), TreeOperation.GetWorkingTree());
+            var commitOperation = new DefaultCommitOperation(
+                    LocalDataProvider,
+                    new DefaultTreeOperation(
+                        LocalDataProvider,
+                        LocalPhysicalFileOperator,
+                        ServiceProvider.GetRequiredService<ILoggerFactory>()
+                        ),
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    );
+            var tree = commitOperation.Get(commit).Tree;
+            var diff = new DefaultDiffOperation(
+                    LocalDataProvider,
+                    new DefaultDiffProxyOperation(),
+                    LocalPhysicalFileOperator
+                    );
+            var treeOperation = new DefaultTreeOperation(
+                    LocalDataProvider,
+                    LocalPhysicalFileOperator,
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    );
+            var result = diff.DiffTrees(treeOperation.GetTree(tree), treeOperation.GetWorkingTree());
             Console.WriteLine(result);
             return 0;
         }
@@ -229,17 +249,36 @@ namespace Tindo.UgitCLI
             {
                 return 0;
             }
+            var commitOperation = new DefaultCommitOperation(
+                   LocalDataProvider,
+                   new DefaultTreeOperation(
+                       LocalDataProvider,
+                       LocalPhysicalFileOperator,
+                       ServiceProvider.GetRequiredService<ILoggerFactory>()
+                       ),
+                   ServiceProvider.GetRequiredService<ILoggerFactory>()
+                   );
 
-            var commit = CommitOperation.Get(oid);
+            var commit = commitOperation.Get(oid);
 
             string parentTree = null;
             if (commit.Parents.Count > 0)
             {
-                parentTree = CommitOperation.Get(commit.Parents[0]).Tree;
+                parentTree = commitOperation.Get(commit.Parents[0]).Tree;
             }
 
             PrintCommit(oid, commit);
-            var result = Diff.DiffTrees(TreeOperation.GetTree(parentTree), TreeOperation.GetTree(commit.Tree));
+            var diff = new DefaultDiffOperation(
+                   LocalDataProvider,
+                   new DefaultDiffProxyOperation(),
+                   LocalPhysicalFileOperator
+                   );
+            var treeOperation = new DefaultTreeOperation(
+                    LocalDataProvider,
+                    LocalPhysicalFileOperator,
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    );
+            var result = diff.DiffTrees(treeOperation.GetTree(parentTree), treeOperation.GetTree(commit.Tree));
             Console.WriteLine(result);
             return 0;
         }
@@ -256,14 +295,16 @@ namespace Tindo.UgitCLI
         private static int Reset(ResetOption o)
         {
             string oid = OidConverter(o.Commit);
-            ResetOperation.Reset(oid);
+            var resetOperation = new DefaultResetOperation(LocalDataProvider);
+            resetOperation.Reset(oid);
             return 0;
         }
 
         private static int Status(StatusOption _)
         {
             string head = OidConverter("@");
-            string branch = BranchOperation.Current;
+            var branchOpeartion = new DefaultBranchOperation(LocalDataProvider);
+            string branch = branchOpeartion.Current;
             if (string.IsNullOrEmpty(branch))
             {
                 Console.WriteLine($"HEAD detached at {head.Substring(0, 10)}");
@@ -278,10 +319,28 @@ namespace Tindo.UgitCLI
             {
                 Console.WriteLine($"Merging with {mergeHead.Substring(0, 10)}");
             }
-
-            string headTree = CommitOperation.Get(head).Tree;
+            var commitOperation = new DefaultCommitOperation(
+                    LocalDataProvider,
+                    new DefaultTreeOperation(
+                        LocalDataProvider,
+                        LocalPhysicalFileOperator,
+                        ServiceProvider.GetRequiredService<ILoggerFactory>()
+                        ),
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    );
+            string headTree = commitOperation.Get(head).Tree;
             bool section = false;
-            foreach (var (path, action) in Diff.IterChangedFiles(TreeOperation.GetTree(headTree), TreeOperation.GetIndexTree()))
+            var diff = new DefaultDiffOperation(
+                    LocalDataProvider,
+                    new DefaultDiffProxyOperation(),
+                    LocalPhysicalFileOperator
+                    );
+            var treeOperation = new DefaultTreeOperation(
+                    LocalDataProvider,
+                    LocalPhysicalFileOperator,
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    );
+            foreach (var (path, action) in diff.IterChangedFiles(treeOperation.GetTree(headTree), treeOperation.GetIndexTree()))
             {
                 if (!section)
                 {
@@ -295,7 +354,7 @@ namespace Tindo.UgitCLI
 
             Console.ResetColor();
             section = false;
-            foreach (var (path, action) in Diff.IterChangedFiles(TreeOperation.GetIndexTree(), TreeOperation.GetWorkingTree()))
+            foreach (var (path, action) in diff.IterChangedFiles(treeOperation.GetIndexTree(), treeOperation.GetWorkingTree()))
             {
                 if (!section)
                 {
@@ -313,9 +372,10 @@ namespace Tindo.UgitCLI
 
         private static int TagOp(TagOption o)
         {
+            var tagOperation = new DefaultTagOperation(LocalDataProvider);
             if (string.IsNullOrWhiteSpace(o.Oid) && string.IsNullOrWhiteSpace(o.Name))
             {
-                foreach (var tag in TagOperation.All)
+                foreach (var tag in tagOperation.All)
                 {
                     Console.WriteLine(tag);
                 }
@@ -323,7 +383,7 @@ namespace Tindo.UgitCLI
             else
             {
                 string oid = OidConverter(o.Oid);
-                TagOperation.Create(o.Name, oid);
+                tagOperation.Create(o.Name, oid);
             }
 
             return 0;
@@ -331,14 +391,32 @@ namespace Tindo.UgitCLI
 
         private static int Checkout(CheckoutOption o)
         {
-            CheckoutOperation.Checkout(o.Commit);
+            var checkoutOperation = new DefaultCheckoutOperation(
+                LocalDataProvider,
+                new DefaultTreeOperation(
+                    LocalDataProvider,
+                    LocalPhysicalFileOperator,
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    ),
+                new DefaultCommitOperation(
+                    LocalDataProvider,
+                    new DefaultTreeOperation(
+                        LocalDataProvider,
+                        LocalPhysicalFileOperator,
+                        ServiceProvider.GetRequiredService<ILoggerFactory>()
+                        ),
+                    ServiceProvider.GetRequiredService<ILoggerFactory>()
+                    ),
+                new DefaultBranchOperation(LocalDataProvider)
+                );
+            checkoutOperation.Checkout(o.Commit);
             return 0;
         }
 
         private static int Init(InitOption _)
         {
-            InitOperation.Init();
-            Console.WriteLine($"Initialized empty ugit repository in {LocalDataProvider.GitDirFullPath}");
+            new DefaultInitOperation(LocalDataProvider).Init();
+            Console.WriteLine($"Initialized empty ugit repository.");
             return 0;
         }
 
@@ -362,7 +440,12 @@ namespace Tindo.UgitCLI
 
         private static int ReadTree(ReadTreeOption o)
         {
-            TreeOperation.ReadTree(OidConverter(o.Tree));
+            var treeOperation = new DefaultTreeOperation(
+                   LocalDataProvider,
+                   LocalPhysicalFileOperator,
+                   ServiceProvider.GetRequiredService<ILoggerFactory>()
+                   );
+            treeOperation.ReadTree(OidConverter(o.Tree));
             return 0;
         }
 
@@ -370,7 +453,16 @@ namespace Tindo.UgitCLI
         {
             try
             {
-                Console.WriteLine(CommitOperation.Create(o.Message));
+                var commitOperation = new DefaultCommitOperation(
+                      LocalDataProvider,
+                      new DefaultTreeOperation(
+                          LocalDataProvider,
+                          LocalPhysicalFileOperator,
+                          ServiceProvider.GetRequiredService<ILoggerFactory>()
+                          ),
+                      ServiceProvider.GetRequiredService<ILoggerFactory>()
+                      );
+                Console.WriteLine(commitOperation.Create(o.Message));
             }
             catch (UgitException e)
             {
@@ -397,9 +489,18 @@ namespace Tindo.UgitCLI
                 }
             }
 
-            foreach (var objectId in CommitOperation.GetHistory(new string[] { oid }))
+            var commitOperation = new DefaultCommitOperation(
+                   LocalDataProvider,
+                   new DefaultTreeOperation(
+                       LocalDataProvider,
+                       LocalPhysicalFileOperator,
+                       ServiceProvider.GetRequiredService<ILoggerFactory>()
+                       ),
+                   ServiceProvider.GetRequiredService<ILoggerFactory>()
+                   );
+            foreach (var objectId in commitOperation.GetHistory(new string[] { oid }))
             {
-                var commit = CommitOperation.Get(objectId);
+                var commit = commitOperation.Get(objectId);
                 PrintCommit(objectId, commit, refs.ContainsKey(objectId) ? refs[objectId] : null);
             }
 
@@ -409,11 +510,12 @@ namespace Tindo.UgitCLI
         private static int Branch(BranchOption o)
         {
             string startPoint = OidConverter(o.StartPoint);
-
+            var branchOperation = new DefaultBranchOperation(LocalDataProvider);
             if (string.IsNullOrEmpty(o.Name))
             {
-                string current = BranchOperation.Current;
-                foreach (var branch in BranchOperation.Names)
+               
+                string current = branchOperation.Current;
+                foreach (var branch in branchOperation.Names)
                 {
                     string prefix = branch == current ? "*" : string.Empty;
                     Console.WriteLine($"{prefix}{branch}");
@@ -421,7 +523,7 @@ namespace Tindo.UgitCLI
             }
             else
             {
-                BranchOperation.Create(o.Name, startPoint);
+                branchOperation.Create(o.Name, startPoint);
                 Console.WriteLine($"Branch {o.Name} create at {startPoint.Substring(0, 10)}");
             }
 

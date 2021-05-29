@@ -1,12 +1,11 @@
 ﻿namespace Tindo.UgitCore
 {
+    using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.IO.Abstractions;
     using System.Linq;
     using System.Text.Json;
-    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Default implementation of <see cref="IDataProvider"/>.
@@ -15,23 +14,26 @@
     {
         private readonly byte typeSeparator = 0;
 
-        private readonly IFileSystem fileSystem;
-
         private readonly string repoPath;
 
         private readonly ILogger<LocalDataProvider> logger;
+
+        private readonly string ugitDirectoryFullPath;
+
+        private readonly IFileOperator fileOperator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
         /// </summary>
         /// <param name="fileSystem">The file system.</param>
         /// <param name="repoPath">repo path.</param>
-        public LocalDataProvider(IFileSystem fileSystem, string repoPath, ILoggerFactory loggerFactotry)
+        public LocalDataProvider(IFileOperator phyiscalFileOperator, string repoPath, ILoggerFactory loggerFactotry)
         {
-            this.fileSystem = fileSystem;
+            this.fileOperator = phyiscalFileOperator;
             this.repoPath = string.IsNullOrWhiteSpace(repoPath) ?
-                this.fileSystem.Directory.GetCurrentDirectory() :
+                this.fileOperator.CurrentDirectory :
                 repoPath;
+            this.ugitDirectoryFullPath = Path.Join(this.repoPath, Constants.GitDir);
             this.logger = loggerFactotry.CreateLogger<LocalDataProvider>();
             
         }
@@ -39,60 +41,46 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
         /// </summary>
-        public LocalDataProvider(ILoggerFactory loggerFactory)
-            : this(new FileSystem(), "", loggerFactory)
+        public LocalDataProvider(IFileOperator phyiscalFileOperator, ILoggerFactory loggerFactory)
+            : this(phyiscalFileOperator, "", loggerFactory)
         {
         }
-
-        /// <inheritdoc/>
-        public string GitDir => Constants.GitDir;
-
-        /// <inheritdoc/>
-        public string GitDirFullPath =>
-            Path.Join(this.repoPath, this.GitDir);
 
         /// <inheritdoc/>
         public Tree Index
         {
             get
             {
-                string path = Path.Join(this.GitDirFullPath, Constants.Index);
-                if (!this.fileSystem.File.Exists(path))
+                string path = Path.Join(this.ugitDirectoryFullPath, Constants.Index);
+                if (this.fileOperator.TryRead(path, out var bytes))
                 {
-                    return new();
+                    var options = new JsonSerializerOptions();
+                    options.Converters.Add(new TreeJsonConverter());
+                    return JsonSerializer.Deserialize<Tree>(bytes, options);
                 }
-
-                var data = this.Read(path);
-                var options = new JsonSerializerOptions();
-                options.Converters.Add(new TreeJsonConverter());
-                return JsonSerializer.Deserialize<Tree>(data, options);
+                return new();
             }
 
             set
             {
-                string path = Path.Join(this.GitDirFullPath, Constants.Index);
+                string path = Path.Join(this.ugitDirectoryFullPath, Constants.Index);
                 var options = new JsonSerializerOptions();
                 options.Converters.Add(new TreeJsonConverter());
                 string data = JsonSerializer.Serialize(value, options);
-                if (this.fileSystem.File.Exists(path))
-                {
-                    this.fileSystem.File.Delete(path);
-                }
-
-                this.Write(path, data.Encode());
+                this.fileOperator.Write(path, data.Encode());
             }
         }
 
         /// <inheritdoc/>
         public byte[] GetObject(string oid, string expected = "blob")
         {
-            string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
-            if (!this.Exist(filePath, true))
+            string filePath = Path.Join(this.ugitDirectoryFullPath, Constants.Objects, oid);
+            if (!this.fileOperator.Exists(filePath, true))
             {
                 return Array.Empty<byte>();
             }
 
-            var data = this.Read(filePath);
+            var data = this.fileOperator.Read(filePath);
             var index = Array.IndexOf(data, this.typeSeparator);
             if (string.IsNullOrWhiteSpace(expected) || index <= 0)
             {
@@ -117,21 +105,21 @@
             }
 
             string oid = data.Sha1HexDigest();
-            string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
-            this.Write(filePath, data);
+            string filePath = Path.Join(this.repoPath, Constants.GitDir, Constants.Objects, oid);
+            this.fileOperator.Write(filePath, data);
             return oid;
         }
 
         /// <inheritdoc/>
         public void Init()
         {
-            if (this.fileSystem.Directory.Exists(this.GitDirFullPath))
+            if (this.fileOperator.Exists(this.ugitDirectoryFullPath, false))
             {
-                this.fileSystem.Directory.Delete(this.GitDirFullPath, true);
+                this.fileOperator.Delete(this.ugitDirectoryFullPath);
             }
 
-            this.fileSystem.Directory.CreateDirectory(this.GitDirFullPath);
-            this.fileSystem.Directory.CreateDirectory(Path.Join(this.GitDirFullPath, Constants.Objects));
+            this.fileOperator.CreateDirectory(this.ugitDirectoryFullPath);
+            this.fileOperator.CreateDirectory(Path.Join(this.ugitDirectoryFullPath, Constants.Objects));
         }
 
         /// <inheritdoc/>
@@ -144,9 +132,8 @@
             }
 
             var val = value.Symbolic ? $"ref: {value.Value}" : value.Value;
-            string filePath = Path.Join(this.GitDirFullPath, @ref);
-            this.fileSystem.CreateParentDirectory(filePath);
-            this.Write(filePath, val.Encode());
+            string filePath = Path.Join(this.ugitDirectoryFullPath, @ref);
+            this.fileOperator.Write(filePath, val.Encode());
         }
 
         /// <inheritdoc/>
@@ -174,10 +161,10 @@
                 }
             }
 
-            string refDirectory = Path.Join(this.GitDirFullPath, Constants.Refs);
-            foreach (var filePath in this.Walk(refDirectory))
+            string refDirectory = Path.Join(this.ugitDirectoryFullPath, Constants.Refs);
+            foreach (var filePath in this.fileOperator.Walk(refDirectory))
             {
-                string refName = Path.GetRelativePath(this.GitDirFullPath, filePath);
+                string refName = Path.GetRelativePath(this.ugitDirectoryFullPath, filePath);
                 if (!refName.StartsWith(prefix))
                 {
                     continue;
@@ -195,10 +182,10 @@
         public void DeleteRef(string @ref, bool deref = true)
         {
             @ref = this.GetRefInternal(@ref, deref).Item1;
-            string filePath = Path.Join(this.GitDirFullPath, @ref);
-            if (this.fileSystem.File.Exists(filePath))
+            string filePath = Path.Join(this.ugitDirectoryFullPath, @ref);
+            if (this.fileOperator.Exists(filePath))
             {
-                this.fileSystem.File.Delete(filePath);
+                this.fileOperator.Delete(filePath);
             }
         }
 
@@ -230,108 +217,47 @@
         }
 
         /// <inheritdoc/>
-        public bool IsIgnore(string path) => path.Split(Path.DirectorySeparatorChar).Contains(this.GitDir);
+        public bool IsIgnore(string path) => 
+            path.Split(Path.DirectorySeparatorChar).Contains(this.ugitDirectoryFullPath);
 
-        /// <inheritdoc/>
-        public bool Exist(string path, bool isFile = true)
-        {
-            return isFile ?
-                this.fileSystem.File.Exists(path) :
-                this.fileSystem.Directory.Exists(path);
-        }
-
-        /// <inheritdoc/>
-        public void Write(string path, byte[] bytes)
-        {
-            this.fileSystem.CreateParentDirectory(path);
-            this.fileSystem.File.WriteAllBytes(path, bytes);
-        }
-
-        /// <inheritdoc/>
-        public byte[] Read(string path)
-        {
-            return this.fileSystem.File.ReadAllBytes(path);
-        }
-        
-        public IEnumerable<string> Walk(string path)
-        {
-            return this.fileSystem.Walk(path);
-        }
-
-        /// <inheritdoc/>
-        public void EmptyCurrentDirectory()
-        {
-            foreach (var filePath in this.fileSystem.Directory.EnumerateFiles("."))
-            {
-                if (this.IsIgnore(filePath))
-                {
-                    continue;
-                }
-
-                this.fileSystem.File.Delete(filePath);
-            }
-
-            foreach (var directoryPath in this.fileSystem.Directory.EnumerateDirectories("."))
-            {
-                if (this.IsIgnore(directoryPath))
-                {
-                    continue;
-                }
-
-                this.fileSystem.Directory.Delete(directoryPath, true);
-            }
-        }
-
-        /// <inheritdoc/>
-        public void Delete(string path)
-        {
-            if (this.IsIgnore(path))
-            {
-                return;
-            }
-
-            this.fileSystem.File.Delete(path);
-        }
+        public void EmptyFolder() => this.fileOperator.EmptyCurrentDirectory(IsIgnore);
 
         /// <inheritdoc/>
         public bool ObjectExist(string oid)
         {
-            return this.fileSystem.File.Exists(Path.Join(this.GitDirFullPath, Constants.Objects, oid));
+            return this.fileOperator.Exists(Path.Join(this.ugitDirectoryFullPath, Constants.Objects, oid));
         }
 
         public Config Config
         {
             get
             {
-                string path = Path.Join(this.GitDirFullPath, Constants.Config);
-                if (!this.fileSystem.File.Exists(path))
+                string filePath = Path.Join(this.ugitDirectoryFullPath, Constants.Config);
+
+                if (this.fileOperator.TryRead(filePath, out var bytes))
                 {
-                    return new();
+                    return JsonSerializer.Deserialize<Config>(bytes);
                 }
 
-                var data = this.Read(path);
-                return JsonSerializer.Deserialize<Config>(data);
+                return new();
+                
             }
 
             set
             {
-                string path = Path.Join(this.GitDirFullPath, Constants.Config);
+                string relativePath = Path.Join(this.ugitDirectoryFullPath, Constants.Config);
                 string data = JsonSerializer.Serialize(value);
-                if (this.fileSystem.File.Exists(path))
-                {
-                    this.fileSystem.File.Delete(path);
-                }
-                this.Write(path, data.Encode());
+                this.fileOperator.Write(relativePath, data.Encode());
             }
         }
 
         private (string, RefValue) GetRefInternal(string @ref, bool deref)
         {
-            var refPath = Path.Join(this.GitDirFullPath, @ref);
+            var refPath = Path.Join(this.ugitDirectoryFullPath, @ref);
             string value = null;
-            if (this.fileSystem.File.Exists(refPath))
+            if (this.fileOperator.Exists(refPath))
             {
-                value = this.fileSystem.File.ReadAllBytes(refPath).Decode();
+                value = this.fileOperator.Read(refPath).Decode();
             }
 
             bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");
@@ -344,6 +270,14 @@
             return deref ?
                 this.GetRefInternal(value, true) :
                 ValueTuple.Create(@ref, RefValue.Create(true, value));
+        }
+
+        public string GitFilePath
+        {
+            get
+            {
+                return this.ugitDirectoryFullPath;
+            }
         }
     }
 }

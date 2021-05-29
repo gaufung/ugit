@@ -5,17 +5,8 @@
     /// <summary>
     /// Data provider for file operation.
     /// </summary>
-    public interface IDataProvider : IFileOperator
+    public interface IDataProvider
     {
-        /// <summary>
-        /// Gets the git directory full path.
-        /// </summary>
-        string GitDirFullPath { get; }
-
-        /// <summary>
-        /// Gets the git directory name.
-        /// </summary>
-        string GitDir { get;  }
 
         /// <summary>
         /// Gets or sets Index.
@@ -95,6 +86,11 @@
         /// <returns>True if existing.</returns>
         bool ObjectExist(string oid);
         
+        /// <summary>
+        /// Gets or sets the Repo Config
+        /// </summary>
         Config Config { get; set; }
+
+        string GitFilePath { get;}
     }
 }

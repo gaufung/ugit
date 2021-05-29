@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +8,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 
 namespace Tindo.UgitCore
 {
@@ -16,7 +16,9 @@ namespace Tindo.UgitCore
     /// </summary>
     public class HttpDataProvider : IDataProvider
     {
-
+        /// <summary>
+        /// The remote url would be like https://localhost:5000/repo
+        /// </summary>
         private readonly string remoteUrl;
 
         private readonly IHttpClientFactory httpClientFactory;
@@ -40,7 +42,7 @@ namespace Tindo.UgitCore
         {
             var httpclient = this.httpClientFactory.CreateClient(this.remoteUrl);
             string url = path.Replace(Path.DirectorySeparatorChar, '/');
-            this.logger.LogInformation($"Write: url: {url}");
+            this.logger.LogInformation($"Write {url}");
             HttpRequestMessage requestMessage = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
@@ -200,5 +202,7 @@ namespace Tindo.UgitCore
         }
 
         public Config Config { get; set; }
+
+        public string GitFilePath => throw new NotImplementedException();
     }
 }

@@ -1,9 +1,10 @@
 ﻿namespace Tindo.UgitCore
 {
     using System.Collections.Generic;
+    using System;
 
     /// <summary>
-    /// Subset operation of file operator no matter of local or remote file system.
+    /// Phsical file operator
     /// </summary>
     public interface IFileOperator
     {
@@ -13,7 +14,7 @@
         /// <param name="path">the Path.</param>
         /// <param name="isFile">whether is file or directory.</param>
         /// <returns>True if exist.</returns>
-        bool Exist(string path, bool isFile = true);
+        bool Exists(string path, bool isFile = true);
 
         /// <summary>
         /// Write a byte array to a file path.
@@ -43,8 +44,20 @@
         IEnumerable<string> Walk(string path);
 
         /// <summary>
-        /// Empty current directory.
+        /// Empty repo directory.
         /// </summary>
-        void EmptyCurrentDirectory();
+        void EmptyCurrentDirectory(Func<string, bool> ignore);
+
+        /// <summary>
+        /// Try to read the bytes from a file.
+        /// </summary>
+        /// <param name="path">Read a file path.</param>
+        /// <param name="bytes">Read the value</param>
+        /// <returns>true if read success.</returns>
+        bool TryRead(string path, out byte[] bytes);
+
+        void CreateDirectory(string directory);
+
+        string CurrentDirectory { get;  }
     }
 }
