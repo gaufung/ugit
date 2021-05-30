@@ -7,7 +7,10 @@
     using System.Security.Cryptography;
     using System.Text;
     using System.Text.RegularExpressions;
-    
+    using System.Runtime;
+    using System;
+    using System.Web;
+
     public static class Extensions
     {
         /// <summary>
@@ -139,6 +142,19 @@
             }
 
             return refs;
+        }
+
+        public static Uri AddQuery(this Uri uri, string name, string value)
+        {
+            var httpValueCollection = HttpUtility.ParseQueryString(uri.Query);
+
+            httpValueCollection.Remove(name);
+            httpValueCollection.Add(name, value);
+
+            var ub = new UriBuilder(uri);
+            ub.Query = httpValueCollection.ToString();
+
+            return ub.Uri;
         }
     }
 }
