@@ -19,7 +19,8 @@ namespace Tindo.UgitServer.Controllers
 
         private readonly ILoggerFactory loggerFactory;
 
-        public GitController(IOptions<UgitServer> ugitServerOption, IFileSystem fileSystem, ILoggerFactory loggerFactory)
+        public GitController(IOptions<UgitServer> ugitServerOption, IFileSystem fileSystem,
+            ILoggerFactory loggerFactory)
         {
             this.ugitServer = ugitServerOption.Value;
             this.fileSystem = fileSystem;
@@ -29,23 +30,18 @@ namespace Tindo.UgitServer.Controllers
         [HttpGet("{repo}/objects/{objectId}")]
         public ActionResult<byte[]> GetObject(string repo, string objectId)
         {
-            var filePath = Path.Join(this.ugitServer.RootPath, repo, Constants.Objects, objectId);
-            return this.fileSystem.File.ReadAllBytes(filePath);
-        }
-
-        [HttpGet("{repo}/objects/{objectId}/expect/{expected}")]
-        public ActionResult<byte[]> GetObject(string repo, string objectId, string expected)
-        {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
-            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath, loggerFactory);
-            return dataProvider.GetObject(objectId, expected);
+            IFileOperator fileOperator = new PhysicalFileOperator(this.fileSystem);
+            IDataProvider dataProvider = new LocalDataProvider(fileOperator, repoPath, loggerFactory);
+            return dataProvider.GetObject(objectId);
         }
 
         [HttpPost("{repo}/objects/{objectId}")]
         public ActionResult WriteObject(string repo, string objectId, [FromBody] byte[] bytes)
         {
             var filePath = Path.Join(this.ugitServer.RootPath, repo, objectId);
-            this.fileSystem.File.WriteAllBytes(filePath, bytes);
+            IFileOperator fileOperator = new PhysicalFileOperator(this.fileSystem);
+            fileOperator.Write(filePath, bytes);
             return Ok();
         }
 
@@ -54,7 +50,8 @@ namespace Tindo.UgitServer.Controllers
             [FromQuery] bool deref = true)
         {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
-            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath, loggerFactory);
+            IFileOperator fileOperator = new PhysicalFileOperator(this.fileSystem);
+            IDataProvider dataProvider = new LocalDataProvider(fileOperator, repoPath, loggerFactory);
             prefix = Path.Join("refs", prefix);
             return dataProvider.GetAllRefs(prefix, deref)
                 .ToDictionary(kv => kv.Item1, kv => kv.Item2);
@@ -64,7 +61,8 @@ namespace Tindo.UgitServer.Controllers
         public ActionResult UpdateRef(string repo, string @ref, [FromBody] RefValue refValue, [FromQuery]bool deref=true)
         {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
-            IDataProvider dataProvider = new LocalDataProvider(this.fileSystem, repoPath, loggerFactory);
+            IFileOperator fileOperator = new PhysicalFileOperator(this.fileSystem);
+            IDataProvider dataProvider = new LocalDataProvider(fileOperator, repoPath, loggerFactory);
             dataProvider.UpdateRef(@ref, refValue, deref);
             return Ok();
         }

@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -16,65 +18,31 @@ namespace Tindo.UgitCore
     /// </summary>
     public class HttpDataProvider : IDataProvider
     {
-        /// <summary>
-        /// The remote url would be like https://localhost:5000/repo
-        /// </summary>
-        private readonly string remoteUrl;
-
-        private readonly IHttpClientFactory httpClientFactory;
-
+        private readonly byte typeSeparator = 0;
+        
         private readonly ILogger<HttpDataProvider> logger;
 
-        public HttpDataProvider(string remoteUrl, IHttpClientFactory httpClientFactory
-        , ILoggerFactory loggerFactory)
+        private readonly IFileOperator httpFileOperator;
+
+        public HttpDataProvider(IFileOperator httpFileOperator, ILoggerFactory loggerFactory)
         {
-            this.remoteUrl = remoteUrl;
-            this.httpClientFactory = httpClientFactory;
+            this.httpFileOperator = httpFileOperator;
             this.logger = loggerFactory.CreateLogger<HttpDataProvider>();
         }
         
         public bool Exist(string path, bool isFile = true)
         {
-            throw new System.NotImplementedException();
+            return this.httpFileOperator.Exists(path, isFile);
         }
 
         public void Write(string path, byte[] bytes)
         {
-            var httpclient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = path.Replace(Path.DirectorySeparatorChar, '/');
-            this.logger.LogInformation($"Write {url}");
-            HttpRequestMessage requestMessage = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(url),
-                Content = new ByteArrayContent(bytes),
-            };
-
-            var response = httpclient.Send(requestMessage);
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new UgitException("failed to write the object");
-            }
+            this.httpFileOperator.Write(path, bytes);
         }
 
         public byte[] Read(string path)
         {
-            var httpClient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = path.Replace(Path.DirectorySeparatorChar, '/');
-            this.logger.LogInformation($"Read, url: {url}");
-            HttpRequestMessage requestMessage = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(url),
-            };
-
-            var response = httpClient.Send(requestMessage);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return response.Content.ReadAsByteArrayAsync().Result;
-            }
-
-            throw new UgitException("failed to get the object");
+            return this.httpFileOperator.Read(path);
         }
 
         public void Delete(string path)
@@ -92,9 +60,16 @@ namespace Tindo.UgitCore
             throw new System.NotImplementedException();
         }
 
-        public string GitDirFullPath => this.remoteUrl;
-        public string GitDir { get; }
-        public Tree Index { get; set; }
+        public string GitDirFullPath => throw new NotImplementedException();
+
+        public string GitDir => throw new NotImplementedException();
+
+        public Tree Index
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
         public void Init()
         {
             throw new System.NotImplementedException();
@@ -107,46 +82,27 @@ namespace Tindo.UgitCore
 
         public byte[] GetObject(string oid, string expected = "blob")
         {
-            var httpClient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = this.remoteUrl + $"/{Constants.Objects}/{oid}/expect/{expected}";
-            this.logger.LogInformation($"GetObject, url: {url}");
-            var requestMessage = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(url),
-            };
+            string path = $"{Constants.Objects}/{oid}";
 
-            var response = httpClient.Send(requestMessage);
-
-            if (response.StatusCode == HttpStatusCode.OK)
+            var data = this.httpFileOperator.Read(path);
+            var index = Array.IndexOf(data, this.typeSeparator);
+            if (string.IsNullOrWhiteSpace(expected) || index <= 0)
             {
-                return response.Content.ReadAsByteArrayAsync().Result;
+                return Array.Empty<byte>();
             }
 
-            throw new UgitException("failed to get the object");
+            var type = data.Take(index).ToArray().Decode();
+            if (!string.Equals(expected, type, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UgitException($"Unknown object ({oid}) type, got {type}");
+            }
+            return data.TakeLast(data.Length - index - 1).ToArray();
 
         }
 
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
-            var httpclient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = this.remoteUrl + $"/refs/{@ref}?deref={deref.ToString()}";
-            this.logger.LogInformation($"UpdateRef: {url}");
-            string body = JsonSerializer.Serialize(value);
-            HttpRequestMessage requestMessage = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Post,
-                Content = new StringContent(body, Encoding.UTF8),
-                RequestUri = new Uri(url)
-            };
-            httpclient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var response = httpclient.Send(requestMessage);
-
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new UgitException("failed to update the ref");
-            }
+            
         }
 
         public RefValue GetRef(string @ref, bool deref = true)
@@ -156,29 +112,7 @@ namespace Tindo.UgitCore
 
         public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
         {
-            var httpclient = this.httpClientFactory.CreateClient(this.remoteUrl);
-            string url = this.remoteUrl + $"/{prefix}?deref={deref.ToString()}";
-            url = url.Replace(Path.DirectorySeparatorChar, '/');
-            this.logger.LogInformation($"Get all Refs: {url}");
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri =  new Uri(url)
-            };
-            httpclient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var response = httpclient.Send(httpRequestMessage);
-            string body = response.Content.ReadAsStringAsync().Result;
-            if (!string.IsNullOrWhiteSpace(body))
-            {
-                var refs = JsonSerializer.Deserialize<Dictionary<string, RefValue>>(body);
-                if (refs != null)
-                {
-                    return refs.Select(kv => (kv.Key, kv.Value));
-                }
-            }
-
-            throw new UgitException($"Failed to fetch the remote repository: {remoteUrl}");
-
+            throw new RowNotInTableException();
         }
 
         public void DeleteRef(string @ref, bool deref = true)

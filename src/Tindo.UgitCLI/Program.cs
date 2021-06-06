@@ -126,8 +126,10 @@ namespace Tindo.UgitCLI
             if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote, 
                 StringComparison.OrdinalIgnoreCase))
             {
-                remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url, 
+                IFileOperator fileOperator = new HttpFileOperator(config.Remote.Value.Url,
                     ServiceProvider.GetRequiredService<IHttpClientFactory>(),
+                    ServiceProvider.GetRequiredService<ILoggerFactory>());
+                remoteDataProvider = new HttpDataProvider(fileOperator,
                     ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             else
@@ -157,8 +159,10 @@ namespace Tindo.UgitCLI
             if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote,
                 StringComparison.OrdinalIgnoreCase))
             {
-                remoteDataProvider = new HttpDataProvider(config.Remote.Value.Url,
+                IFileOperator fileOperator = new HttpFileOperator(config.Remote.Value.Url,
                     ServiceProvider.GetRequiredService<IHttpClientFactory>(),
+                    ServiceProvider.GetRequiredService<ILoggerFactory>());
+                remoteDataProvider = new HttpDataProvider(fileOperator,
                     ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             else
