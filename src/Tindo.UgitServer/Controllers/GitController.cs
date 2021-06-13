@@ -28,12 +28,13 @@ namespace Tindo.UgitServer.Controllers
         }
 
         [HttpGet("{repo}/objects/{objectId}")]
-        public ActionResult<byte[]> GetObject(string repo, string objectId)
+        public ActionResult GetObject(string repo, string objectId)
         {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
             IFileOperator fileOperator = new PhysicalFileOperator(this.fileSystem);
-            IDataProvider dataProvider = new LocalDataProvider(fileOperator, repoPath, loggerFactory);
-            return dataProvider.GetObject(objectId);
+            var filepath = Path.Join(repoPath,Constants.GitDir, Constants.Objects, objectId);
+            var bytes = fileOperator.Read(filepath);
+            return File(bytes, "application/octet-stream");
         }
 
         [HttpPost("{repo}/objects/{objectId}")]
@@ -45,7 +46,7 @@ namespace Tindo.UgitServer.Controllers
             return Ok();
         }
 
-        [HttpGet("{repo}/refs/{prefix}")]
+        [HttpGet("{repo}/refs/{prefix?}")]
         public ActionResult<Dictionary<string, RefValue>> GetAllRefs(string repo, string prefix,
             [FromQuery] bool deref = true)
         {

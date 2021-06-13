@@ -10,6 +10,8 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Tindo.UgitCore
 {
@@ -112,7 +114,11 @@ namespace Tindo.UgitCore
 
         public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
         {
-            throw new RowNotInTableException();
+            Debugger.Launch();
+            string path = $"{prefix}?deref={deref.ToString().ToLower()}";
+            var bytes = this.httpFileOperator.Read(path);
+            var refs = JsonSerializer.Deserialize<IDictionary<string, RefValue>>(bytes);
+            return refs.Select(it => (it.Key, it.Value));
         }
 
         public void DeleteRef(string @ref, bool deref = true)
@@ -137,6 +143,6 @@ namespace Tindo.UgitCore
 
         public Config Config { get; set; }
 
-        public string GitFilePath => throw new NotImplementedException();
+        public string GitFilePath => string.Empty;
     }
 }

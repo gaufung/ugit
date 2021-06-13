@@ -164,6 +164,8 @@ namespace Tindo.UgitCLI
                     ServiceProvider.GetRequiredService<ILoggerFactory>());
                 remoteDataProvider = new HttpDataProvider(fileOperator,
                     ServiceProvider.GetRequiredService<ILoggerFactory>());
+                remoteFileOperator = new HttpFileOperator(config.Remote.Value.Url, ServiceProvider.GetRequiredService<IHttpClientFactory>(),
+                    ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             else
             {
