@@ -121,9 +121,9 @@ namespace Tindo.UgitCLI
         private static int Push(PushOption o)
         {
             IDataProvider remoteDataProvider;
-            IFileOperator remoteFileOperator = null;
             var config = LocalDataProvider.Config;
-            if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote, 
+            IFileOperator remoteFileOperator;
+            if (config.Remote.HasValue && config.Remote.Value.Name.Equals(o.Remote,
                 StringComparison.OrdinalIgnoreCase))
             {
                 IFileOperator fileOperator = new HttpFileOperator(config.Remote.Value.Url,
@@ -131,13 +131,15 @@ namespace Tindo.UgitCLI
                     ServiceProvider.GetRequiredService<ILoggerFactory>());
                 remoteDataProvider = new HttpDataProvider(fileOperator,
                     ServiceProvider.GetRequiredService<ILoggerFactory>());
+                remoteFileOperator = new HttpFileOperator(config.Remote.Value.Url, ServiceProvider.GetRequiredService<IHttpClientFactory>(),
+                   ServiceProvider.GetRequiredService<ILoggerFactory>());
             }
             else
             {
-                remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote, ServiceProvider.GetRequiredService<ILoggerFactory>());;
+                remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote, ServiceProvider.GetRequiredService<ILoggerFactory>()); ;
                 remoteFileOperator = new PhysicalFileOperator(FileSystem);
             }
-            
+
             ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, remoteFileOperator, ServiceProvider.GetRequiredService<ILoggerFactory>()), ServiceProvider.GetRequiredService<ILoggerFactory>());
 
             ITreeOperation treeOperation = new DefaultTreeOperation(LocalDataProvider, LocalPhysicalFileOperator, ServiceProvider.GetRequiredService<ILoggerFactory>());

@@ -218,7 +218,7 @@
 
         /// <inheritdoc/>
         public bool IsIgnore(string path) => 
-            path.Split(Path.DirectorySeparatorChar).Contains(this.ugitDirectoryFullPath);
+            path.Split(Path.DirectorySeparatorChar).Contains(Constants.GitDir);
 
         public void EmptyFolder() => this.fileOperator.EmptyCurrentDirectory(IsIgnore);
 

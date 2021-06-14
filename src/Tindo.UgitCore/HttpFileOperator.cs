@@ -105,6 +105,7 @@ namespace Tindo.UgitCore
         {
             HttpClient httpClient = this.httpClientFactory.CreateClient();
             Uri uri = new Uri($"{this.remoteUrl}/{path}");
+            this.logger.LogInformation($"Write url: {uri}");
             HttpRequestMessage request = new HttpRequestMessage
             {
                 RequestUri = uri,

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Tindo.UgitCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Tindo.UgitServer.Controllers
 {
@@ -38,10 +40,16 @@ namespace Tindo.UgitServer.Controllers
         }
 
         [HttpPost("{repo}/objects/{objectId}")]
-        public ActionResult WriteObject(string repo, string objectId, [FromBody] byte[] bytes)
+        public ActionResult WriteObject(string repo, string objectId)
         {
-            var filePath = Path.Join(this.ugitServer.RootPath, repo, objectId);
+            var filePath = Path.Join(this.ugitServer.RootPath, repo, Constants.GitDir, Constants.Objects, objectId);
             IFileOperator fileOperator = new PhysicalFileOperator(this.fileSystem);
+            byte[] bytes = Array.Empty<byte>();
+            using (var ms = new MemoryStream(2048))
+            {
+                Request.Body.CopyToAsync(ms).Wait();
+                bytes = ms.ToArray();
+            }
             fileOperator.Write(filePath, bytes);
             return Ok();
         }
@@ -58,13 +66,26 @@ namespace Tindo.UgitServer.Controllers
                 .ToDictionary(kv => kv.Item1, kv => kv.Item2);
         }
 
-        [HttpPost("{repo}/refs/{refname}")]
-        public ActionResult UpdateRef(string repo, string @ref, [FromBody] RefValue refValue, [FromQuery]bool deref=true)
+        [HttpGet("{repo}")]
+        public ActionResult<Dictionary<string, RefValue>> GetAllRefs(string repo, [FromQuery] bool deref = true)
+        {
+            return GetAllRefs(repo, "", deref);
+        }
+
+        [HttpPost("{repo}/refs/{*refname}")]
+        public ActionResult UpdateRef(string repo, string refname, [FromQuery]bool deref=true)
         {
             string repoPath = Path.Join(this.ugitServer.RootPath, repo);
             IFileOperator fileOperator = new PhysicalFileOperator(this.fileSystem);
             IDataProvider dataProvider = new LocalDataProvider(fileOperator, repoPath, loggerFactory);
-            dataProvider.UpdateRef(@ref, refValue, deref);
+            byte[] bytes = Array.Empty<byte>();
+            using (var ms = new MemoryStream(2048))
+            {
+                Request.Body.CopyToAsync(ms).Wait();
+                bytes = ms.ToArray();
+            }
+            var refValue = JsonSerializer.Deserialize<RefValue>(bytes);
+            dataProvider.UpdateRef(Path.Join("refs", refname), refValue, deref);
             return Ok();
         }
         

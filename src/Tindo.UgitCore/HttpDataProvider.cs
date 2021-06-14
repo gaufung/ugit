@@ -104,7 +104,9 @@ namespace Tindo.UgitCore
 
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
-            
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
+            string path = $"{@ref}?deref={deref.ToString().ToLower()}";
+            httpFileOperator.Write(path, bytes);
         }
 
         public RefValue GetRef(string @ref, bool deref = true)
@@ -114,7 +116,6 @@ namespace Tindo.UgitCore
 
         public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
         {
-            Debugger.Launch();
             string path = $"{prefix}?deref={deref.ToString().ToLower()}";
             var bytes = this.httpFileOperator.Read(path);
             var refs = JsonSerializer.Deserialize<IDictionary<string, RefValue>>(bytes);
