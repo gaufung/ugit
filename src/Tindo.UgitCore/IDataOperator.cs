@@ -8,6 +8,10 @@ namespace Tindo.UgitCore
 {
     public interface IDataOperator
     {
+        byte[] GetObject(string oid, string expected = "blob");
 
+        string WriteObject(byte[] data, string type = "blob");
+
+        void Initialize();
     }
 }

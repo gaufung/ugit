@@ -38,5 +38,7 @@
         public static readonly string Config = "config";
 
         public static readonly string Author = "author";
+
+        public static readonly byte TypeSeparator = 0;
     }
 }

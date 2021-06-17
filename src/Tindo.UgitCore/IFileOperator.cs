@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tindo.UgitCore
+﻿namespace Tindo.UgitCore
 {
     public interface IFileOperator
     {
         string CurrentDirectory { get;  }
+
+        bool Exists(string path, bool isFile = true);
+
+        bool TryRead(string path, out byte[] bytes);
+
+        void Write(string filePath, byte[] data);
+
+        void Delete(string path, bool isFile = true);
+
+        void CreateDirectory(string directory, bool force = true);
     }
 }
