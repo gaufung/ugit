@@ -26,7 +26,6 @@
 
             this.repoRootPath = repoRootPath;
             this.repoUgitPath = Path.Join(this.repoRootPath, Constants.GitDir);
-            this.logger.LogInformation($"Initilize {nameof(LocalDataOperator)} within {this.repoRootPath}");
         }
 
         public LocalDataOperator(IFileOperator localFileOpeator, ILoggerFactory loggerFactory)
@@ -77,6 +76,47 @@
             this.localFileOperator.CreateDirectory(this.repoUgitPath);
             string objectDirectory = Path.Join(this.repoUgitPath, Constants.Objects);
             this.localFileOperator.CreateDirectory(objectDirectory);
+        }
+
+        public string RepositoryPath => this.repoUgitPath;
+
+        private (string, RefValue) GetRefInternal(string @ref, bool deref)
+        {
+            var refPath = Path.Join(this.repoUgitPath, @ref);
+            
+            if (!this.localFileOperator.TryRead(refPath, out var bytes))
+            {
+                return ValueTuple.Create(@ref, RefValue.Create(false, string.Empty));
+            }
+            string value = bytes.Decode();
+            bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");
+            if (!symbolic)
+            {
+                return ValueTuple.Create(@ref, RefValue.Create(false, value));
+            }
+
+            value = value.Split(":")[1].Trim();
+            return deref ? this.GetRefInternal(value, true) :
+                ValueTuple.Create(@ref, RefValue.Create(true, value));
+        }
+
+        public RefValue GetRef(string @ref, bool deref = true)
+        {
+            return this.GetRefInternal(@ref, deref).Item2;
+        }
+
+        public void UpdateRef(string @ref, RefValue value, bool deref = true)
+        {
+            @ref = this.GetRefInternal(@ref, deref).Item1;
+            if(string.IsNullOrWhiteSpace(value.Value))
+            {
+                this.logger.LogError("RefValue is null or empty to update");
+                throw new UgitException("RefValue is null or empty");
+            }
+
+            var val = value.Symbolic ? $"ref: {value.Value}" : value.Value;
+            string refPath = Path.Join(this.repoUgitPath, @ref);
+            this.localFileOperator.Write(refPath, val.Encode());
         }
     }
 }

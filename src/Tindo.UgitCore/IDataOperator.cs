@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tindo.UgitCore
+﻿namespace Tindo.UgitCore
 {
     public interface IDataOperator
     {
@@ -13,5 +7,11 @@ namespace Tindo.UgitCore
         string WriteObject(byte[] data, string type = "blob");
 
         void Initialize();
+
+        string RepositoryPath { get; }
+
+        RefValue GetRef(string @ref, bool deref = true);
+
+        void UpdateRef(string @ref, RefValue value, bool deref = true);
     }
 }

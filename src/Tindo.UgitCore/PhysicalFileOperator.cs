@@ -55,7 +55,7 @@ namespace Tindo.UgitCore
 
         public void Write(string filePath, byte[] data)
         {
-            CreateDirectory(filePath);
+            CreateParentDirectory(filePath);
             if (this.Exists(filePath))
             {
                 this.Delete(filePath);
