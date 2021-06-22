@@ -1,4 +1,7 @@
-﻿namespace Tindo.UgitCore
+﻿using System.Collections.Generic;
+using System.Text.Json;
+
+namespace Tindo.UgitCore
 {
     using Microsoft.Extensions.Logging;
     using System;
@@ -29,7 +32,7 @@
         }
 
         public LocalDataOperator(IFileOperator localFileOpeator, ILoggerFactory loggerFactory)
-            : this (localFileOpeator, "", loggerFactory)
+            : this(localFileOpeator, "", loggerFactory)
         {
 
         }
@@ -58,11 +61,11 @@
             return data.TakeLast(data.Length - index - 1).ToArray();
         }
 
-        public string WriteObject(byte[] data, string type="blob")
+        public string WriteObject(byte[] data, string type = "blob")
         {
             if (!string.IsNullOrEmpty(type))
             {
-                data = type.Encode().Concat(new byte[] { Constants.TypeSeparator }).Concat(data).ToArray();
+                data = type.Encode().Concat(new byte[] {Constants.TypeSeparator}).Concat(data).ToArray();
             }
 
             string oid = data.Sha1HexDigest();
@@ -76,6 +79,11 @@
             this.localFileOperator.CreateDirectory(this.repoUgitPath);
             string objectDirectory = Path.Join(this.repoUgitPath, Constants.Objects);
             this.localFileOperator.CreateDirectory(objectDirectory);
+            string headsDirectory = Path.Join(this.repoUgitPath, Constants.Refs, Constants.Heads);
+            this.localFileOperator.CreateDirectory(headsDirectory);
+            string tagsDirectory = Path.Join(this.repoUgitPath, Constants.Refs, Constants.Tags);
+            this.localFileOperator.CreateDirectory(tagsDirectory);
+
         }
 
         public string RepositoryPath => this.repoUgitPath;
@@ -83,11 +91,12 @@
         private (string, RefValue) GetRefInternal(string @ref, bool deref)
         {
             var refPath = Path.Join(this.repoUgitPath, @ref);
-            
+
             if (!this.localFileOperator.TryRead(refPath, out var bytes))
             {
                 return ValueTuple.Create(@ref, RefValue.Create(false, string.Empty));
             }
+
             string value = bytes.Decode();
             bool symbolic = !string.IsNullOrWhiteSpace(value) && value.StartsWith("ref:");
             if (!symbolic)
@@ -96,7 +105,8 @@
             }
 
             value = value.Split(":")[1].Trim();
-            return deref ? this.GetRefInternal(value, true) :
+            return deref ? 
+                this.GetRefInternal(value, true) : 
                 ValueTuple.Create(@ref, RefValue.Create(true, value));
         }
 
@@ -108,7 +118,7 @@
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
             @ref = this.GetRefInternal(@ref, deref).Item1;
-            if(string.IsNullOrWhiteSpace(value.Value))
+            if (string.IsNullOrWhiteSpace(value.Value))
             {
                 this.logger.LogError("RefValue is null or empty to update");
                 throw new UgitException("RefValue is null or empty");
@@ -117,6 +127,98 @@
             var val = value.Symbolic ? $"ref: {value.Value}" : value.Value;
             string refPath = Path.Join(this.repoUgitPath, @ref);
             this.localFileOperator.Write(refPath, val.Encode());
+        }
+
+        public void DeleteRef(string @ref, bool deref = true)
+        {
+            @ref = this.GetRefInternal(@ref, deref).Item1;
+
+            string filePath = Path.Join(this.repoUgitPath, @ref);
+            if (this.localFileOperator.Exists(filePath))
+            {
+                this.localFileOperator.Delete(filePath);
+            }
+        }
+
+        public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
+        {
+            if (Constants.HEAD.StartsWith(prefix))
+            {
+                if (!string.IsNullOrEmpty(this.GetRef(Constants.HEAD, deref).Value))
+                {
+                    yield return (Constants.HEAD, this.GetRef(Constants.HEAD, deref));
+                }
+            }
+
+            if (Constants.MergeHEAD.StartsWith(prefix))
+            {
+                if (!string.IsNullOrEmpty(this.GetRef(Constants.MergeHEAD, deref).Value))
+                {
+                    yield return (Constants.MergeHEAD, this.GetRef(Constants.MergeHEAD, deref));
+                }
+            }
+
+            string refsDirectory = Path.Join(this.repoUgitPath, Constants.Refs);
+            foreach (var filePath in this.localFileOperator.Walk(refsDirectory))
+            {
+                this.logger.LogInformation($"getting ref file path {filePath}, prefix: {prefix}");
+                string refName = Path.GetRelativePath(this.repoUgitPath, filePath);
+                if (!refName.StartsWith(prefix)) continue;
+                
+                this.logger.LogInformation($"Getting ref name {refName}");
+                var refValue = this.GetRef(refName, deref);
+                if (!string.IsNullOrEmpty(refValue.Value))
+                {
+                    yield return (refName, refValue);
+                }
+            }
+        }
+
+        public string GetOid(string name)
+        {
+            name = name == "@" ? Constants.HEAD : name;
+            string[] refsToTry = new[]
+            {
+                Path.Join(name),
+                Path.Join(Constants.Refs, name),
+                Path.Join(Constants.Refs, Constants.Tags, name),
+                Path.Join(Constants.Refs, Constants.Heads, name)
+            };
+            foreach (var @ref in refsToTry)
+            {
+                if (!this.GetRef(@ref, false).Value.IsNullOrWhiteSpace())
+                {
+                    return this.GetRef(@ref).Value;
+                }
+            }
+
+            if (name.IsOnlyHex() && name.Length == 40)
+            {
+                return name;
+            }
+
+            return null;
+        }
+
+        public Tree Index
+        {
+            get
+            {
+                string filePath = Path.Join(this.repoUgitPath, Constants.Index);
+                if (this.localFileOperator.TryRead(filePath, out var bytes))
+                {
+                    return JsonSerializer.Deserialize<Tree>(bytes);
+                }
+
+                return new();
+            }
+
+            set
+            {
+                string filePath = Path.Join(this.repoUgitPath, Constants.Index);
+                var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
+                this.localFileOperator.Write(filePath, bytes);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Tindo.UgitCore
 {
@@ -6,47 +7,68 @@ namespace Tindo.UgitCore
 
     public class PhysicalFileOperator : IFileOperator
     {
-        private readonly IFileSystem fileSystem;
+        private readonly IFileSystem _fileSystem;
 
         public PhysicalFileOperator(IFileSystem fileSystem)
         {
-            this.fileSystem = fileSystem;
+            this._fileSystem = fileSystem;
         }
 
-        public string CurrentDirectory => this.fileSystem.Directory.GetCurrentDirectory();
+        public string CurrentDirectory => this._fileSystem.Directory.GetCurrentDirectory();
 
         public void CreateDirectory(string directory, bool force = true)
         {
-            if (this.fileSystem.Directory.Exists(directory) && !force)
+            if (this._fileSystem.Directory.Exists(directory) && !force)
             {
                 throw new UgitException($"{directory} is not empty.");
             }
-            this.fileSystem.Directory.CreateDirectory(directory);
+            this._fileSystem.Directory.CreateDirectory(directory);
+        }
+
+        public IEnumerable<string> Walk(string directory)
+        {
+            if (!this.Exists(directory, false))
+            {
+                yield break;
+            }
+
+            foreach (var filePath in this._fileSystem.Directory.EnumerateFiles(directory))
+            {
+                yield return filePath;
+            }
+
+            foreach (var subDirectory in this._fileSystem.Directory.EnumerateDirectories(directory))
+            {
+                foreach (var filepath in this.Walk(subDirectory))
+                {
+                    yield return filepath;
+                }
+            }
         }
 
         public void Delete(string path, bool isFile = true)
         {
-            if (isFile && this.fileSystem.File.Exists(path))
+            if (isFile && this._fileSystem.File.Exists(path))
             {
-                this.fileSystem.File.Delete(path);
+                this._fileSystem.File.Delete(path);
             }
-            else if (!isFile && this.fileSystem.Directory.Exists(path))
+            else if (!isFile && this._fileSystem.Directory.Exists(path))
             {
-                this.fileSystem.Directory.Delete(path);
+                this._fileSystem.Directory.Delete(path);
             }
         }
 
         public bool Exists(string path, bool isFile = true)
         {
-            return isFile ? this.fileSystem.File.Exists(path)
-                : this.fileSystem.Directory.Exists(path);
+            return isFile ? this._fileSystem.File.Exists(path)
+                : this._fileSystem.Directory.Exists(path);
         }
 
         public bool TryRead(string path, out byte[] bytes)
         {
             if (this.Exists(path))
             {
-                bytes = this.fileSystem.File.ReadAllBytes(path);
+                bytes = this._fileSystem.File.ReadAllBytes(path);
                 return true;
             }
             bytes = Array.Empty<byte>();
@@ -61,15 +83,15 @@ namespace Tindo.UgitCore
                 this.Delete(filePath);
             }
 
-            this.fileSystem.File.WriteAllBytes(filePath, data);
+            this._fileSystem.File.WriteAllBytes(filePath, data);
         }
 
         private void CreateParentDirectory(string filePath)
         {
-            string parentDirectory = this.fileSystem.Path.GetDirectoryName(filePath);
-            if (!string.IsNullOrEmpty(parentDirectory) && !this.fileSystem.Directory.Exists(parentDirectory))
+            string parentDirectory = this._fileSystem.Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(parentDirectory) && !this._fileSystem.Directory.Exists(parentDirectory))
             {
-                this.fileSystem.Directory.CreateDirectory(parentDirectory);
+                this._fileSystem.Directory.CreateDirectory(parentDirectory);
             }
         }
     }

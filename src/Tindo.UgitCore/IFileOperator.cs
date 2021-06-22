@@ -1,4 +1,7 @@
-﻿namespace Tindo.UgitCore
+﻿
+using System.Collections.Generic;
+
+namespace Tindo.UgitCore
 {
     public interface IFileOperator
     {
@@ -13,5 +16,7 @@
         void Delete(string path, bool isFile = true);
 
         void CreateDirectory(string directory, bool force = true);
+
+        IEnumerable<string> Walk(string directory);
     }
 }

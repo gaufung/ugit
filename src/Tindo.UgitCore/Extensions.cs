@@ -1,4 +1,6 @@
-﻿namespace Tindo.UgitCore
+﻿using System.Runtime.CompilerServices;
+
+namespace Tindo.UgitCore
 {
     using System;
     using System.Collections.Generic;
@@ -86,5 +88,7 @@
 
             return ub.Uri;
         }
+
+        public static bool IsNullOrWhiteSpace(this string str) => string.IsNullOrWhiteSpace(str);
     }
 }

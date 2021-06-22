@@ -1,4 +1,7 @@
-﻿namespace Tindo.UgitCore
+﻿using System.Collections.Generic;
+
+
+namespace Tindo.UgitCore
 {
     public interface IDataOperator
     {
@@ -13,5 +16,13 @@
         RefValue GetRef(string @ref, bool deref = true);
 
         void UpdateRef(string @ref, RefValue value, bool deref = true);
+
+        void DeleteRef(string @ref, bool deref = true);
+
+        IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true);
+
+        string GetOid(string name);
+        
+        Tree Index { get; set; }
     }
 }

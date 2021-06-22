@@ -20,7 +20,7 @@
         {
             this.dataOperator.Initialize();
             this.logger.LogInformation($"initilize ugit repository in {this.dataOperator.RepositoryPath}");
-            this.dataOperator.UpdateRef(Constants.HEAD, RefValue.Create(true, Path.Join(Constants.Refs, Constants.HEAD, Constants.Master)));
+            this.dataOperator.UpdateRef(Constants.HEAD, RefValue.Create(true, Path.Join(Constants.Refs, Constants.Heads, Constants.Master)));
             Console.WriteLine($"Initialized empty Ugit repository in {this.dataOperator.RepositoryPath}");
         }
     }
