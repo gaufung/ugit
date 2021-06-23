@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System;
 
 namespace Tindo.UgitCore
 {
@@ -18,5 +19,7 @@ namespace Tindo.UgitCore
         void CreateDirectory(string directory, bool force = true);
 
         IEnumerable<string> Walk(string directory);
+
+        void EmptyDirectory(Func<string, bool> ignore);
     }
 }

@@ -1,9 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Tindo.UgitCore
+﻿namespace Tindo.UgitCore
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
@@ -51,9 +48,9 @@ namespace Tindo.UgitCore
         /// <typeparam name="TValue">The dictionary value type.</typeparam>
         /// <param name="dic">The dictionary.</param>
         /// <param name="other">The other dictionary.</param>
-        public static void Update<TKey, TValue>(
-            this IDictionary<TKey, TValue> dic,
-            IDictionary<TKey, TValue> other)
+        public static void Update(
+            this Tree dic,
+            Tree other)
         {
             foreach (var entry in other)
             {

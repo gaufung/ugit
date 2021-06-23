@@ -3,10 +3,10 @@ using System.Text.Json;
 
 namespace Tindo.UgitCore
 {
-    using Microsoft.Extensions.Logging;
     using System;
     using System.IO;
     using System.Linq;
+    using Microsoft.Extensions.Logging;
 
     public class LocalDataOperator : IDataOperator
     {

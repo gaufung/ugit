@@ -94,5 +94,19 @@ namespace Tindo.UgitCore
                 this._fileSystem.Directory.CreateDirectory(parentDirectory);
             }
         }
+
+        public void EmptyDirectory(Func<string, bool> ignore)
+        {
+            foreach(var filePath in this._fileSystem.Directory.EnumerateFiles("."))
+            {
+                if (ignore(filePath)) continue;
+                this.Delete(filePath);
+            }
+            foreach (var directory in this._fileSystem.Directory.EnumerateDirectories("."))
+            {
+                if (ignore(directory)) continue;
+                this.Delete(directory, false);
+            }
+        }
     }
 }
