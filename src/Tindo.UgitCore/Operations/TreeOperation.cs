@@ -167,5 +167,7 @@ namespace Tindo.UgitCore.Operations
                 entries.Select(e => $"{e.Item3} {e.Item2} {e.Item1}"));
             return this._dataOperator.WriteObject(subTree.Encode(), Constants.Tree);
         }
+
+        public Tree IndexTree => this._dataOperator.Index;
     }
 }

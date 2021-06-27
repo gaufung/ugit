@@ -24,5 +24,7 @@ namespace Tindo.UgitCore
         string GetOid(string name);
         
         Tree Index { get; set; }
+
+        Configuration Config { get; set; }
     }
 }

@@ -19,5 +19,7 @@ namespace Tindo.UgitCore.Operations
         Tree GetWorkingDirectory();
 
         IEnumerable<(string, string, string)> Iterate(string oid);
+
+        Tree IndexTree { get; }
     }
 }

@@ -4,8 +4,8 @@ namespace Tindo.UgitCore
 {
     public class Configuration
     {
-        public Author Author { get; set; }
+        public Author? Author { get; set; }
 
-        public IList<Remote> Remotes { get; set; }
+        public Remote? Remotes { get; set; }
     }
 }

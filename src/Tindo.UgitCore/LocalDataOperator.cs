@@ -220,5 +220,24 @@ namespace Tindo.UgitCore
                 this.localFileOperator.Write(filePath, bytes);
             }
         }
+
+        public Configuration Config 
+        {
+            get
+            {
+                string filePath = Path.Join(this.repoRootPath, Constants.Config);
+                if (this.localFileOperator.TryRead(filePath, out var bytes))
+                {
+                    return JsonSerializer.Deserialize<Configuration>(bytes);
+                }
+                return new();
+            }
+            set
+            {
+                string filePath = Path.Join(this.repoRootPath, Constants.Config);
+                var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
+                this.localFileOperator.Write(filePath, bytes);
+            }
+        }
     }
 }
