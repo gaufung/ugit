@@ -12,24 +12,27 @@
     {
         private readonly IDataProvider dataProvider;
 
+        private readonly IFileOperator fileOperator;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTreeOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultTreeOperation(IDataProvider dataProvider)
+        public DefaultTreeOperation(IDataProvider dataProvider, IFileOperator fileOperator)
         {
             this.dataProvider = dataProvider;
+            this.fileOperator = fileOperator;
         }
 
         /// <inheritdoc/>
         public void CheckoutIndex(Dictionary<string, string> index)
         {
-            this.dataProvider.EmptyCurrentDirectory();
+            this.fileOperator.EmptyCurrentDirectory(this.dataProvider.IsIgnore);
             foreach (var entry in index)
             {
                 string path = entry.Key;
                 string oid = entry.Value;
-                this.dataProvider.Write(path, this.dataProvider.GetObject(oid, Constants.Blob));
+                this.fileOperator.Write(path, this.dataProvider.GetObject(oid, Constants.Blob));
             }
         }
 
@@ -113,7 +116,7 @@
         public IDictionary<string, string> GetWorkingTree()
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
-            foreach (var filePath in this.dataProvider.Walk("."))
+            foreach (var filePath in this.fileOperator.Walk("."))
             {
                 if (this.dataProvider.IsIgnore(filePath))
                 {
@@ -121,7 +124,7 @@
                 }
 
                 string path = Path.GetRelativePath(".", filePath);
-                result[path] = this.dataProvider.HashObject(this.dataProvider.Read(path));
+                result[path] = this.dataProvider.HashObject(this.fileOperator.Read(path));
             }
 
             return result;

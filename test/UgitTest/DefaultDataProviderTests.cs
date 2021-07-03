@@ -9,6 +9,7 @@ using System.Text;
 namespace Ugit
 {
     [TestClass]
+    [Ignore]
     public class DefaultDataProviderTests
     {
         private Mock<IDirectory> direcotryMock;
@@ -19,6 +20,8 @@ namespace Ugit
 
         private IDataProvider dataProvider;
 
+        private Mock<IFileOperator> fileOperator;
+
         [TestInitialize]
         public void Init()
         {
@@ -27,7 +30,8 @@ namespace Ugit
             fileSystemMock = new Mock<IFileSystem>(MockBehavior.Loose);
             fileSystemMock.Setup(f => f.File).Returns(fileMock.Object);
             fileSystemMock.Setup(f => f.Directory).Returns(direcotryMock.Object);
-            dataProvider = new DefaultDataProvider(fileSystemMock.Object);
+            fileOperator = new Mock<IFileOperator>();
+            dataProvider = new LocalDataProvider(fileOperator.Object);
         }
 
         [TestMethod]
@@ -307,7 +311,7 @@ namespace Ugit
 
             fileMock.Setup(f => f.Delete(Path.Join("foo.txt")));
             direcotryMock.Setup(d => d.Delete("sub", true));
-            dataProvider.EmptyCurrentDirectory();
+            fileOperator.Object.EmptyCurrentDirectory(dataProvider.IsIgnore);
             fileMock.VerifyAll();
             direcotryMock.VerifyAll();
         }
@@ -341,7 +345,7 @@ namespace Ugit
         {
             string path = "test";
             this.fileMock.Setup(f => f.Exists(path)).Returns(true);
-            Assert.IsTrue(this.dataProvider.Exist(path));
+            Assert.IsTrue(this.fileOperator.Object.Exist(path));
             fileMock.VerifyAll();
         }
 
@@ -350,7 +354,7 @@ namespace Ugit
         {
             string directory = "test";
             this.direcotryMock.Setup(d => d.Exists(directory)).Returns(true);
-            Assert.IsTrue(this.dataProvider.Exist(directory, false));
+            Assert.IsTrue(this.fileOperator.Object.Exist(directory, false));
             direcotryMock.VerifyAll();
         }
 
@@ -360,7 +364,7 @@ namespace Ugit
             string path = Path.Join("sub", "hello.txt");
             direcotryMock.Setup(d => d.Exists("sub")).Returns(true);
             fileMock.Setup(d => d.WriteAllBytes(path, It.IsAny<byte[]>()));
-            dataProvider.Write(path, Array.Empty<byte>());
+            fileOperator.Object.Write(path, Array.Empty<byte>());
             direcotryMock.VerifyAll();
             fileMock.VerifyAll();
         }
@@ -369,7 +373,7 @@ namespace Ugit
         public void ReadAllBytesTest()
         {
             this.fileMock.Setup(d => d.ReadAllBytes("test.txt")).Returns(Array.Empty<byte>());
-            CollectionAssert.AreEqual(Array.Empty<byte>(), dataProvider.Read("test.txt"));
+            CollectionAssert.AreEqual(Array.Empty<byte>(), fileOperator.Object.Read("test.txt"));
             fileMock.VerifyAll();
         }
 
@@ -377,7 +381,7 @@ namespace Ugit
         public void DeleteIgnoreTest()
         {
             string path = Path.Join(".ugit", "HEAD");
-            dataProvider.Delete(path);
+            fileOperator.Object.Delete(path);
         }
 
         [TestMethod]
@@ -385,7 +389,7 @@ namespace Ugit
         {
             string path = Path.Join("sub", "foo.txt");
             this.fileMock.Setup(d => d.Delete(path));
-            dataProvider.Delete(path);
+            fileOperator.Object.Delete(path);
             this.fileMock.VerifyAll();
         }
 
@@ -394,7 +398,7 @@ namespace Ugit
         {
             this.direcotryMock.Setup(d => d.SetCurrentDirectory(Path.Join("foo", "bar")));
             this.direcotryMock.Setup(d => d.GetCurrentDirectory()).Returns(Path.Join("foo", "bar"));
-            this.dataProvider = new DefaultDataProvider(this.fileSystemMock.Object, Path.Join("foo", "bar"));
+            this.dataProvider = new LocalDataProvider(this.fileOperator.Object, Path.Join("foo", "bar"));
             Assert.AreEqual(Path.Join("foo", "bar", ".ugit"), this.dataProvider.GitDirFullPath);
         }
     }

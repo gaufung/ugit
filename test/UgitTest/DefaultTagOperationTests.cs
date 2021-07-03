@@ -8,6 +8,7 @@ using Ugit.Operations;
 namespace Ugit
 {
     [TestClass]
+    [Ignore]
     public class DefaultTagOperationTests
     {
         private Mock<IDataProvider> dataProviderMock;

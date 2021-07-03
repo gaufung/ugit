@@ -8,9 +8,12 @@ using Ugit.Operations;
 namespace Ugit
 {
     [TestClass]
+    [Ignore]
     public class DefaultTreeOperationTests
     {
         private Mock<IDataProvider> dataProvider;
+
+        private Mock<IFileOperator> fileOperator;
 
         private ITreeOperation treeOpeartion;
 
@@ -18,7 +21,7 @@ namespace Ugit
         public void Init()
         {
             dataProvider = new Mock<IDataProvider>();
-            treeOpeartion = new DefaultTreeOperation(dataProvider.Object);
+            treeOpeartion = new DefaultTreeOperation(dataProvider.Object, fileOperator.Object);
         }
 
         /// <summary>
@@ -54,11 +57,11 @@ namespace Ugit
         [TestMethod]
         public void CheckoutIndexTest()
         {
-            dataProvider.Setup(d => d.EmptyCurrentDirectory());
+            fileOperator.Setup(d => d.EmptyCurrentDirectory(this.dataProvider.Object.IsIgnore));
             dataProvider.Setup(d => d.GetObject("foo-oid", "blob")).Returns("Hello Foo".Encode());
             dataProvider.Setup(d => d.GetObject("bar-oid", "blob")).Returns("Hello bar".Encode());
-            dataProvider.Setup(d => d.Write("foo.txt", It.IsAny<byte[]>()));
-            dataProvider.Setup(d => d.Write("bar.txt", It.IsAny<byte[]>()));
+            fileOperator.Setup(d => d.Write("foo.txt", It.IsAny<byte[]>()));
+            fileOperator.Setup(d => d.Write("bar.txt", It.IsAny<byte[]>()));
             Dictionary<string, string> index = new Dictionary<string, string>()
             {
                 {"foo.txt", "foo-oid" },
@@ -89,13 +92,13 @@ namespace Ugit
 
             var tree = treeOpeartion.GetTree("foo-oid", "");
 
-            dataProvider.Setup(d => d.EmptyCurrentDirectory());
+            fileOperator.Setup(d => d.EmptyCurrentDirectory(this.dataProvider.Object.IsIgnore));
             dataProvider.Setup(d => d.GetObject("a-oid", "blob")).Returns("Hello a".Encode());
             dataProvider.Setup(d => d.GetObject("b-oid", "blob")).Returns("Hello b".Encode());
             dataProvider.Setup(d => d.GetObject("c-oid", "blob")).Returns("Hello c".Encode());
-            dataProvider.Setup(d => d.Write("a.txt", It.IsAny<byte[]>()));
-            dataProvider.Setup(d => d.Write(Path.Join("bar", "b.txt"), It.IsAny<byte[]>()));
-            dataProvider.Setup(d => d.Write(Path.Join("bar", "c.md"), It.IsAny<byte[]>()));
+            fileOperator.Setup(d => d.Write("a.txt", It.IsAny<byte[]>()));
+            fileOperator.Setup(d => d.Write(Path.Join("bar", "b.txt"), It.IsAny<byte[]>()));
+            fileOperator.Setup(d => d.Write(Path.Join("bar", "c.md"), It.IsAny<byte[]>()));
 
             treeOpeartion.ReadTree("foo-oid", true);
             dataProvider.VerifyAll();
@@ -132,7 +135,7 @@ namespace Ugit
         [TestMethod]
         public void GetWorkingTree()
         {
-            dataProvider.Setup(d => d.Walk(".")).Returns(new[]
+            fileOperator.Setup(d => d.Walk(".")).Returns(new[]
             {
                 Path.Join(".", "foo.txt"),
                 Path.Join(".", ".ugit", "index"),
@@ -148,7 +151,7 @@ namespace Ugit
                 return false;
             });
 
-            dataProvider.Setup(d => d.Read(It.IsAny<string>())).Returns<string>(path =>
+            fileOperator.Setup(d => d.Read(It.IsAny<string>())).Returns<string>(path =>
             {
                 if(path == Path.Join("foo.txt") || path == Path.Join("sub", "bar.md"))
                 {

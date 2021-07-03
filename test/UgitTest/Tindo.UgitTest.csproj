@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Ugit\Ugit.csproj" />
+    <ProjectReference Include="..\..\src\Ugit\Tindo.Ugit.csproj" />
   </ItemGroup>
 
 </Project>

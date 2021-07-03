@@ -5,7 +5,7 @@
     /// <summary>
     /// Data provider for file operation.
     /// </summary>
-    internal interface IDataProvider : IFileOperator
+    internal interface IDataProvider
     {
         /// <summary>
         /// Gets the git directory full path.

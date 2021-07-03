@@ -9,6 +9,7 @@ using Ugit.Operations;
 namespace Ugit
 {
     [TestClass]
+    [Ignore]
     public class DefaultCheckoutOperationTests
     {
 

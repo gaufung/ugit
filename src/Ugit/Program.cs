@@ -40,14 +40,17 @@
 
         private static readonly IAddOperation AddOperation;
 
+        private static readonly IFileOperator FileOperator;
+
         private static readonly Func<string, string> OidConverter;
 
         static Program()
         {
             FileSystem = new FileSystem();
-            DataProvider = new DefaultDataProvider();
-            Diff = new DefaultDiffOperation(DataProvider, new DefaultDiffProxyOperation());
-            TreeOperation = new DefaultTreeOperation(DataProvider);
+            FileOperator = new PhysicalFileOperator(FileSystem);
+            DataProvider = new LocalDataProvider(FileOperator);
+            Diff = new DefaultDiffOperation(DataProvider, new DefaultDiffProxyOperation(), FileOperator);
+            TreeOperation = new DefaultTreeOperation(DataProvider, FileOperator);
             CommitOperation = new DefaultCommitOperation(DataProvider, TreeOperation);
             TagOperation = new DefaultTagOperation(DataProvider);
             ResetOperation = new DefaultResetOperation(DataProvider);
@@ -55,7 +58,7 @@
             InitOperation = new DefaultInitOperation(DataProvider);
             BranchOperation = new DefaultBranchOperation(DataProvider);
             CheckoutOperation = new DefaultCheckoutOperation(DataProvider, TreeOperation, CommitOperation, BranchOperation);
-            AddOperation = new DefaultAddOperation(DataProvider);
+            AddOperation = new DefaultAddOperation(DataProvider, FileOperator);
             OidConverter = DataProvider.GetOid;
         }
 
@@ -103,14 +106,16 @@
 
         private static int Push(PushOption o)
         {
-            IDataProvider remoteDataProvider = new DefaultDataProvider(new FileSystem(), o.Remote);
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
+            IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote);
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, new PhysicalFileOperator(new FileSystem())));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 DataProvider,
                 CommitOperation,
                 remoteDataProvider,
-                remoteCommitOperation);
+                remoteCommitOperation,
+                new PhysicalFileOperator(new FileSystem()),
+                new PhysicalFileOperator(new FileSystem()));
             string refName = Path.Join("refs", "heads", o.Branch);
             remoteOperation.Push(refName);
             return 0;
@@ -118,14 +123,16 @@
 
         private static int Fetch(FetchOption o)
         {
-            IDataProvider remoteDataProvider = new DefaultDataProvider(new FileSystem(), o.Remote);
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
+            IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote);
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, new PhysicalFileOperator(new FileSystem())));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 DataProvider,
                 CommitOperation,
                 remoteDataProvider,
-                remoteCommitOperation);
+                remoteCommitOperation,
+                new PhysicalFileOperator(new FileSystem()),
+                new PhysicalFileOperator(new FileSystem()));
             remoteOperation.Fetch();
             return 0;
         }

@@ -11,13 +11,16 @@
     {
         private readonly IDataProvider dataProvider;
 
+        private readonly IFileOperator fileOperator;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultAddOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultAddOperation(IDataProvider dataProvider)
+        public DefaultAddOperation(IDataProvider dataProvider, IFileOperator fileOperator)
         {
             this.dataProvider = dataProvider;
+            this.fileOperator = fileOperator;
         }
 
         /// <inheritdoc/>
@@ -26,11 +29,11 @@
             var index = this.dataProvider.Index;
             foreach (var name in fileNames)
             {
-                if (this.dataProvider.Exist(name, true))
+                if (this.fileOperator.Exist(name, true))
                 {
                     this.AddFile(index, name);
                 }
-                else if (this.dataProvider.Exist(name, false))
+                else if (this.fileOperator.Exist(name, false))
                 {
                     this.AddDirectionary(index, name);
                 }
@@ -41,7 +44,7 @@
 
         private void AddDirectionary(IDictionary<string, string> index, string directoryName)
         {
-            foreach (var fileName in this.dataProvider.Walk(directoryName))
+            foreach (var fileName in this.fileOperator.Walk(directoryName))
             {
                 this.AddFile(index, fileName);
             }
@@ -52,7 +55,7 @@
             if (!this.dataProvider.IsIgnore(fileName))
             {
                 var normalFileName = Path.GetRelativePath(".", fileName);
-                byte[] data = this.dataProvider.Read(normalFileName);
+                byte[] data = this.fileOperator.Read(normalFileName);
                 string oid = this.dataProvider.HashObject(data);
                 index[normalFileName] = oid;
             }

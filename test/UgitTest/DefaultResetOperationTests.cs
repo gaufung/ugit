@@ -5,6 +5,7 @@ using Ugit.Operations;
 namespace Ugit
 {
     [TestClass]
+    [Ignore]
     public class DefaultResetOperationTests
     {
         private Mock<IDataProvider> dataProvider;

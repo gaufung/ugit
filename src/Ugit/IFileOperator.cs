@@ -1,5 +1,6 @@
 ﻿namespace Ugit
 {
+using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -27,13 +28,16 @@
         /// </summary>
         /// <param name="path">the file path.</param>
         /// <returns>byte array that file contains.</returns>
+        bool TryRead(string path, out byte[] bytes);
+
+
         byte[] Read(string path);
 
         /// <summary>
         /// Delete a file.
         /// </summary>
         /// <param name="path">filePath.</param>
-        void Delete(string path);
+        void Delete(string path, bool isFile=true);
 
         /// <summary>
         /// Walk in given directory path.
@@ -42,9 +46,10 @@
         /// <returns>The file path list.</returns>
         IEnumerable<string> Walk(string path);
 
-        /// <summary>
-        /// Empty current directory.
-        /// </summary>
-        void EmptyCurrentDirectory();
+        void EmptyCurrentDirectory(Func<string, bool> ignore);
+
+        string CurrentDirectory { get; }
+
+        void CreateDirectory(string directory, bool force = true);
     }
 }

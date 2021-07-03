@@ -7,6 +7,7 @@ using Ugit.Operations;
 namespace Ugit
 {
     [TestClass]
+    [Ignore]
     public class DefaultCommitOperationTests
     {
         private Mock<IDataProvider> dataProvider;

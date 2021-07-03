@@ -8,6 +8,7 @@ using Ugit.Operations;
 namespace Ugit
 {
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+    [Ignore]
     public class DefaultBranchOperationTests
     {
         private Mock<IDataProvider> dataProvider;

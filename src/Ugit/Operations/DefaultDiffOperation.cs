@@ -13,16 +13,19 @@
 
         private readonly IDiffProxyOperation diffProxy;
 
+        private readonly IFileOperator fileOperator;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultDiffOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
         /// <param name="fileSystem">file system.</param>
-        public DefaultDiffOperation(IDataProvider dataProvider, IDiffProxyOperation diffProxy)
+        public DefaultDiffOperation(IDataProvider dataProvider, IDiffProxyOperation diffProxy, IFileOperator fileOperator)
         {
             this.dataProvider = dataProvider;
             this.diffProxy = diffProxy;
+            this.fileOperator = fileOperator;
         }
 
         /// <inheritdoc/>
@@ -59,9 +62,9 @@
         public string DiffBlob(string fromOid, string toOid, string path)
         {
             string fromFile = Path.GetTempFileName();
-            this.dataProvider.Write(fromFile, this.dataProvider.GetObject(fromOid));
+            this.fileOperator.Write(fromFile, this.dataProvider.GetObject(fromOid));
             string toFile = Path.GetTempFileName();
-            this.dataProvider.Write(toFile, this.dataProvider.GetObject(toOid));
+            this.fileOperator.Write(toFile, this.dataProvider.GetObject(toOid));
             var (_, output, _) = this.diffProxy.Execute(
                 "diff",
                 $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
@@ -110,9 +113,9 @@
         public string MergeBlob(string headOid, string otherOid)
         {
             string headFile = Path.GetTempFileName();
-            this.dataProvider.Write(headFile, this.dataProvider.GetObject(headOid));
+            this.fileOperator.Write(headFile, this.dataProvider.GetObject(headOid));
             string otherFile = Path.GetTempFileName();
-            this.dataProvider.Write(otherFile, this.dataProvider.GetObject(otherOid));
+            this.fileOperator.Write(otherFile, this.dataProvider.GetObject(otherOid));
             string arguments = string.Join(" ", new string[] { "-DHEAD", headFile, otherFile });
             var (_, output, _) = this.diffProxy.Execute("diff", arguments);
             return output;

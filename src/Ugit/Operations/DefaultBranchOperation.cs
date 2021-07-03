@@ -1,7 +1,6 @@
 ﻿namespace Ugit.Operations
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
 
     /// <summary>
