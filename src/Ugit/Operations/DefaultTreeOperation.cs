@@ -1,4 +1,4 @@
-﻿namespace Ugit.Operations
+﻿namespace Tindo.Ugit.Operations
 {
     using System;
     using System.Collections.Generic;
@@ -124,7 +124,7 @@
                 }
 
                 string path = Path.GetRelativePath(".", filePath);
-                result[path] = this.dataProvider.HashObject(this.fileOperator.Read(path));
+                result[path] = this.dataProvider.WriteObject(this.fileOperator.Read(path));
             }
 
             return result;
@@ -178,7 +178,7 @@
             string subTree = string.Join(
                 "\n",
                 entries.Select(e => $"{e.Item3} {e.Item2} {e.Item1}"));
-            return this.dataProvider.HashObject(subTree.Encode(), Constants.Tree);
+            return this.dataProvider.WriteObject(subTree.Encode(), Constants.Tree);
         }
     }
 }

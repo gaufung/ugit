@@ -2,9 +2,9 @@
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using Ugit.Operations;
+using Tindo.Ugit.Operations;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     [Ignore]
@@ -47,7 +47,7 @@ namespace Ugit
             this.dataProvider.Setup(d => d.GetRef("MERGE_HEAD", true)).Returns(RefValue.Create(false, "merge-head-oid"));
             this.dataProvider.Setup(d => d.DeleteRef("MERGE_HEAD", false));
             string commit = "tree tree-oid\nparent master-first-oid\nparent merge-head-oid\n\nhello foo\n";
-            this.dataProvider.Setup(d => d.HashObject(It.Is<byte[]>(i => i.Length == commit.Encode().Length), "commit")).Returns("commit-oid");
+            this.dataProvider.Setup(d => d.WriteObject(It.Is<byte[]>(i => i.Length == commit.Encode().Length), "commit")).Returns("commit-oid");
             dataProvider.Setup(d => d.UpdateRef("HEAD", It.Is<RefValue>(i => !i.Symbolic && i.Value == "commit-oid"), true));
             string actual = commitOperation.CreateCommit("hello foo");
             Assert.AreEqual("commit-oid", actual);

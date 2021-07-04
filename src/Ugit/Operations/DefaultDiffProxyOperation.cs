@@ -1,4 +1,4 @@
-﻿namespace Ugit.Operations
+﻿namespace Tindo.Ugit.Operations
 {
     using System.Diagnostics;
 

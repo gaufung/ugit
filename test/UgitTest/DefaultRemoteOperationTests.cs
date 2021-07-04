@@ -1,4 +1,4 @@
-namespace Ugit
+namespace Tindo.Ugit
 {
     using System;
     using System.Collections.Generic;
@@ -6,7 +6,7 @@ namespace Ugit
     using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using Ugit.Operations;
+    using Tindo.Ugit.Operations;
 
     [TestClass]
     [Ignore]

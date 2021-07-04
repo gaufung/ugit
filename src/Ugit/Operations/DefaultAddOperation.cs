@@ -1,4 +1,4 @@
-﻿namespace Ugit.Operations
+﻿namespace Tindo.Ugit.Operations
 {
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -29,11 +29,11 @@
             var index = this.dataProvider.Index;
             foreach (var name in fileNames)
             {
-                if (this.fileOperator.Exist(name, true))
+                if (this.fileOperator.Exists(name, true))
                 {
                     this.AddFile(index, name);
                 }
-                else if (this.fileOperator.Exist(name, false))
+                else if (this.fileOperator.Exists(name, false))
                 {
                     this.AddDirectionary(index, name);
                 }
@@ -56,7 +56,7 @@
             {
                 var normalFileName = Path.GetRelativePath(".", fileName);
                 byte[] data = this.fileOperator.Read(normalFileName);
-                string oid = this.dataProvider.HashObject(data);
+                string oid = this.dataProvider.WriteObject(data);
                 index[normalFileName] = oid;
             }
         }

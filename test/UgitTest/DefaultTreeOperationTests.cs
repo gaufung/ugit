@@ -3,9 +3,9 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Ugit.Operations;
+using Tindo.Ugit.Operations;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     [Ignore]
@@ -113,7 +113,7 @@ namespace Ugit
                 { Path.Join("sub", "bar.md"), "bar-oid" }
             });
 
-            dataProvider.Setup(d => d.HashObject(It.IsAny<byte[]>(), "tree")).Returns<byte[], string>((bytes, type)=>
+            dataProvider.Setup(d => d.WriteObject(It.IsAny<byte[]>(), "tree")).Returns<byte[], string>((bytes, type)=>
             {
                 if (bytes.Length == "blob bar-oid bar.md".Encode().Length)
                 {
@@ -160,7 +160,7 @@ namespace Ugit
                 throw new Exception();
             });
 
-            this.dataProvider.Setup(d => d.HashObject(It.IsAny<byte[]>(), "blob")).Returns("oid");
+            this.dataProvider.Setup(d => d.WriteObject(It.IsAny<byte[]>(), "blob")).Returns("oid");
 
             var workingTree = treeOpeartion.GetWorkingTree();
             Assert.AreEqual(2, workingTree.Count);

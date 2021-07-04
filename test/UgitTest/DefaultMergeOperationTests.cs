@@ -3,9 +3,9 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ugit.Operations;
+using Tindo.Ugit.Operations;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     [Ignore]

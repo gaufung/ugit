@@ -1,4 +1,4 @@
-﻿namespace Ugit.Operations
+﻿namespace Tindo.Ugit.Operations
 {
     using System.Collections.Generic;
     using System.IO;
@@ -134,7 +134,7 @@
                 string path = entry.Item1;
                 string headOid = entry.Item2.First();
                 string otherOid = entry.Item2.Last();
-                tree[path] = this.dataProvider.HashObject(this.MergeBlob(headOid, otherOid).Encode());
+                tree[path] = this.dataProvider.WriteObject(this.MergeBlob(headOid, otherOid).Encode());
             }
 
             return tree;

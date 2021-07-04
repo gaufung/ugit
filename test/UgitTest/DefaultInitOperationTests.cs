@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Ugit.Operations;
+using Tindo.Ugit.Operations;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     [Ignore]

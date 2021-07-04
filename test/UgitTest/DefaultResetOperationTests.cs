@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Ugit.Operations;
+using Tindo.Ugit.Operations;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     [Ignore]

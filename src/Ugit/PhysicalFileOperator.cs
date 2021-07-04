@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     internal class PhysicalFileOperator : IFileOperator
     {
@@ -41,7 +41,7 @@ namespace Ugit
             }
         }
 
-        public bool Exist(string path, bool isFile = true)
+        public bool Exists(string path, bool isFile = true)
         {
             return isFile ? this._fileSystem.File.Exists(path)
                : this._fileSystem.Directory.Exists(path);
@@ -49,7 +49,7 @@ namespace Ugit
 
         public bool TryRead(string path, out byte[] bytes)
         {
-            if (this.Exist(path))
+            if (this.Exists(path))
             {
                 bytes = this._fileSystem.File.ReadAllBytes(path);
                 return true;
@@ -61,7 +61,7 @@ namespace Ugit
 
         public IEnumerable<string> Walk(string path)
 {
-            if (!this.Exist(path, false))
+            if (!this.Exists(path, false))
             {
                 yield break;
 }
@@ -82,7 +82,7 @@ namespace Ugit
         public void Write(string path, byte[] bytes)
         {
             CreateParentDirectory(path);
-            if (this.Exist(path))
+            if (this.Exists(path))
             {
                 this.Delete(path);
             }

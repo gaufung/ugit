@@ -1,4 +1,4 @@
-﻿namespace Ugit
+﻿namespace Tindo.Ugit
 {
     using System.Collections.Generic;
 
@@ -33,7 +33,7 @@
         /// <param name="data">The object byte array.</param>
         /// <param name="type">The object type.</param>
         /// <returns>The object id digest.</returns>
-        string HashObject(byte[] data, string type = "blob");
+        string WriteObject(byte[] data, string type = "blob");
 
         /// <summary>
         /// Get the object by object id.

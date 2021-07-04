@@ -6,7 +6,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     [Ignore]
@@ -71,7 +71,7 @@ namespace Ugit
             byte[] data = Encoding.UTF8.GetBytes("Hello World");
             string filePath = Path.Join(".ugit", "objects", "0a6649a0077da1bf5a8b3b5dd3ea733ea6a81938");
             fileMock.Setup(f => f.WriteAllBytes(filePath, data));
-            var actual = dataProvider.HashObject(data);
+            var actual = dataProvider.WriteObject(data);
             Assert.AreEqual("0a6649a0077da1bf5a8b3b5dd3ea733ea6a81938", actual);
         }
 
@@ -81,7 +81,7 @@ namespace Ugit
             byte[] data = Encoding.UTF8.GetBytes("Hello World");
             string filePath = Path.Join(".ugit", "objects", "0a4d55a8d778e5022fab701977c5d840bbc486d0");
             fileMock.Setup(f => f.WriteAllBytes(filePath, data));
-            var actual = dataProvider.HashObject(data, "");
+            var actual = dataProvider.WriteObject(data, "");
             Assert.AreEqual("0a4d55a8d778e5022fab701977c5d840bbc486d0", actual);
         }
 
@@ -345,7 +345,7 @@ namespace Ugit
         {
             string path = "test";
             this.fileMock.Setup(f => f.Exists(path)).Returns(true);
-            Assert.IsTrue(this.fileOperator.Object.Exist(path));
+            Assert.IsTrue(this.fileOperator.Object.Exists(path));
             fileMock.VerifyAll();
         }
 
@@ -354,7 +354,7 @@ namespace Ugit
         {
             string directory = "test";
             this.direcotryMock.Setup(d => d.Exists(directory)).Returns(true);
-            Assert.IsTrue(this.fileOperator.Object.Exist(directory, false));
+            Assert.IsTrue(this.fileOperator.Object.Exists(directory, false));
             direcotryMock.VerifyAll();
         }
 

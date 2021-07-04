@@ -1,4 +1,4 @@
-﻿namespace Ugit.Operations
+﻿namespace Tindo.Ugit.Operations
 {
     using System;
     using System.Collections.Generic;
@@ -45,7 +45,7 @@
 
             commit += "\n";
             commit += $"{message}\n";
-            string oid = this.dataProvider.HashObject(commit.Encode(), Constants.Commit);
+            string oid = this.dataProvider.WriteObject(commit.Encode(), Constants.Commit);
             this.dataProvider.UpdateRef(Constants.HEAD, RefValue.Create(false, oid));
             return oid;
         }

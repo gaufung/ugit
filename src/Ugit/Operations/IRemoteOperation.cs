@@ -1,4 +1,4 @@
-﻿namespace Ugit
+﻿namespace Tindo.Ugit.Operations
 {
     /// <summary>
     /// Remote operation interface.

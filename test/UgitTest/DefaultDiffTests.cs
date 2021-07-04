@@ -2,9 +2,9 @@
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using Ugit.Operations;
+using Tindo.Ugit.Operations;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     [Ignore]
@@ -130,7 +130,7 @@ namespace Ugit
 
             dataproviderMock.Setup(d => d.GetObject("foo", "blob")).Returns("hello".Encode());
             dataproviderMock.Setup(d => d.GetObject("foo1", "blob")).Returns("Hello".Encode());
-            dataproviderMock.Setup(d => d.HashObject(It.IsAny<byte[]>(), "blob")).Returns("foo");
+            dataproviderMock.Setup(d => d.WriteObject(It.IsAny<byte[]>(), "blob")).Returns("foo");
             fileOperator.Setup(f => f.Write(It.IsAny<string>(), It.IsAny<byte[]>()));
             diffProxyMock.Setup(d => d.Execute(It.IsAny<string>(), It.IsAny<string>())).Returns((0, "Hello", ""));
             var acutal = diff.MergeTree(headTree, otherTree);

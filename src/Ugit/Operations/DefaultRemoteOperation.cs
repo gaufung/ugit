@@ -1,4 +1,4 @@
-﻿namespace Ugit
+﻿namespace Tindo.Ugit.Operations
 {
     using System.Collections.Generic;
     using System.IO;

@@ -1,4 +1,4 @@
-﻿namespace Ugit
+﻿namespace Tindo.Ugit
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +20,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
         /// </summary>
-        /// <param name="fileSystem">The file system.</param>
+        /// <param name="fileOperator">The file operator.</param>
         /// <param name="repoPath">repo path.</param>
         public LocalDataProvider(IFileOperator fileOperator, string repoPath)
         {
@@ -37,6 +37,7 @@
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
+        /// <param name="fileOperator">The file operator.</param>
         /// </summary>
         internal LocalDataProvider(IFileOperator fileOperator)
             : this(fileOperator, string.Empty)
@@ -68,7 +69,7 @@
             {
                 string path = Path.Join(this.GitDirFullPath, Constants.Index);
                 var data = JsonSerializer.SerializeToUtf8Bytes(value);
-                if (this.fileOperator.Exist(path))
+                if (this.fileOperator.Exists(path))
                 {
                     this.fileOperator.Delete(path);
                 }
@@ -100,7 +101,7 @@
         }
 
         /// <inheritdoc/>
-        public string HashObject(byte[] data, string type = "blob")
+        public string WriteObject(byte[] data, string type = "blob")
         {
             if (!string.IsNullOrWhiteSpace(type))
             {
@@ -116,7 +117,7 @@
         /// <inheritdoc/>
         public void Init()
         {
-            if (this.fileOperator.Exist(this.GitDirFullPath, false))
+            if (this.fileOperator.Exists(this.GitDirFullPath, false))
             {
                 this.fileOperator.Delete(this.GitDirFullPath, false);
             }
@@ -228,7 +229,7 @@
         /// <inheritdoc/>
         public bool ObjectExist(string oid)
         {
-            return this.fileOperator.Exist(Path.Join(this.GitDirFullPath, "objects", oid));
+            return this.fileOperator.Exists(Path.Join(this.GitDirFullPath, "objects", oid));
         }
 
         private (string, RefValue) GetRefInternal(string @ref, bool deref)

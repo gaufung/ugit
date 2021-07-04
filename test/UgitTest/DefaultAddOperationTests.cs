@@ -1,11 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Ugit.Operations;
+using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 using System.IO;
 using System;
 using System.Collections.Generic;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     [Ignore]
@@ -35,17 +36,17 @@ namespace Ugit
                 Path.Join(".", ".ugit", "HEAD"),
             };
 
-            this.fileOperator.Setup(d => d.Exist(Path.Join(".", "hello.txt"), true)).Returns(true);
-            this.fileOperator.Setup(d => d.Exist(Path.Join(".", ".ugit", "HEAD"), true)).Returns(true);
-            this.fileOperator.Setup(d => d.Exist(Path.Join(".", "sub"), true)).Returns(false);
-            this.fileOperator.Setup(d => d.Exist(Path.Join(".", "sub"), false)).Returns(true);
+            this.fileOperator.Setup(d => d.Exists(Path.Join(".", "hello.txt"), true)).Returns(true);
+            this.fileOperator.Setup(d => d.Exists(Path.Join(".", ".ugit", "HEAD"), true)).Returns(true);
+            this.fileOperator.Setup(d => d.Exists(Path.Join(".", "sub"), true)).Returns(false);
+            this.fileOperator.Setup(d => d.Exists(Path.Join(".", "sub"), false)).Returns(true);
 
             this.dataProvider.Setup(d => d.IsIgnore(It.IsAny<string>())).Returns<string>(s => s.Contains(".ugit"));
             this.fileOperator.Setup(d => d.Read(It.IsAny<string>())).Returns(Array.Empty<byte>());
             this.fileOperator.Setup(d => d.Walk(Path.Join(".", "sub"))).Returns(new string[]{
                Path.Join(".", "sub", "foo.txt") 
             });
-            this.dataProvider.Setup(d => d.HashObject(It.IsAny<byte[]>(), "blob")).Returns("bar-oid");
+            this.dataProvider.Setup(d => d.WriteObject(It.IsAny<byte[]>(), "blob")).Returns("bar-oid");
             addOperation.Add(fileNames);
             this.dataProvider.VerifyAll();
         }

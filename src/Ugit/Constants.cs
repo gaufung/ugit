@@ -1,4 +1,4 @@
-namespace Ugit
+namespace Tindo.Ugit
 {
     /// <summary>
     /// Constrant variables definitions.

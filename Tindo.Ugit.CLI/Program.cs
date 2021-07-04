@@ -5,8 +5,8 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Runtime.CompilerServices;
 using CommandLine;
-using Ugit;
-using Ugit.Operations;
+using Tindo.Ugit;
+using Tindo.Ugit.Operations;
 using Ugit.Options;
 
 namespace Tindo.Ugit.CLI
@@ -280,7 +280,7 @@ namespace Tindo.Ugit.CLI
         private static int HashObject(HashObjectOption o)
         {
             byte[] data = FileSystem.File.ReadAllBytes(o.File);
-            Console.WriteLine(DataProvider.HashObject(data));
+            Console.WriteLine(DataProvider.WriteObject(data));
             return 0;
         }
 

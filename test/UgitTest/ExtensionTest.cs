@@ -6,7 +6,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 
-namespace Ugit
+namespace Tindo.Ugit
 {
     [TestClass]
     public class ExtensionTest
