@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ugit", "src\Ugit\Tindo.Ugit.csproj", "{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tindo.Ugit", "src\Ugit\Tindo.Ugit.csproj", "{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UgitTest", "test\UgitTest\Tindo.UgitTest.csproj", "{A11729C8-0335-4C6D-8B74-A2385FB153BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tindo.UgitTest", "test\UgitTest\Tindo.UgitTest.csproj", "{A11729C8-0335-4C6D-8B74-A2385FB153BF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tindo.Ugit.CLI", "Tindo.Ugit.CLI\Tindo.Ugit.CLI.csproj", "{B86AD629-C875-4F86-B1FD-D7315523C8E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +27,10 @@ Global
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B86AD629-C875-4F86-B1FD-D7315523C8E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B86AD629-C875-4F86-B1FD-D7315523C8E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B86AD629-C875-4F86-B1FD-D7315523C8E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B86AD629-C875-4F86-B1FD-D7315523C8E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF} = {8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}
+		{B86AD629-C875-4F86-B1FD-D7315523C8E5} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9BD04BF7-1070-4A04-AE94-1164C8722646}
