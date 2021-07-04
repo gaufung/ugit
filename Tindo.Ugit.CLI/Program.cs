@@ -48,8 +48,8 @@ namespace Tindo.Ugit.CLI
             FileSystem = new FileSystem();
             FileOperator = new PhysicalFileOperator(FileSystem);
             DataProvider = new LocalDataProvider(FileOperator);
-            Diff = new DefaultDiffOperation(DataProvider, new DefaultDiffProxyOperation(), FileOperator);
-            TreeOperation = new DefaultTreeOperation(DataProvider, FileOperator);
+            Diff = new DefaultDiffOperation(DataProvider, new DefaultDiffProxyOperation());
+            TreeOperation = new DefaultTreeOperation(DataProvider);
             CommitOperation = new DefaultCommitOperation(DataProvider, TreeOperation);
             TagOperation = new DefaultTagOperation(DataProvider);
             ResetOperation = new DefaultResetOperation(DataProvider);
@@ -57,7 +57,7 @@ namespace Tindo.Ugit.CLI
             InitOperation = new DefaultInitOperation(DataProvider);
             BranchOperation = new DefaultBranchOperation(DataProvider);
             CheckoutOperation = new DefaultCheckoutOperation(DataProvider, TreeOperation, CommitOperation, BranchOperation);
-            AddOperation = new DefaultAddOperation(DataProvider, FileOperator);
+            AddOperation = new DefaultAddOperation(DataProvider);
             OidConverter = DataProvider.GetOid;
         }
 
@@ -106,15 +106,13 @@ namespace Tindo.Ugit.CLI
         private static int Push(PushOption o)
         {
             IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote);
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, new PhysicalFileOperator(new FileSystem())));
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 DataProvider,
                 CommitOperation,
                 remoteDataProvider,
-                remoteCommitOperation,
-                new PhysicalFileOperator(new FileSystem()),
-                new PhysicalFileOperator(new FileSystem()));
+                remoteCommitOperation);
             string refName = Path.Join("refs", "heads", o.Branch);
             remoteOperation.Push(refName);
             return 0;
@@ -123,15 +121,13 @@ namespace Tindo.Ugit.CLI
         private static int Fetch(FetchOption o)
         {
             IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote);
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider, new PhysicalFileOperator(new FileSystem())));
+            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
                 DataProvider,
                 CommitOperation,
                 remoteDataProvider,
-                remoteCommitOperation,
-                new PhysicalFileOperator(new FileSystem()),
-                new PhysicalFileOperator(new FileSystem()));
+                remoteCommitOperation);
             remoteOperation.Fetch();
             return 0;
         }

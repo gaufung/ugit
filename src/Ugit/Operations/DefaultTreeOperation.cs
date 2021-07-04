@@ -18,10 +18,10 @@
         /// Initializes a new instance of the <see cref="DefaultTreeOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultTreeOperation(IDataProvider dataProvider, IFileOperator fileOperator)
+        public DefaultTreeOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
-            this.fileOperator = fileOperator;
+            this.fileOperator = this.dataProvider.FileOperator;
         }
 
         /// <inheritdoc/>

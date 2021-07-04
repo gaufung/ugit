@@ -21,11 +21,11 @@
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
         /// <param name="fileSystem">file system.</param>
-        public DefaultDiffOperation(IDataProvider dataProvider, IDiffProxyOperation diffProxy, IFileOperator fileOperator)
+        public DefaultDiffOperation(IDataProvider dataProvider, IDiffProxyOperation diffProxy)
         {
             this.dataProvider = dataProvider;
             this.diffProxy = diffProxy;
-            this.fileOperator = fileOperator;
+            this.fileOperator = this.dataProvider.FileOperator;
         }
 
         /// <inheritdoc/>

@@ -52,6 +52,9 @@
             Path.Join(this.repoPath, this.GitDir);
 
         /// <inheritdoc/>
+        public IFileOperator FileOperator => this.fileOperator;
+
+        /// <inheritdoc/>
         public Dictionary<string, string> Index
         {
             get

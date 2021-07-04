@@ -15,11 +15,17 @@
         /// <summary>
         /// Gets the git directory name.
         /// </summary>
-        string GitDir { get;  }
+        string GitDir { get; }
 
         /// <summary>
-        /// Gets or sets Index.
+        /// Gets the FileOperator.
+        /// </summary>
+        IFileOperator FileOperator { get; }
+
+
         /// <summary>
+        /// Gets or sets the Index.
+        /// </summary>
         Dictionary<string, string> Index { get; set; }
 
         /// <summary>

@@ -27,9 +27,7 @@ namespace Tindo.Ugit
                 localDataProviderMock.Object,
                 localCommitOperationMock.Object,
                 remoteDataProviderMock.Object,
-                remoteCommitOperationMock.Object,
-                localFileOperator.Object,
-                remoteFileOperator.Object
+                remoteCommitOperationMock.Object
             ) ;
         }
 

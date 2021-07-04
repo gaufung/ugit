@@ -22,7 +22,7 @@ namespace Tindo.Ugit
         {
             dataProvider = new Mock<IDataProvider>();
             fileOperator = new Mock<IFileOperator>();
-            addOperation = new DefaultAddOperation(dataProvider.Object, fileOperator.Object);
+            addOperation = new DefaultAddOperation(dataProvider.Object);
         }
 
         [TestMethod]

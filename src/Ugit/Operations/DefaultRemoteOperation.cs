@@ -32,16 +32,14 @@
             IDataProvider localDataProvider,
             ICommitOperation localCommitOpeartion,
             IDataProvider remoteDataProvider,
-            ICommitOperation remoteCommitOperation,
-            IFileOperator localFileOperator,
-            IFileOperator remoteFileOperator)
+            ICommitOperation remoteCommitOperation)
         {
             this.localDataProvider = localDataProvider;
             this.localCommitOperation = localCommitOpeartion;
             this.remoteDataProvider = remoteDataProvider;
             this.remoteCommitOperation = remoteCommitOperation;
-            this.localFileOperator = localFileOperator;
-            this.remoteFileOperator = remoteFileOperator;
+            this.localFileOperator = this.localDataProvider.FileOperator;
+            this.remoteFileOperator = this.remoteDataProvider.FileOperator;
         }
 
         /// <inheritdoc/>

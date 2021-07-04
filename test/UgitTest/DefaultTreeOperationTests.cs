@@ -21,7 +21,7 @@ namespace Tindo.Ugit
         public void Init()
         {
             dataProvider = new Mock<IDataProvider>();
-            treeOpeartion = new DefaultTreeOperation(dataProvider.Object, fileOperator.Object);
+            treeOpeartion = new DefaultTreeOperation(dataProvider.Object);
         }
 
         /// <summary>

@@ -17,10 +17,10 @@
         /// Initializes a new instance of the <see cref="DefaultAddOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultAddOperation(IDataProvider dataProvider, IFileOperator fileOperator)
+        public DefaultAddOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
-            this.fileOperator = fileOperator;
+            this.fileOperator = this.dataProvider.FileOperator;
         }
 
         /// <inheritdoc/>

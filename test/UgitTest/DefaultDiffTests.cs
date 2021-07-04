@@ -25,7 +25,7 @@ namespace Tindo.Ugit
             dataproviderMock = new Mock<IDataProvider>();
             diffProxyMock = new Mock<IDiffProxyOperation>();
             fileOperator = new Mock<IFileOperator>();
-            diff = new DefaultDiffOperation(dataproviderMock.Object, diffProxyMock.Object, fileOperator.Object);
+            diff = new DefaultDiffOperation(dataproviderMock.Object, diffProxyMock.Object);
         }
 
         [TestMethod]
