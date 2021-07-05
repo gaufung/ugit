@@ -31,13 +31,13 @@ namespace Tindo.Ugit
         [TestMethod]
         public void CompareTreesTest()
         {
-            Dictionary<string, string> fromTree = new Dictionary<string, string>
+            Tree fromTree = new Tree
             {
                 { "hello.txt", "foo" },
                 { "world.txt", "bar" },
                 { "ugit.txt", "baz" },
             };
-            Dictionary<string, string> toTree = new Dictionary<string, string>
+            Tree toTree = new Tree
             {
                 { "hello.txt", "foo1" },
                 { "world.txt", "bar" },
@@ -60,13 +60,13 @@ namespace Tindo.Ugit
         [TestMethod]
         public void DiffTreeTest()
         {
-            Dictionary<string, string> fromTree = new Dictionary<string, string>
+            Tree fromTree = new Tree
             {
                 { "hello.txt", "foo" },
                 { "world.txt", "bar" },
                 { "ugit.txt", "baz" },
             };
-            Dictionary<string, string> toTree = new Dictionary<string, string>
+            Tree toTree = new Tree
             {
                 { "hello.txt", "foo1" },
                 { "world.txt", "bar" },
@@ -94,13 +94,13 @@ namespace Tindo.Ugit
         [TestMethod]
         public void IterChangedFilesTest()
         {
-            Dictionary<string, string> fromTree = new Dictionary<string, string>
+            Tree fromTree = new Tree
             {
                 { "hello.txt", "foo" },
                 { "world.txt", "bar" },
                 { "ugit.txt", "baz" },
             };
-            Dictionary<string, string> toTree = new Dictionary<string, string>
+            Tree toTree = new Tree
             {
                 { "hello.txt", "foo1" },
                 { "world.txt", "bar" },
@@ -119,11 +119,11 @@ namespace Tindo.Ugit
         [TestMethod]
         public void MergeTreeTest()
         {
-            Dictionary<string, string> headTree = new Dictionary<string, string>
+            Tree headTree = new Tree
             {
                 { "hello.txt", "foo" },
             };
-            Dictionary<string, string> otherTree = new Dictionary<string, string>
+            Tree otherTree = new Tree
             {
                 { "hello.txt", "foo1" },
             };

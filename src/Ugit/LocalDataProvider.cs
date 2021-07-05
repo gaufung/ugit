@@ -55,17 +55,17 @@
         public IFileOperator FileOperator => this.fileOperator;
 
         /// <inheritdoc/>
-        public Dictionary<string, string> Index
+        public Tree Index
         {
             get
             {
                 string path = Path.Join(this.GitDirFullPath, Constants.Index);
                 if (this.fileOperator.TryRead(path, out var data))
                 {
-                    return JsonSerializer.Deserialize<Dictionary<string, string>>(data);
+                    return JsonSerializer.Deserialize<Tree>(data);
                 }
 
-                return new Dictionary<string, string>();
+                return new Tree();
             }
 
             set

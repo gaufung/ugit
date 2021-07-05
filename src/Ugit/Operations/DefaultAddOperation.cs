@@ -35,14 +35,14 @@
                 }
                 else if (this.fileOperator.Exists(name, false))
                 {
-                    this.AddDirectionary(index, name);
+                    this.AddDictionary(index, name);
                 }
             }
 
             this.dataProvider.Index = index;
         }
 
-        private void AddDirectionary(IDictionary<string, string> index, string directoryName)
+        private void AddDictionary(Tree index, string directoryName)
         {
             foreach (var fileName in this.fileOperator.Walk(directoryName))
             {
@@ -50,14 +50,14 @@
             }
         }
 
-        private void AddFile(IDictionary<string, string> index, string fileName)
+        private void AddFile(Tree tree, string fileName)
         {
             if (!this.dataProvider.IsIgnore(fileName))
             {
                 var normalFileName = Path.GetRelativePath(".", fileName);
                 byte[] data = this.fileOperator.Read(normalFileName);
                 string oid = this.dataProvider.WriteObject(data);
-                index[normalFileName] = oid;
+                tree[normalFileName] = oid;
             }
         }
     }

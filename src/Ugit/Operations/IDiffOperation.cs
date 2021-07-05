@@ -13,14 +13,14 @@
         /// <param name="fromTree">The first tree respents the snapshot. {filePath:oid}.</param>
         /// <param name="toTree">The second tree respents the snapshot. {filePath:oid}.</param>
         /// <returns>The difference.</returns>
-        string DiffTrees(IDictionary<string, string> fromTree, IDictionary<string, string> toTree);
+        string DiffTrees(Tree fromTree, Tree toTree);
 
         /// <summary>
         /// Compare multiple tree.
         /// </summary>
         /// <param name="trees">The trees to compare.</param>
         /// <returns>The difference.{filepath, [oids]}.</returns>
-        IEnumerable<(string, IEnumerable<string>)> CompareTrees(params IDictionary<string, string>[] trees);
+        IEnumerable<(string, IEnumerable<string>)> CompareTrees(params Tree[] trees);
 
         /// <summary>
         /// The differnce of two blob files.
@@ -37,7 +37,7 @@
         /// <param name="fromTree">The first tree.</param>
         /// <param name="toTree">The second tree.</param>
         /// <returns>The differnce specification. {filepath: action}</returns>
-        IEnumerable<(string, string)> IterChangedFiles(IDictionary<string, string> fromTree, IDictionary<string, string> toTree);
+        IEnumerable<(string, string)> IterChangedFiles(Tree fromTree, Tree toTree);
 
         /// <summary>
         /// Merge two tree.
@@ -45,7 +45,7 @@
         /// <param name="headTree">The first tree.</param>
         /// <param name="otherTree">The second tree.</param>
         /// <returns>The Merge result.</returns>
-        IDictionary<string, string> MergeTree(IDictionary<string, string> headTree, IDictionary<string, string> otherTree);
+        Tree MergeTree(Tree headTree, Tree otherTree);
 
         /// <summary>
         /// Merge blob files.

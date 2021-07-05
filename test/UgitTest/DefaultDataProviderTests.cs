@@ -272,7 +272,7 @@ namespace Tindo.Ugit
             fileMock.Setup(f => f.Delete(indexPath));
             string data = "{\"foo\":\"bar\"}";
             fileMock.Setup(f => f.WriteAllText(indexPath, data));
-            dataProvider.Index = new System.Collections.Generic.Dictionary<string, string>()
+            dataProvider.Index = new Tree()
             {
                 { "foo", "bar"}
             };

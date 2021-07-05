@@ -35,11 +35,11 @@ namespace Tindo.Ugit
                 "this is message."
 
             }).Encode());
-            this.treeOperation.Setup(d => d.GetTree("master-tree-oid", "")).Returns(new Dictionary<string, string>()
+            this.treeOperation.Setup(d => d.GetTree("master-tree-oid", "")).Returns(new Tree()
             {
                 { "hello.txt", "hello.oid"}
             });
-            this.treeOperation.Setup(d => d.GetIndexTree()).Returns(new Dictionary<string, string>()
+            this.treeOperation.Setup(d => d.GetIndexTree()).Returns(new Tree()
             {
                 {"hello.txt", "hello.oid" },
                 {"ugit.txt", "ugit.oid" }
@@ -59,10 +59,10 @@ namespace Tindo.Ugit
         {
             this.treeOperation.Setup(t => t.WriteTree()).Returns("tree-oid");
             this.dataProvider.Setup(d => d.GetRef("HEAD", true)).Returns(RefValue.Create(false, ""));
-            this.treeOperation.Setup(d => d.GetTree("", "")).Returns(new Dictionary<string, string>()
+            this.treeOperation.Setup(d => d.GetTree("", "")).Returns(new Tree()
             {
             });
-            this.treeOperation.Setup(d => d.GetIndexTree()).Returns(new Dictionary<string, string>()
+            this.treeOperation.Setup(d => d.GetIndexTree()).Returns(new Tree()
             {
             });
             _ = commitOperation.CreateCommit("hello foo");

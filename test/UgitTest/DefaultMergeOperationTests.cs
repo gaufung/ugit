@@ -95,20 +95,20 @@ namespace Tindo.Ugit
             });
 
             this.dataProvider.Setup(d => d.UpdateRef("MERGE_HEAD", It.Is<RefValue>(r => !r.Symbolic && r.Value == "other-oid"), true));
-            this.dataProvider.Setup(d => d.Index).Returns(new Dictionary<string, string>());
+            this.dataProvider.Setup(d => d.Index).Returns(new Tree());
             this.treeOperation.Setup(d => d.GetTree("head-tree-oid", "")).Returns(
-                new Dictionary<string, string>()
+                new Tree()
                 {
                     { "foo.txt", "foo-oid"},
                     { "bar.txt", "bar-oid" }
                 });
             this.treeOperation.Setup(d => d.GetTree("other-tree-oid", "")).Returns(
-                new Dictionary<string, string>()
+                new Tree()
                 {
                     { "foo.txt", "foo-oid"},
                 });
-            this.diff.Setup(d => d.MergeTree(It.IsAny<IDictionary<string, string>>(),
-                It.IsAny<IDictionary<string, string>>())).Returns<IDictionary<string, string>, IDictionary<string, string>>((tree1, tree2) =>
+            this.diff.Setup(d => d.MergeTree(It.IsAny<Tree>(),
+                It.IsAny<Tree>())).Returns<IDictionary<string, string>, IDictionary<string, string>>((tree1, tree2) =>
                 {
                     if(tree1.Count==2 && 
                         tree1.ContainsKey("foo.txt") &&
@@ -116,7 +116,7 @@ namespace Tindo.Ugit
                         tree2.Count == 1 &&
                         tree2.ContainsKey("foo.txt"))
                     {
-                        return new Dictionary<string, string>()
+                        return new Tree()
                         {
                             { "foo.txt", "foo-oid" },
                             { "bar.txt", "bar-oid" }

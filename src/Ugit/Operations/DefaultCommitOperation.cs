@@ -162,14 +162,14 @@
         private void CommitValidate()
         {
             string HEAD = this.dataProvider.GetRef(Constants.HEAD).Value;
-            IDictionary<string, string> headTree = new Dictionary<string, string>();
+            Tree headTree = new Tree();
             if (!string.IsNullOrWhiteSpace(HEAD))
             {
                 Commit commit = this.GetCommit(HEAD);
                 headTree = this.treeOperation.GetTree(commit.Tree);
             }
 
-            IDictionary<string, string> indexTree = this.treeOperation.GetIndexTree();
+            Tree indexTree = this.treeOperation.GetIndexTree();
             bool isSame = true;
 
             if (headTree.Count != indexTree.Count)
