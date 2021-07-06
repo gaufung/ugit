@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
-using System.Runtime.CompilerServices;
-using CommandLine;
-using Tindo.Ugit;
 using Tindo.Ugit.Operations;
-using Ugit.Options;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 
 namespace Tindo.Ugit.CLI
 {
-
-
     class Program
     {
         private static readonly IDataProvider DataProvider;
@@ -63,49 +58,137 @@ namespace Tindo.Ugit.CLI
 
         private static int Main(string[] args)
         {
-            int exitCode = Parser.Default.ParseArguments<
-                InitOption,
-                HashObjectOption,
-                CatFileOption,
-                ReadTreeOption,
-                CommitOption,
-                LogOption,
-                CheckoutOption,
-                TagOption,
-                BranchOption,
-                StatusOption,
-                ResetOption,
-                ShowOption,
-                DiffOption,
-                MergeOption,
-                MergeBaseOption,
-                AddOption,
-                FetchOption,
-                PushOption>(args).MapResult(
-                (InitOption o) => Init(o),
-                (HashObjectOption o) => HashObject(o),
-                (CatFileOption o) => CatFile(o),
-                (ReadTreeOption o) => ReadTree(o),
-                (CommitOption o) => Commit(o),
-                (LogOption o) => Log(o),
-                (CheckoutOption o) => Checkout(o),
-                (TagOption o) => TagOp(o),
-                (BranchOption o) => Branch(o),
-                (StatusOption o) => Status(o),
-                (ResetOption o) => Reset(o),
-                (ShowOption o) => Show(o),
-                (DiffOption o) => Different(o),
-                (MergeOption o) => Merge(o),
-                (AddOption o) => Add(o),
-                (FetchOption o) => Fetch(o),
-                (PushOption o) => Push(o),
-                errors => 1);
-            return exitCode;
+            return CreateArgsCommand().Invoke(args);
         }
 
-        private static int Push(PushOption o)
+        static Command CreateArgsCommand()
         {
-            IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote);
+            var initCmd = new Command("init", "initialize ugit repo");
+            initCmd.Handler = CommandHandler.Create(Init);
+
+            var hashObjectCmd = new Command("hash-object", "hash a file object")
+            {
+                new Argument<string>("file")
+            };
+            hashObjectCmd.Handler = CommandHandler.Create<string>(HashObject);
+
+            var catFileCmd = new Command("cat-file", "look up a file by object id")
+            {
+                new Argument<string>("object")
+            };
+            catFileCmd.Handler = CommandHandler.Create<string>(CatFile);
+
+            var readTreeCmd = new Command("read-tree", "read out tree")
+            {
+                new Argument<string>("tree")
+            };
+            readTreeCmd.Handler = CommandHandler.Create<string>(ReadTree);
+
+            var commitCmd = new Command("commit")
+            {
+                new Option<string>(new string[]{"-m", "--message"}, "message")
+            };
+            commitCmd.Handler = CommandHandler.Create<string>(Commit);
+
+            var logCmd = new Command("log")
+            {
+                new Argument<string>("oid", () => "@"),
+            };
+            logCmd.Handler = CommandHandler.Create<string>(Log);
+
+            var checkoutCmd = new Command("checkout")
+            {
+                new Argument<string>("commit")
+            };
+            checkoutCmd.Handler = CommandHandler.Create<string>(Checkout);
+
+            var tagCmd = new Command("tag")
+            {
+                new Argument<string>("name", ()=>string.Empty),
+                new Argument<string>("oid", () => "@")
+            };
+            tagCmd.Handler = CommandHandler.Create<string, string>(TagOp);
+
+            var branchCmd = new Command("branch")
+            {
+                new Argument<string>("name", () => string.Empty),
+                new Argument<string>("oid", () => "@")
+            };
+            branchCmd.Handler = CommandHandler.Create<string, string>(Branch);
+
+            var statusCmd = new Command("status");
+            statusCmd.Handler = CommandHandler.Create(Status);
+
+            var resetCmd = new Command("reset")
+            {
+                new Argument<string>("commit")
+            };
+            resetCmd.Handler = CommandHandler.Create<string>(Reset);
+
+            var showCmd = new Command("show")
+            {
+                new Argument<string>("oid", () => "@")
+            };
+            showCmd.Handler = CommandHandler.Create<string>(Show);
+            
+            var diffCmd = new Command("diff")
+            {
+                new Argument<string>("commit", () => "@")
+            };
+            diffCmd.Handler = CommandHandler.Create<string>(Different);
+            
+            var mergeCmd = new Command("merge")
+            {
+                new Argument<string>("commit", () => "@")
+            };
+            mergeCmd.Handler = CommandHandler.Create<string>(Merge);
+
+            var addCmd = new Command("add")
+            {
+                new Argument<IEnumerable<string>>("files"),
+            };
+            addCmd.Handler = CommandHandler.Create<IEnumerable<string>>(Add);
+
+            var fetchCmd = new Command("fetch")
+            {
+                new Argument<string>("remote")
+            };
+            fetchCmd.Handler = CommandHandler.Create<string>(Fetch);
+
+            var pushCmd = new Command("push")
+            {
+                new Argument<string>("remote"),
+                new Argument<string>("branch")
+            };
+            pushCmd.Handler = CommandHandler.Create<string,string>(Push);
+            
+            var rootCommand = new RootCommand
+            {
+                initCmd,
+                hashObjectCmd,
+                catFileCmd,
+                readTreeCmd,
+                commitCmd,
+                logCmd,
+                checkoutCmd,
+                tagCmd,
+                branchCmd,
+                statusCmd,
+                resetCmd,
+                showCmd,
+                diffCmd,
+                mergeCmd,
+                addCmd,
+                fetchCmd,
+                pushCmd,
+            };
+
+            return rootCommand;
+        }
+
+        private static void Push(string remote, string branch)
+        {
+            IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), remote);
             ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
@@ -113,14 +196,13 @@ namespace Tindo.Ugit.CLI
                 CommitOperation,
                 remoteDataProvider,
                 remoteCommitOperation);
-            string refName = Path.Join("refs", "heads", o.Branch);
+            string refName = Path.Join("refs", "heads", branch);
             remoteOperation.Push(refName);
-            return 0;
         }
 
-        private static int Fetch(FetchOption o)
+        private static void Fetch(string remote)
         {
-            IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), o.Remote);
+            IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), remote);
             ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new DefaultRemoteOperation(
@@ -129,37 +211,34 @@ namespace Tindo.Ugit.CLI
                 remoteDataProvider,
                 remoteCommitOperation);
             remoteOperation.Fetch();
-            return 0;
         }
 
-        private static int Add(AddOption o)
+       
+        private static void Add(IEnumerable<string> files)
         {
-            AddOperation.Add(o.Files);
-            return 0;
+            AddOperation.Add(files);
         }
 
-        private static int Merge(MergeOption o)
+        private static void Merge(string commit)
         {
-            var commit = OidConverter(o.Commit);
+            commit = OidConverter(commit);
             MergeOperation.Merge(commit);
-            return 0;
         }
-
-        private static int Different(DiffOption o)
+        
+        private static void Different(string commit)
         {
-            var commit = OidConverter(o.Commit);
+            commit = OidConverter(commit);
             var tree = CommitOperation.GetCommit(commit).Tree;
             var result = Diff.DiffTrees(TreeOperation.GetTree(tree), TreeOperation.GetWorkingTree());
             Console.WriteLine(result);
-            return 0;
         }
 
-        private static int Show(ShowOption o)
+        private static void Show(string oid)
         {
-            string oid = OidConverter(o.Oid);
+            oid = OidConverter(oid);
             if (string.IsNullOrEmpty(oid))
             {
-                return 0;
+                return;
             }
 
             var commit = CommitOperation.GetCommit(oid);
@@ -173,7 +252,6 @@ namespace Tindo.Ugit.CLI
             PrintCommit(oid, commit);
             var result = Diff.DiffTrees(TreeOperation.GetTree(parentTree), TreeOperation.GetTree(commit.Tree));
             Console.WriteLine(result);
-            return 0;
         }
 
         private static void PrintCommit(string oid, Commit commit, IEnumerable<string> @ref = null)
@@ -184,14 +262,13 @@ namespace Tindo.Ugit.CLI
             Console.WriteLine(string.Empty);
         }
 
-        private static int Reset(ResetOption o)
+        private static void Reset(string commit)
         {
-            string oid = OidConverter(o.Commit);
+            string oid = OidConverter(commit);
             ResetOperation.Reset(oid);
-            return 0;
         }
-
-        private static int Status(StatusOption _)
+        
+        private static void Status()
         {
             string head = OidConverter("@");
             string branch = BranchOperation.Current;
@@ -239,12 +316,12 @@ namespace Tindo.Ugit.CLI
             }
 
             Console.ResetColor();
-            return 0;
         }
 
-        private static int TagOp(TagOption o)
+        static void TagOp(string name, string oid)
         {
-            if (string.IsNullOrWhiteSpace(o.Oid) && string.IsNullOrWhiteSpace(o.Name))
+            
+            if (string.IsNullOrWhiteSpace(name))
             {
                 foreach (var tag in TagOperation.All)
                 {
@@ -253,67 +330,60 @@ namespace Tindo.Ugit.CLI
             }
             else
             {
-                string oid = OidConverter(o.Oid);
-                TagOperation.Create(o.Name, oid);
+                oid = OidConverter(oid);
+                TagOperation.Create(name, oid);
             }
-
-            return 0;
         }
-
-        private static int Checkout(CheckoutOption o)
+        
+        private static void Checkout(string commit)
         {
-            CheckoutOperation.Checkout(o.Commit);
-            return 0;
-        }
+            CheckoutOperation.Checkout(commit);
 
-        private static int Init(InitOption _)
+        }
+        
+
+        private static void Init()
         {
             InitOperation.Init();
             Console.WriteLine($"Initialized empty ugit repository in {DataProvider.GitDirFullPath}");
-            return 0;
         }
 
-        private static int HashObject(HashObjectOption o)
+        private static void HashObject(string file)
         {
-            byte[] data = FileSystem.File.ReadAllBytes(o.File);
+            byte[] data = FileSystem.File.ReadAllBytes(file);
             Console.WriteLine(DataProvider.WriteObject(data));
-            return 0;
         }
 
-        private static int CatFile(CatFileOption o)
+        private static void CatFile(string oid)
         {
-            byte[] data = DataProvider.GetObject(OidConverter(o.Object));
+            byte[] data = DataProvider.GetObject(OidConverter(oid));
             if (data.Length > 0)
             {
                 Console.WriteLine(data.Decode());
             }
-
-            return 0;
         }
 
-        private static int ReadTree(ReadTreeOption o)
+        private static void ReadTree(string tree)
         {
-            TreeOperation.ReadTree(OidConverter(o.Tree));
-            return 0;
+            TreeOperation.ReadTree(OidConverter(tree));
         }
 
-        private static int Commit(CommitOption o)
+        private static void Commit(string message)
         {
             try
             {
-                Console.WriteLine(CommitOperation.CreateCommit(o.Message));
+                Console.WriteLine(CommitOperation.CreateCommit(message));
             }
             catch (UgitException e)
             {
                 Console.WriteLine(e.Message);
             }
-
-            return 0;
         }
+        
 
-        private static int Log(LogOption o)
+        static void Log(string oid)
         {
-            string oid = OidConverter(o.Oid);
+            oid = OidConverter(oid);
 
             IDictionary<string, IList<string>> refs = new Dictionary<string, IList<string>>();
             foreach (var (refname, @ref) in DataProvider.GetAllRefs())
@@ -333,15 +403,13 @@ namespace Tindo.Ugit.CLI
                 var commit = CommitOperation.GetCommit(objectId);
                 PrintCommit(objectId, commit, refs.ContainsKey(objectId) ? refs[objectId] : null);
             }
-
-            return 0;
         }
-
-        private static int Branch(BranchOption o)
+        
+        private static void Branch(string name, string oid)
         {
-            string startPoint = OidConverter(o.StartPoint);
+            string startPoint = OidConverter(oid);
 
-            if (string.IsNullOrEmpty(o.Name))
+            if (string.IsNullOrEmpty(name))
             {
                 string current = BranchOperation.Current;
                 foreach (var branch in BranchOperation.Names)
@@ -352,11 +420,10 @@ namespace Tindo.Ugit.CLI
             }
             else
             {
-                BranchOperation.Create(o.Name, startPoint);
-                Console.WriteLine($"Branch {o.Name} create at {startPoint.Substring(0, 10)}");
+                BranchOperation.Create(name, startPoint);
+                Console.WriteLine($"Branch {name} create at {startPoint.Substring(0, 10)}");
             }
 
-            return 0;
         }
     }
 }
