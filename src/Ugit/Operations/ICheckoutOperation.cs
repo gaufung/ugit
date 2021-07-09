@@ -1,4 +1,4 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     /// <summary>
     /// Checkout opeartion.

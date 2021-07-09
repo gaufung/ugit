@@ -1,17 +1,17 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     /// <summary>
-    /// Default reset opeartion.
+    /// Default reset operation.
     /// </summary>
-    internal class DefaultResetOperation : IResetOperation
+    internal class ResetOperation : IResetOperation
     {
         private readonly IDataProvider dataProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultResetOperation"/> class.
+        /// Initializes a new instance of the <see cref="ResetOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultResetOperation(IDataProvider dataProvider)
+        public ResetOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
         }

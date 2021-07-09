@@ -1,4 +1,4 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -7,17 +7,17 @@
     /// <summary>
     /// Default implementation of <seealso cref="IAddOperation"/>.
     /// </summary>
-    internal class DefaultAddOperation : IAddOperation
+    internal class AddOperation : IAddOperation
     {
         private readonly IDataProvider dataProvider;
 
         private readonly IFileOperator fileOperator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultAddOperation"/> class.
+        /// Initializes a new instance of the <see cref="AddOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultAddOperation(IDataProvider dataProvider)
+        public AddOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
             this.fileOperator = this.dataProvider.FileOperator;

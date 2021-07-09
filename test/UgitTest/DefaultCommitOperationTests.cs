@@ -2,7 +2,7 @@
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
@@ -20,7 +20,7 @@ namespace Tindo.Ugit
         {
             dataProvider = new Mock<IDataProvider>();
             treeOperation = new Mock<ITreeOperation>();
-            commitOperation = new DefaultCommitOperation(dataProvider.Object, treeOperation.Object);
+            commitOperation = new CommitOperation(dataProvider.Object, treeOperation.Object);
         }
 
         [TestMethod]

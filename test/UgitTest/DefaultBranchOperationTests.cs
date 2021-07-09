@@ -3,7 +3,7 @@ using Moq;
 using System;
 using System.IO;
 using System.Linq;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
@@ -19,7 +19,7 @@ namespace Tindo.Ugit
         public void Init()
         {
             dataProvider = new Mock<IDataProvider>();
-            branchOperation = new DefaultBranchOperation(dataProvider.Object);
+            branchOperation = new BranchOperation(dataProvider.Object);
         }
 
         [TestMethod]

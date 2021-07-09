@@ -6,7 +6,7 @@ namespace Tindo.Ugit
     using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using Tindo.Ugit.Operations;
+    using Ugit;
 
     [TestClass]
     [Ignore]
@@ -23,7 +23,7 @@ namespace Tindo.Ugit
         [TestInitialize]
         public void Init()
         {
-            remoteOpetaion = new DefaultRemoteOperation(
+            remoteOpetaion = new RemoteOperation(
                 localDataProviderMock.Object,
                 localCommitOperationMock.Object,
                 remoteDataProviderMock.Object,

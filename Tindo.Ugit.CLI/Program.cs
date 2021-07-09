@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 
@@ -43,16 +43,16 @@ namespace Tindo.Ugit.CLI
             FileSystem = new FileSystem();
             FileOperator = new PhysicalFileOperator(FileSystem);
             DataProvider = new LocalDataProvider(FileOperator);
-            Diff = new DefaultDiffOperation(DataProvider, new DefaultDiffProxyOperation());
-            TreeOperation = new DefaultTreeOperation(DataProvider);
-            CommitOperation = new DefaultCommitOperation(DataProvider, TreeOperation);
-            TagOperation = new DefaultTagOperation(DataProvider);
-            ResetOperation = new DefaultResetOperation(DataProvider);
-            MergeOperation = new DefaultMergeOperation(DataProvider, CommitOperation, TreeOperation, Diff);
+            Diff = new DiffOperation(DataProvider, new DiffProxy());
+            TreeOperation = new TreeOperation(DataProvider);
+            CommitOperation = new CommitOperation(DataProvider, TreeOperation);
+            TagOperation = new TagOperation(DataProvider);
+            ResetOperation = new ResetOperation(DataProvider);
+            MergeOperation = new MergeOperation(DataProvider, CommitOperation, TreeOperation, Diff);
             InitOperation = new DefaultInitOperation(DataProvider);
-            BranchOperation = new DefaultBranchOperation(DataProvider);
-            CheckoutOperation = new DefaultCheckoutOperation(DataProvider, TreeOperation, CommitOperation, BranchOperation);
-            AddOperation = new DefaultAddOperation(DataProvider);
+            BranchOperation = new BranchOperation(DataProvider);
+            CheckoutOperation = new CheckoutOperation(DataProvider, TreeOperation, CommitOperation, BranchOperation);
+            AddOperation = new AddOperation(DataProvider);
             OidConverter = DataProvider.GetOid;
         }
 
@@ -189,9 +189,9 @@ namespace Tindo.Ugit.CLI
         private static void Push(string remote, string branch)
         {
             IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), remote);
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
+            ICommitOperation remoteCommitOperation = new CommitOperation(remoteDataProvider, new TreeOperation(remoteDataProvider));
 
-            IRemoteOperation remoteOperation = new DefaultRemoteOperation(
+            IRemoteOperation remoteOperation = new RemoteOperation(
                 DataProvider,
                 CommitOperation,
                 remoteDataProvider,
@@ -203,9 +203,9 @@ namespace Tindo.Ugit.CLI
         private static void Fetch(string remote)
         {
             IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), remote);
-            ICommitOperation remoteCommitOperation = new DefaultCommitOperation(remoteDataProvider, new DefaultTreeOperation(remoteDataProvider));
+            ICommitOperation remoteCommitOperation = new CommitOperation(remoteDataProvider, new TreeOperation(remoteDataProvider));
 
-            IRemoteOperation remoteOperation = new DefaultRemoteOperation(
+            IRemoteOperation remoteOperation = new RemoteOperation(
                 DataProvider,
                 CommitOperation,
                 remoteDataProvider,

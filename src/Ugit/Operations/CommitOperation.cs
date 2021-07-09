@@ -1,4 +1,4 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     using System;
     using System.Collections.Generic;
@@ -6,20 +6,20 @@
     using Nito.Collections;
 
     /// <summary>
-    /// Default implmentation of <see cref="ICommitOperation"/>.
+    /// Default implementation of <see cref="ICommitOperation"/>.
     /// </summary>
-    internal class DefaultCommitOperation : ICommitOperation
+    internal class CommitOperation : ICommitOperation
     {
         private readonly IDataProvider dataProvider;
 
         private readonly ITreeOperation treeOperation;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultCommitOperation"/> class.
+        /// Initializes a new instance of the <see cref="CommitOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data Provider.</param>
         /// <param name="treeOperation">The tree opeartion.</param>
-        public DefaultCommitOperation(IDataProvider dataProvider, ITreeOperation treeOperation)
+        public CommitOperation(IDataProvider dataProvider, ITreeOperation treeOperation)
         {
             this.dataProvider = dataProvider;
             this.treeOperation = treeOperation;
@@ -122,7 +122,6 @@
         public IEnumerable<string> GetObjectHistory(IEnumerable<string> oids)
         {
             HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            
             IEnumerable<string> IterObjectInTree(string oid)
             {
                 visited.Add(oid);
@@ -145,13 +144,13 @@
                 }
             }
 
-            foreach(var oid in GetCommitHistory(oids))
+            foreach (var oid in this.GetCommitHistory(oids))
             {
                 yield return oid;
-                var commit = GetCommit(oid);
+                var commit = this.GetCommit(oid);
                 if (!visited.Contains(commit.Tree))
                 {
-                    foreach(var val in IterObjectInTree(commit.Tree))
+                    foreach (var val in IterObjectInTree(commit.Tree))
                     {
                         yield return val;
                     }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
@@ -16,7 +16,7 @@ namespace Tindo.Ugit
         public void Init()
         {
             dataProvider = new Mock<IDataProvider>();
-            resetOpreation = new DefaultResetOperation(dataProvider.Object);
+            resetOpreation = new ResetOperation(dataProvider.Object);
         }
 
         [TestMethod]

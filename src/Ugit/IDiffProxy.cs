@@ -1,9 +1,9 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     /// <summary>
     /// The Diff command proxy.
     /// </summary>
-    internal interface IDiffProxyOperation
+    internal interface IDiffProxy
     {
         /// <summary>
         /// Execute diff command.

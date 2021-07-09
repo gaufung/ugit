@@ -1,14 +1,14 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Ugit.Operations;
+    using Ugit;
 
     /// <summary>
     /// Default implementation of IRemoteOperation.
     /// </summary>
-    internal class DefaultRemoteOperation : IRemoteOperation
+    internal class RemoteOperation : IRemoteOperation
     {
         private static readonly string RemoteRefsBase = Path.Join(Constants.Refs, Constants.Heads);
         private static readonly string LocalRefsBase = Path.Join(Constants.Refs, Constants.Remote);
@@ -20,22 +20,20 @@
         private readonly IFileOperator remoteFileOperator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultRemoteOperation"/> class.
+        /// Initializes a new instance of the <see cref="RemoteOperation"/> class.
         /// </summary>
         /// <param name="localDataProvider">local data provider.</param>
-        /// <param name="localTreeOperation">local tree operation.</param>
-        /// <param name="localCommitOpeartion">local commit operation.</param>
-        /// <param name="remoteDataProvider">remote data provder.</param>
-        /// <param name="remoteTreeOperation">remote tree operation.</param>
+        /// <param name="localCommitOperation">local commit operation.</param>
+        /// <param name="remoteDataProvider">remote data provider.</param>
         /// <param name="remoteCommitOperation">remote commit operation.</param>
-        public DefaultRemoteOperation(
+        public RemoteOperation(
             IDataProvider localDataProvider,
-            ICommitOperation localCommitOpeartion,
+            ICommitOperation localCommitOperation,
             IDataProvider remoteDataProvider,
             ICommitOperation remoteCommitOperation)
         {
             this.localDataProvider = localDataProvider;
-            this.localCommitOperation = localCommitOpeartion;
+            this.localCommitOperation = localCommitOperation;
             this.remoteDataProvider = remoteDataProvider;
             this.remoteCommitOperation = remoteCommitOperation;
             this.localFileOperator = this.localDataProvider.FileOperator;

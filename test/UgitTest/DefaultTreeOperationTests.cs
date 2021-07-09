@@ -3,7 +3,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
@@ -21,7 +21,7 @@ namespace Tindo.Ugit
         public void Init()
         {
             dataProvider = new Mock<IDataProvider>();
-            treeOpeartion = new DefaultTreeOperation(dataProvider.Object);
+            treeOpeartion = new TreeOperation(dataProvider.Object);
         }
 
         /// <summary>

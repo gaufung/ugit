@@ -3,7 +3,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
@@ -28,7 +28,7 @@ namespace Tindo.Ugit
             dataProvider = new Mock<IDataProvider>();
             diff = new Mock<IDiffOperation>();
             treeOperation = new Mock<ITreeOperation>();
-            mergeOperation = new DefaultMergeOperation(dataProvider.Object,
+            mergeOperation = new MergeOperation(dataProvider.Object,
                 commitOperation.Object, treeOperation.Object, diff.Object);
         }
 

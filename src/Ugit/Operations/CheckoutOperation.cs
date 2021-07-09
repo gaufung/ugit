@@ -1,11 +1,11 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     using System.IO;
 
     /// <summary>
     /// Default implementation of Checkout operation.
     /// </summary>
-    internal class DefaultCheckoutOperation : ICheckoutOperation
+    internal class CheckoutOperation : ICheckoutOperation
     {
         private readonly IDataProvider dataProvider;
 
@@ -16,13 +16,13 @@
         private readonly IBranchOperation branchOperation;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultCheckoutOperation"/> class.
+        /// Initializes a new instance of the <see cref="CheckoutOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
         /// <param name="treeOperation">The tree opeartion.</param>
         /// <param name="commitOperation">The commit operation.</param>
         /// <param name="branchOperation">The branch operation.</param>
-        public DefaultCheckoutOperation(
+        public CheckoutOperation(
             IDataProvider dataProvider,
             ITreeOperation treeOperation,
             ICommitOperation commitOperation,

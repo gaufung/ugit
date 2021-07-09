@@ -42,10 +42,11 @@
         internal LocalDataProvider(IFileOperator fileOperator)
             : this(fileOperator, string.Empty)
         {
+            this.fileOperator = fileOperator;
         }
 
         /// <inheritdoc/>
-        public string GitDir { get; } = ".ugit";
+        public string GitDir => ".ugit";
 
         /// <inheritdoc/>
         public string GitDirFullPath =>
@@ -137,15 +138,7 @@
                 throw new ArgumentException("ref value could be null or empty");
             }
 
-            string val;
-            if (value.Symbolic)
-            {
-                val = $"ref: {value.Value}";
-            }
-            else
-            {
-                val = value.Value;
-            }
+            var val = value.Symbolic ? $"ref: {value.Value}" : value.Value;
 
             string filePath = Path.Join(this.GitDirFullPath, @ref);
             this.fileOperator.Write(filePath, val.Encode());
@@ -203,8 +196,7 @@
         public string GetOid(string name)
         {
             name = name == "@" ? Constants.HEAD : name;
-            string[] refsToTry = new string[]
-            {
+            string[] refsToTry = {
                 Path.Join(name),
                 Path.Join("refs", name),
                 Path.Join("refs", "tags", name),

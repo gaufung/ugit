@@ -1,4 +1,4 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     using System;
     using System.Collections.Generic;
@@ -8,17 +8,17 @@
     /// <summary>
     /// The default implementation of ITreeOperation.
     /// </summary>
-    internal class DefaultTreeOperation : ITreeOperation
+    internal class TreeOperation : ITreeOperation
     {
         private readonly IDataProvider dataProvider;
 
         private readonly IFileOperator fileOperator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultTreeOperation"/> class.
+        /// Initializes a new instance of the <see cref="TreeOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultTreeOperation(IDataProvider dataProvider)
+        public TreeOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
             this.fileOperator = this.dataProvider.FileOperator;

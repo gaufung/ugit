@@ -1,4 +1,4 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     using System;
     using System.Collections.Generic;
@@ -7,7 +7,7 @@
     /// <summary>
     /// Default implementation of <see cref="IMergeOperation"/>.
     /// </summary>
-    internal class DefaultMergeOperation : IMergeOperation
+    internal class MergeOperation : IMergeOperation
     {
         private readonly ICommitOperation commitOperation;
         private readonly IDataProvider dataProvider;
@@ -15,13 +15,13 @@
         private readonly ITreeOperation treeOperation;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultMergeOperation"/> class.
+        /// Initializes a new instance of the <see cref="MergeOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
         /// <param name="commitOperation">The commit operation.</param>
         /// <param name="treeOperation">The tree operation.</param>
         /// <param name="diff">The diff operation.</param>
-        public DefaultMergeOperation(
+        public MergeOperation(
             IDataProvider dataProvider,
             ICommitOperation commitOperation,
             ITreeOperation treeOperation,

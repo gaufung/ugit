@@ -1,6 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Tindo.Ugit.Operations;
 using Tindo.Ugit;
 using System.IO;
 using System;
@@ -22,7 +21,7 @@ namespace Tindo.Ugit
         {
             dataProvider = new Mock<IDataProvider>();
             fileOperator = new Mock<IFileOperator>();
-            addOperation = new DefaultAddOperation(dataProvider.Object);
+            addOperation = new AddOperation(dataProvider.Object);
         }
 
         [TestMethod]

@@ -1,34 +1,34 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
     /// <summary>
-    /// The default implemantation of <see cref="IDiffOperation"/>.
+    /// The default implementation of <see cref="IDiffOperation"/>.
     /// </summary>
-    internal class DefaultDiffOperation : IDiffOperation
+    internal class DiffOperation : IDiffOperation
     {
         private readonly IDataProvider dataProvider;
 
-        private readonly IDiffProxyOperation diffProxy;
+        private readonly IDiffProxy diffProxy;
 
         private readonly IFileOperator fileOperator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultDiffOperation"/> class.
+        /// Initializes a new instance of the <see cref="DiffOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
         /// <param name="fileSystem">file system.</param>
-        public DefaultDiffOperation(IDataProvider dataProvider, IDiffProxyOperation diffProxy)
+        public DiffOperation(IDataProvider dataProvider, IDiffProxy diffProxy)
         {
             this.dataProvider = dataProvider;
             this.diffProxy = diffProxy;
             this.fileOperator = this.dataProvider.FileOperator;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params Tree[] trees)
         {
 #if NET5_0
@@ -71,6 +71,7 @@
             return output;
         }
 
+        /// <inheritdoc/>
         public string DiffTrees(Tree fromTree, Tree toTree)
         {
             return string.Join(

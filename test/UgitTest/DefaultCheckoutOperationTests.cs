@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
@@ -31,7 +31,7 @@ namespace Tindo.Ugit
             commitOperation = new Mock<ICommitOperation>();
             branchOperation = new Mock<IBranchOperation>();
 
-            checkoutOperation = new DefaultCheckoutOperation(dataProvider.Object,
+            checkoutOperation = new CheckoutOperation(dataProvider.Object,
                 treeOperation.Object, commitOperation.Object, branchOperation.Object);
         }
 

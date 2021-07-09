@@ -1,4 +1,4 @@
-﻿namespace Tindo.Ugit.Operations
+﻿namespace Tindo.Ugit
 {
     using System.Collections.Generic;
     using System.IO;
@@ -6,15 +6,15 @@
     /// <summary>
     /// Default implementation of IBranchOperation.
     /// </summary>
-    internal class DefaultBranchOperation : IBranchOperation
+    internal class BranchOperation : IBranchOperation
     {
         private readonly IDataProvider dataProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultBranchOperation"/> class.
+        /// Initializes a new instance of the <see cref="BranchOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public DefaultBranchOperation(IDataProvider dataProvider)
+        public BranchOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
         }

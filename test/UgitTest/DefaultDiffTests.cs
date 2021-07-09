@@ -2,7 +2,7 @@
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
@@ -15,7 +15,7 @@ namespace Tindo.Ugit
 
         private Mock<IDataProvider> dataproviderMock;
 
-        private Mock<IDiffProxyOperation> diffProxyMock;
+        private Mock<IDiffProxy> diffProxyMock;
 
         private Mock<IFileOperator> fileOperator;
 
@@ -23,9 +23,9 @@ namespace Tindo.Ugit
         public void Init()
         {
             dataproviderMock = new Mock<IDataProvider>();
-            diffProxyMock = new Mock<IDiffProxyOperation>();
+            diffProxyMock = new Mock<IDiffProxy>();
             fileOperator = new Mock<IFileOperator>();
-            diff = new DefaultDiffOperation(dataproviderMock.Object, diffProxyMock.Object);
+            diff = new DiffOperation(dataproviderMock.Object, diffProxyMock.Object);
         }
 
         [TestMethod]

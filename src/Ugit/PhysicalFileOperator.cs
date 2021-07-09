@@ -1,57 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-
-namespace Tindo.Ugit
+﻿namespace Tindo.Ugit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO.Abstractions;
+
+    /// <inheritdoc />
     internal class PhysicalFileOperator : IFileOperator
     {
-        private readonly IFileSystem _fileSystem;
+        private readonly IFileSystem fileSystem;
 
-        public string CurrentDirectory => this._fileSystem.Directory.GetCurrentDirectory();
+        /// <inheritdoc/>
+        public string CurrentDirectory => this.fileSystem.Directory.GetCurrentDirectory();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PhysicalFileOperator"/> class.
+        /// </summary>
+        /// <param name="fileSystem">The File system.</param>
         public PhysicalFileOperator(IFileSystem fileSystem)
         {
-            this._fileSystem = fileSystem;
+            this.fileSystem = fileSystem;
         }
 
+        /// <inheritdoc/>
         public void Delete(string path, bool isFile = true)
         {
-            if (isFile && this._fileSystem.File.Exists(path))
+            if (isFile && this.fileSystem.File.Exists(path))
             {
-                this._fileSystem.File.Delete(path);
+                this.fileSystem.File.Delete(path);
             }
-            else if (!isFile && this._fileSystem.Directory.Exists(path))
+            else if (!isFile && this.fileSystem.Directory.Exists(path))
             {
-                this._fileSystem.Directory.Delete(path, true);
+                this.fileSystem.Directory.Delete(path, true);
             }
         }
 
+        /// <inheritdoc/>
         public void EmptyCurrentDirectory(Func<string, bool> ignore)
         {
-            foreach (var filePath in this._fileSystem.Directory.EnumerateFiles("."))
+            foreach (var filePath in this.fileSystem.Directory.EnumerateFiles("."))
             {
-                if (ignore(filePath)) continue;
+                if (ignore(filePath))
+                {
+                    continue;
+                }
+
                 this.Delete(filePath);
             }
-            foreach (var directory in this._fileSystem.Directory.EnumerateDirectories("."))
+
+            foreach (var directory in this.fileSystem.Directory.EnumerateDirectories("."))
             {
-                if (ignore(directory)) continue;
+                if (ignore(directory))
+                {
+                    continue;
+                }
+
                 this.Delete(directory, false);
             }
         }
 
+        /// <inheritdoc/>
         public bool Exists(string path, bool isFile = true)
         {
-            return isFile ? this._fileSystem.File.Exists(path)
-               : this._fileSystem.Directory.Exists(path);
+            return isFile ? this.fileSystem.File.Exists(path)
+               : this.fileSystem.Directory.Exists(path);
         }
 
+        /// <inheritdoc/>
         public bool TryRead(string path, out byte[] bytes)
         {
             if (this.Exists(path))
             {
-                bytes = this._fileSystem.File.ReadAllBytes(path);
+                bytes = this.fileSystem.File.ReadAllBytes(path);
                 return true;
             }
 
@@ -59,18 +78,20 @@ namespace Tindo.Ugit
             return false;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<string> Walk(string path)
-{
+        {
             if (!this.Exists(path, false))
             {
                 yield break;
-}
+            }
 
-            foreach (var filePath in this._fileSystem.Directory.EnumerateFiles(path))
+            foreach (var filePath in this.fileSystem.Directory.EnumerateFiles(path))
             {
                 yield return filePath;
             }
-            foreach (var subDirectory in this._fileSystem.Directory.EnumerateDirectories(path))
+
+            foreach (var subDirectory in this.fileSystem.Directory.EnumerateDirectories(path))
             {
                 foreach (var filepath in this.Walk(subDirectory))
                 {
@@ -79,42 +100,47 @@ namespace Tindo.Ugit
             }
         }
 
+        /// <inheritdoc/>
         public void Write(string path, byte[] bytes)
         {
-            CreateParentDirectory(path);
+            this.CreateParentDirectory(path);
             if (this.Exists(path))
             {
                 this.Delete(path);
             }
 
-            this._fileSystem.File.WriteAllBytes(path, bytes);
+            this.fileSystem.File.WriteAllBytes(path, bytes);
         }
 
-        private void CreateParentDirectory(string filePath)
-        {
-            string parentDirectory = this._fileSystem.Path.GetDirectoryName(filePath);
-            if (!string.IsNullOrEmpty(parentDirectory) && !this._fileSystem.Directory.Exists(parentDirectory))
-            {
-                this._fileSystem.Directory.CreateDirectory(parentDirectory);
-            }
-        }
-
+        /// <inheritdoc/>
         public void CreateDirectory(string directory, bool force = true)
         {
-            if (this._fileSystem.Directory.Exists(directory) && !force)
+            if (this.fileSystem.Directory.Exists(directory) && !force)
             {
                 throw new UgitException($"{directory} is not empty.");
             }
-            this._fileSystem.Directory.CreateDirectory(directory);
+
+            this.fileSystem.Directory.CreateDirectory(directory);
         }
 
+        /// <inheritdoc/>
         public byte[] Read(string path)
         {
             if (this.TryRead(path, out var data))
             {
                 return data;
             }
+
             throw new UgitException("file doesn't exist");
+        }
+
+        private void CreateParentDirectory(string filePath)
+        {
+            string parentDirectory = this.fileSystem.Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(parentDirectory) && !this.fileSystem.Directory.Exists(parentDirectory))
+            {
+                this.fileSystem.Directory.CreateDirectory(parentDirectory);
+            }
         }
     }
 }

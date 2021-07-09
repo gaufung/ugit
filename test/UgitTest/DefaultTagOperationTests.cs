@@ -3,7 +3,7 @@ using Moq;
 using System;
 using System.IO;
 using System.Linq;
-using Tindo.Ugit.Operations;
+using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
@@ -19,7 +19,7 @@ namespace Tindo.Ugit
         public void Init()
         {
             dataProviderMock = new Mock<IDataProvider>();
-            tagOperation = new DefaultTagOperation(dataProviderMock.Object);
+            tagOperation = new TagOperation(dataProviderMock.Object);
         }
 
         [TestMethod]
