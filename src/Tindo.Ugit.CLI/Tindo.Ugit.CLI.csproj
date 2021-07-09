@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Ugit\Tindo.Ugit.csproj" />
+    <ProjectReference Include="..\Tindo.Ugit\Tindo.Ugit.csproj" />
   </ItemGroup>
 
   <ItemGroup>
