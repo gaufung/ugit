@@ -1,8 +1,9 @@
 ﻿namespace Tindo.Ugit
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
 
     /// <summary>
     /// Default implementation of <seealso cref="IAddOperation"/>.
@@ -13,6 +14,8 @@
 
         private readonly IFileOperator fileOperator;
 
+        private readonly ILogger<AddOperation> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AddOperation"/> class.
         /// </summary>
@@ -21,6 +24,18 @@
         {
             this.dataProvider = dataProvider;
             this.fileOperator = this.dataProvider.FileOperator;
+            this.logger = new NullLogger<AddOperation>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AddOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">The data provider.</param>
+        /// <param name="loggerFactory">loggerFactory interface.</param>
+        public AddOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
+            : this(dataProvider)
+        {
+            this.logger = loggerFactory.CreateLogger<AddOperation>();
         }
 
         /// <inheritdoc/>

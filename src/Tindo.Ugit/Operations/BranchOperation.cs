@@ -1,4 +1,7 @@
-﻿namespace Tindo.Ugit
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Tindo.Ugit
 {
     using System.Collections.Generic;
     using System.IO;
@@ -10,6 +13,8 @@
     {
         private readonly IDataProvider dataProvider;
 
+        private readonly ILogger<BranchOperation> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BranchOperation"/> class.
         /// </summary>
@@ -17,6 +22,13 @@
         public BranchOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
+            this.logger = new NullLogger<BranchOperation>();
+        }
+
+        public BranchOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
+         : this(dataProvider)
+        {
+            this.logger = loggerFactory.CreateLogger<BranchOperation>();
         }
 
         /// <inheritdoc/>

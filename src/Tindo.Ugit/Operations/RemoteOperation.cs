@@ -1,4 +1,7 @@
-﻿namespace Tindo.Ugit
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Tindo.Ugit
 {
     using System.Collections.Generic;
     using System.IO;
@@ -19,6 +22,8 @@
         private readonly IFileOperator localFileOperator;
         private readonly IFileOperator remoteFileOperator;
 
+        private readonly ILogger<RemoteOperation> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RemoteOperation"/> class.
         /// </summary>
@@ -38,6 +43,18 @@
             this.remoteCommitOperation = remoteCommitOperation;
             this.localFileOperator = this.localDataProvider.FileOperator;
             this.remoteFileOperator = this.remoteDataProvider.FileOperator;
+            this.logger = new NullLogger<RemoteOperation>();
+        }
+
+        public RemoteOperation(
+            IDataProvider localDataProvider,
+            ICommitOperation localCommitOperation,
+            IDataProvider remoteDataProvider,
+            ICommitOperation remoteCommitOperation,
+            ILoggerFactory loggerFactory)
+        : this(localDataProvider, localCommitOperation, remoteDataProvider,remoteCommitOperation)
+        {
+            this.logger = loggerFactory.CreateLogger<RemoteOperation>();
         }
 
         /// <inheritdoc/>

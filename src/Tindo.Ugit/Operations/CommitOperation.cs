@@ -1,4 +1,7 @@
-﻿namespace Tindo.Ugit
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Tindo.Ugit
 {
     using System;
     using System.Collections.Generic;
@@ -14,6 +17,8 @@
 
         private readonly ITreeOperation treeOperation;
 
+        private readonly ILogger<CommitOperation> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CommitOperation"/> class.
         /// </summary>
@@ -23,6 +28,22 @@
         {
             this.dataProvider = dataProvider;
             this.treeOperation = treeOperation;
+            this.logger = new NullLogger<CommitOperation>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommitOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">The data Provider.</param>
+        /// <param name="treeOperation">The tree operation.</param>
+        /// <param name="loggerFactory">The Logger factory.</param>
+        public CommitOperation(
+            IDataProvider dataProvider,
+            ITreeOperation treeOperation,
+            ILoggerFactory loggerFactory)
+        : this(dataProvider, treeOperation)
+        {
+            this.logger = loggerFactory.CreateLogger<CommitOperation>();
         }
 
         /// <inheritdoc/>

@@ -1,4 +1,7 @@
-﻿namespace Tindo.Ugit
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Tindo.Ugit
 {
     using System.Collections.Generic;
     using System.IO;
@@ -15,17 +18,34 @@
 
         private readonly IFileOperator fileOperator;
 
+        private readonly ILogger<DiffOperation> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DiffOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
-        /// <param name="fileSystem">file system.</param>
         public DiffOperation(IDataProvider dataProvider, IDiffProxy diffProxy)
         {
             this.dataProvider = dataProvider;
             this.diffProxy = diffProxy;
             this.fileOperator = this.dataProvider.FileOperator;
+            this.logger = new NullLogger<DiffOperation>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiffOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">the data provider.</param>
+        /// <param name="diffProxy">the diff command proxy.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
+        public DiffOperation(
+            IDataProvider dataProvider,
+            IDiffProxy diffProxy,
+            ILoggerFactory loggerFactory)
+        : this(dataProvider, diffProxy)
+        {
+            this.logger = loggerFactory.CreateLogger<DiffOperation>();
         }
 
         /// <inheritdoc />
