@@ -22,7 +22,7 @@ jobs:
     - name: Build & Function Test
       run: |
         dotnet build --configuration Release --no-restore
-        cd /home/runner/work/ugit/ugit/src/Tindo.UgitCLI/bin/Release/net5.0/scripts/Linux
+        cd /home/runner/work/ugit/ugit/src/Tindo.Ugit.CLI/bin/Release/net5.0/scripts/Linux
         bash ./test_ugit.sh
     - name: Gernerate coverage report
       run: |
