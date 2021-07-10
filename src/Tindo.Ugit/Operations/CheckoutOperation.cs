@@ -1,4 +1,7 @@
-﻿namespace Tindo.Ugit
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Tindo.Ugit
 {
     using System.IO;
 
@@ -14,6 +17,8 @@
         private readonly ICommitOperation commitOperation;
 
         private readonly IBranchOperation branchOperation;
+
+        private readonly ILogger<CheckoutOperation> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckoutOperation"/> class.
@@ -32,6 +37,26 @@
             this.treeOperation = treeOperation;
             this.commitOperation = commitOperation;
             this.branchOperation = branchOperation;
+            this.logger = new NullLogger<CheckoutOperation>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CheckoutOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">The data provider.</param>
+        /// <param name="treeOperation">The tree operation.</param>
+        /// <param name="commitOperation">The commit operation.</param>
+        /// <param name="branchOperation">The branch operation.</param>
+        /// <param name="loggerFactory">The logger factory.</param>
+        public CheckoutOperation(
+            IDataProvider dataProvider,
+            ITreeOperation treeOperation,
+            ICommitOperation commitOperation,
+            IBranchOperation branchOperation,
+            ILoggerFactory loggerFactory)
+        : this(dataProvider, treeOperation, commitOperation, branchOperation)
+        {
+            this.logger = loggerFactory.CreateLogger<CheckoutOperation>();
         }
 
         /// <inheritdoc/>

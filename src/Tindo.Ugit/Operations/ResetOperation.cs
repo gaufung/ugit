@@ -1,4 +1,7 @@
-﻿namespace Tindo.Ugit
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Tindo.Ugit
 {
     /// <summary>
     /// Default reset operation.
@@ -7,6 +10,8 @@
     {
         private readonly IDataProvider dataProvider;
 
+        private readonly ILogger<ResetOperation> logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ResetOperation"/> class.
         /// </summary>
@@ -14,6 +19,13 @@
         public ResetOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
+            this.logger = new NullLogger<ResetOperation>();
+        }
+
+        public ResetOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
+            : this(dataProvider)
+        {
+            this.logger = loggerFactory.CreateLogger<ResetOperation>();
         }
 
         /// <inheritdoc/>

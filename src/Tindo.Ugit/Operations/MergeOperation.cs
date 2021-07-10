@@ -1,4 +1,7 @@
-﻿namespace Tindo.Ugit
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+
+namespace Tindo.Ugit
 {
     using System;
     using System.Collections.Generic;
@@ -13,6 +16,7 @@
         private readonly IDataProvider dataProvider;
         private readonly IDiffOperation diff;
         private readonly ITreeOperation treeOperation;
+        private readonly ILogger<MergeOperation> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MergeOperation"/> class.
@@ -31,6 +35,18 @@
             this.commitOperation = commitOperation;
             this.treeOperation = treeOperation;
             this.diff = diff;
+            this.logger = new NullLogger<MergeOperation>();
+        }
+
+        public MergeOperation(
+            IDataProvider dataProvider,
+            ICommitOperation commitOperation,
+            ITreeOperation treeOperation,
+            IDiffOperation diff,
+            ILoggerFactory loggerFactory)
+        : this(dataProvider, commitOperation, treeOperation, diff)
+        {
+            this.logger = loggerFactory.CreateLogger<MergeOperation>();
         }
 
         /// <inheritdoc/>
