@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-
-namespace Tindo.Ugit
+﻿namespace Tindo.Ugit
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Ugit;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
 
     /// <summary>
     /// Default implementation of IRemoteOperation.
