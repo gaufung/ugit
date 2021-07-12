@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-
-namespace Tindo.Ugit
+﻿namespace Tindo.Ugit
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
 
     /// <summary>
     /// The default implementation of ITreeOperation.

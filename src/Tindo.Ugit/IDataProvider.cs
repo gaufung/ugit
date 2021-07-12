@@ -22,7 +22,6 @@
         /// </summary>
         IFileOperator FileOperator { get; }
 
-
         /// <summary>
         /// Gets or sets the Index.
         /// </summary>

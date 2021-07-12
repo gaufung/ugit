@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-
+﻿
 namespace Tindo.Ugit
 {
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
+
     /// <summary>
     /// Default reset operation.
     /// </summary>

@@ -20,11 +20,7 @@
         /// <returns>The digest value.</returns>
         public static string Sha1HexDigest(this byte[] data)
         {
-#if NET5_0
             using SHA1Managed sha1 = new ();
-#else
-            using SHA1Managed sha1 = new SHA1Managed();
-#endif
             var hash = sha1.ComputeHash(data);
             return string.Join(string.Empty, hash.Select(h => h.ToString("x2")));
         }
@@ -130,11 +126,7 @@
         /// <returns>The ref mapping { ref, ref-value }</returns>
         public static IDictionary<string, string> GetRefsMapping(this IDataProvider dataProvider, string prefix)
         {
-#if NET5_0
             Dictionary<string, string> refs = new ();
-#else
-            Dictionary<string, string> refs = new Dictionary<string, string>();
-#endif
             foreach (var (refname, @ref) in dataProvider.GetAllRefs(prefix))
             {
                 refs.Add(refname, @ref.Value);

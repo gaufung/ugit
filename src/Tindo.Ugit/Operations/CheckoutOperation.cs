@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-
-namespace Tindo.Ugit
+﻿namespace Tindo.Ugit
 {
     using System.IO;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
 
     /// <summary>
     /// Default implementation of Checkout operation.
