@@ -27,7 +27,7 @@
         {
             this.dataProvider = dataProvider;
             this.treeOperation = treeOperation;
-            this.logger = new NullLogger<CommitOperation>();
+            this.logger = NullLogger<CommitOperation>.Instance;
         }
 
         /// <summary>

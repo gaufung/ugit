@@ -36,7 +36,7 @@
             this.treeOperation = treeOperation;
             this.commitOperation = commitOperation;
             this.branchOperation = branchOperation;
-            this.logger = new NullLogger<CheckoutOperation>();
+            this.logger = NullLogger<CheckoutOperation>.Instance;
         }
 
         /// <summary>

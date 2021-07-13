@@ -29,7 +29,7 @@
             this.dataProvider = dataProvider;
             this.diffProxy = diffProxy;
             this.fileOperator = this.dataProvider.FileOperator;
-            this.logger = new NullLogger<DiffOperation>();
+            this.logger = NullLogger<DiffOperation>.Instance;
         }
 
         /// <summary>

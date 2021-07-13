@@ -21,7 +21,7 @@
         public BranchOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
-            this.logger = new NullLogger<BranchOperation>();
+            this.logger = NullLogger<BranchOperation>.Instance;
         }
 
         public BranchOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)

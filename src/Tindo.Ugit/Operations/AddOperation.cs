@@ -24,7 +24,7 @@
         {
             this.dataProvider = dataProvider;
             this.fileOperator = this.dataProvider.FileOperator;
-            this.logger = new NullLogger<AddOperation>();
+            this.logger = NullLogger<AddOperation>.Instance;
         }
 
         /// <summary>

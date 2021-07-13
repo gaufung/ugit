@@ -26,7 +26,7 @@
         {
             this.dataProvider = dataProvider;
             this.fileOperator = this.dataProvider.FileOperator;
-            this.logger = new NullLogger<TreeOperation>();
+            this.logger = NullLogger<TreeOperation>.Instance;
         }
 
         public TreeOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)

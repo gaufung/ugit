@@ -21,7 +21,7 @@
         public TagOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
-            this.logger = new NullLogger<TagOperation>();
+            this.logger = NullLogger<TagOperation>.Instance;
         }
 
         public TagOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)

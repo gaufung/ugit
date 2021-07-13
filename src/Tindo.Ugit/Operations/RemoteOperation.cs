@@ -41,7 +41,7 @@
             this.remoteCommitOperation = remoteCommitOperation;
             this.localFileOperator = this.localDataProvider.FileOperator;
             this.remoteFileOperator = this.remoteDataProvider.FileOperator;
-            this.logger = new NullLogger<RemoteOperation>();
+            this.logger = NullLogger<RemoteOperation>.Instance;
         }
 
         public RemoteOperation(

@@ -20,7 +20,7 @@ namespace Tindo.Ugit
         public ResetOperation(IDataProvider dataProvider)
         {
             this.dataProvider = dataProvider;
-            this.logger = new NullLogger<ResetOperation>();
+            this.logger = NullLogger<ResetOperation>.Instance;
         }
 
         public ResetOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
