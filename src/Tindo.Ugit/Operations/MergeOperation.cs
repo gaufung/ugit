@@ -34,7 +34,7 @@
             this.commitOperation = commitOperation;
             this.treeOperation = treeOperation;
             this.diff = diff;
-            this.logger = new NullLogger<MergeOperation>();
+            this.logger = NullLogger<MergeOperation>.Instance;
         }
 
         public MergeOperation(
