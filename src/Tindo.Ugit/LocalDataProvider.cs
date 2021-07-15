@@ -94,7 +94,7 @@
                     var type = data.Take(index).ToArray().Decode();
                     if (!string.Equals(expected, type, StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new UgitException($"Unknow object type, got {type}");
+                        throw new UgitException($"Unknown object type, got {type}");
                     }
 
                     return data.TakeLast(data.Length - index - 1).ToArray();
