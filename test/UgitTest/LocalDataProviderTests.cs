@@ -48,10 +48,11 @@ namespace Tindo.Ugit
         public void IndexGetEmptyTest()
         {
             string path = Path.Join("foo", ".ugit", "index");
-            mockFileOperator.Setup(f => f.Exists(path, true)).Returns(false);
+            byte[] data = Array.Empty<byte>();
+            mockFileOperator.Setup(f => f.TryRead(path, out data)).Returns(false);
             dataProvider.Index.Count.Should().Be(0);
             mockFileOperator.VerifyAll();
-            
+
         }
 
         [TestMethod]
