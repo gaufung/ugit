@@ -94,7 +94,7 @@
                     var type = data.Take(index).ToArray().Decode();
                     if (!string.Equals(expected, type, StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new UgitException($"Unknow object type, got {type}");
+                        throw new UgitException($"Unknown object type, got {type}");
                     }
 
                     return data.TakeLast(data.Length - index - 1).ToArray();
@@ -132,12 +132,12 @@
         /// <inheritdoc/>
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
-            @ref = this.GetRefInternal(@ref, deref).Item1;
             if (string.IsNullOrWhiteSpace(value.Value))
             {
-                throw new ArgumentException("ref value could be null or empty");
+                throw new UgitException("ref value could be null or empty");
             }
 
+            @ref = this.GetRefInternal(@ref, deref).Item1;
             var val = value.Symbolic ? $"ref: {value.Value}" : value.Value;
 
             string filePath = Path.Join(this.GitDirFullPath, @ref);
