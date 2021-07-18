@@ -24,10 +24,8 @@
         /// <param name="dataProvider">The data Provider.</param>
         /// <param name="treeOperation">The tree opeartion.</param>
         public CommitOperation(IDataProvider dataProvider, ITreeOperation treeOperation)
+            : this(dataProvider, treeOperation, NullLogger<CommitOperation>.Instance)
         {
-            this.dataProvider = dataProvider;
-            this.treeOperation = treeOperation;
-            this.logger = NullLogger<CommitOperation>.Instance;
         }
 
         /// <summary>
@@ -35,14 +33,15 @@
         /// </summary>
         /// <param name="dataProvider">The data Provider.</param>
         /// <param name="treeOperation">The tree operation.</param>
-        /// <param name="loggerFactory">The Logger factory.</param>
+        /// <param name="logger">The Logger factory.</param>
         public CommitOperation(
             IDataProvider dataProvider,
             ITreeOperation treeOperation,
-            ILoggerFactory loggerFactory)
-        : this(dataProvider, treeOperation)
+            ILogger<CommitOperation> logger)
         {
-            this.logger = loggerFactory.CreateLogger<CommitOperation>();
+            this.dataProvider = dataProvider;
+            this.treeOperation = treeOperation;
+            this.logger = logger;
         }
 
         /// <inheritdoc/>

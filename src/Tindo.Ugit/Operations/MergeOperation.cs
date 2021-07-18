@@ -29,23 +29,30 @@
             ICommitOperation commitOperation,
             ITreeOperation treeOperation,
             IDiffOperation diff)
+            : this(dataProvider, commitOperation, treeOperation, diff, NullLogger<MergeOperation>.Instance)
         {
-            this.dataProvider = dataProvider;
-            this.commitOperation = commitOperation;
-            this.treeOperation = treeOperation;
-            this.diff = diff;
-            this.logger = NullLogger<MergeOperation>.Instance;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MergeOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">The data provider.</param>
+        /// <param name="commitOperation">The commit operation.</param>
+        /// <param name="treeOperation">The tree operation.</param>
+        /// <param name="diff">The diff operation.</param>
+        /// <param name="logger">The logger.</param>
         public MergeOperation(
             IDataProvider dataProvider,
             ICommitOperation commitOperation,
             ITreeOperation treeOperation,
             IDiffOperation diff,
-            ILoggerFactory loggerFactory)
-        : this(dataProvider, commitOperation, treeOperation, diff)
+            ILogger<MergeOperation> logger)
         {
-            this.logger = loggerFactory.CreateLogger<MergeOperation>();
+            this.dataProvider = dataProvider;
+            this.commitOperation = commitOperation;
+            this.treeOperation = treeOperation;
+            this.diff = diff;
+            this.logger = logger;
         }
 
         /// <inheritdoc/>

@@ -23,16 +23,20 @@
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
         public TreeOperation(IDataProvider dataProvider)
+            : this(dataProvider, NullLogger<TreeOperation>.Instance)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TreeOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">The data provider.</param>
+        /// <param name="logger">The logger.</param>
+        public TreeOperation(IDataProvider dataProvider, ILogger<TreeOperation> logger)
         {
             this.dataProvider = dataProvider;
             this.fileOperator = this.dataProvider.FileOperator;
-            this.logger = NullLogger<TreeOperation>.Instance;
-        }
-
-        public TreeOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
-        : this(dataProvider)
-        {
-            this.logger = loggerFactory.CreateLogger<TreeOperation>();
+            this.logger = logger;
         }
 
         /// <inheritdoc/>

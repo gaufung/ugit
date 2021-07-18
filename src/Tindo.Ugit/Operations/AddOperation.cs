@@ -20,22 +20,21 @@
         /// Initializes a new instance of the <see cref="AddOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public AddOperation(IDataProvider dataProvider)
+        public AddOperation(IDataProvider dataProvider) 
+            : this(dataProvider, NullLogger<AddOperation>.Instance)
         {
-            this.dataProvider = dataProvider;
-            this.fileOperator = this.dataProvider.FileOperator;
-            this.logger = NullLogger<AddOperation>.Instance;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AddOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        /// <param name="loggerFactory">loggerFactory interface.</param>
-        public AddOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
-            : this(dataProvider)
+        /// <param name="logger">The logger.</param>
+        public AddOperation(IDataProvider dataProvider, ILogger<AddOperation> logger)
         {
-            this.logger = loggerFactory.CreateLogger<AddOperation>();
+            this.dataProvider = dataProvider;
+            this.fileOperator = this.dataProvider.FileOperator;
+            this.logger = logger;
         }
 
         /// <inheritdoc/>
