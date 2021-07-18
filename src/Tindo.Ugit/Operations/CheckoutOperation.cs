@@ -31,12 +31,8 @@
             ITreeOperation treeOperation,
             ICommitOperation commitOperation,
             IBranchOperation branchOperation)
+            : this(dataProvider, treeOperation, commitOperation, branchOperation, NullLogger<CheckoutOperation>.Instance)
         {
-            this.dataProvider = dataProvider;
-            this.treeOperation = treeOperation;
-            this.commitOperation = commitOperation;
-            this.branchOperation = branchOperation;
-            this.logger = NullLogger<CheckoutOperation>.Instance;
         }
 
         /// <summary>
@@ -46,16 +42,19 @@
         /// <param name="treeOperation">The tree operation.</param>
         /// <param name="commitOperation">The commit operation.</param>
         /// <param name="branchOperation">The branch operation.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
+        /// <param name="logger">The logger factory.</param>
         public CheckoutOperation(
             IDataProvider dataProvider,
             ITreeOperation treeOperation,
             ICommitOperation commitOperation,
             IBranchOperation branchOperation,
-            ILoggerFactory loggerFactory)
-        : this(dataProvider, treeOperation, commitOperation, branchOperation)
+            ILogger<CheckoutOperation> logger)
         {
-            this.logger = loggerFactory.CreateLogger<CheckoutOperation>();
+            this.dataProvider = dataProvider;
+            this.treeOperation = treeOperation;
+            this.commitOperation = commitOperation;
+            this.branchOperation = branchOperation;
+            this.logger = logger;
         }
 
         /// <inheritdoc/>

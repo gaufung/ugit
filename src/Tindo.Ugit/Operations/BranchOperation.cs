@@ -19,15 +19,19 @@
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
         public BranchOperation(IDataProvider dataProvider)
+            : this(dataProvider, NullLogger<BranchOperation>.Instance)
         {
-            this.dataProvider = dataProvider;
-            this.logger = NullLogger<BranchOperation>.Instance;
         }
 
-        public BranchOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
-         : this(dataProvider)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BranchOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">the data provider.</param>
+        /// <param name="logger">the logger.</param>
+        public BranchOperation(IDataProvider dataProvider, ILogger<BranchOperation> logger)
         {
-            this.logger = loggerFactory.CreateLogger<BranchOperation>();
+            this.dataProvider = dataProvider;
+            this.logger = logger;
         }
 
         /// <inheritdoc/>

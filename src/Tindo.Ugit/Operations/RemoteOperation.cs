@@ -34,6 +34,24 @@
             ICommitOperation localCommitOperation,
             IDataProvider remoteDataProvider,
             ICommitOperation remoteCommitOperation)
+            : this(localDataProvider, localCommitOperation, remoteDataProvider, remoteCommitOperation, NullLogger<RemoteOperation>.Instance)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RemoteOperation"/> class.
+        /// </summary>
+        /// <param name="localDataProvider">local data provider.</param>
+        /// <param name="localCommitOperation">local commit operation.</param>
+        /// <param name="remoteDataProvider">remote data provider.</param>
+        /// <param name="remoteCommitOperation">remote commit operation.</param>
+        /// <param name="logger">The logger.</param>
+        public RemoteOperation(
+            IDataProvider localDataProvider,
+            ICommitOperation localCommitOperation,
+            IDataProvider remoteDataProvider,
+            ICommitOperation remoteCommitOperation,
+            ILogger<RemoteOperation> logger)
         {
             this.localDataProvider = localDataProvider;
             this.localCommitOperation = localCommitOperation;
@@ -41,18 +59,7 @@
             this.remoteCommitOperation = remoteCommitOperation;
             this.localFileOperator = this.localDataProvider.FileOperator;
             this.remoteFileOperator = this.remoteDataProvider.FileOperator;
-            this.logger = NullLogger<RemoteOperation>.Instance;
-        }
-
-        public RemoteOperation(
-            IDataProvider localDataProvider,
-            ICommitOperation localCommitOperation,
-            IDataProvider remoteDataProvider,
-            ICommitOperation remoteCommitOperation,
-            ILoggerFactory loggerFactory)
-        : this(localDataProvider, localCommitOperation, remoteDataProvider,remoteCommitOperation)
-        {
-            this.logger = loggerFactory.CreateLogger<RemoteOperation>();
+            this.logger = logger;
         }
 
         /// <inheritdoc/>

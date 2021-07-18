@@ -25,11 +25,8 @@
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
         public DiffOperation(IDataProvider dataProvider, IDiffProxy diffProxy)
+            : this(dataProvider, diffProxy, NullLogger<DiffOperation>.Instance)
         {
-            this.dataProvider = dataProvider;
-            this.diffProxy = diffProxy;
-            this.fileOperator = this.dataProvider.FileOperator;
-            this.logger = NullLogger<DiffOperation>.Instance;
         }
 
         /// <summary>
@@ -37,14 +34,16 @@
         /// </summary>
         /// <param name="dataProvider">the data provider.</param>
         /// <param name="diffProxy">the diff command proxy.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
+        /// <param name="logger">The logger factory.</param>
         public DiffOperation(
             IDataProvider dataProvider,
             IDiffProxy diffProxy,
-            ILoggerFactory loggerFactory)
-        : this(dataProvider, diffProxy)
+            ILogger<DiffOperation> logger)
         {
-            this.logger = loggerFactory.CreateLogger<DiffOperation>();
+            this.dataProvider = dataProvider;
+            this.diffProxy = diffProxy;
+            this.fileOperator = this.dataProvider.FileOperator;
+            this.logger = logger;
         }
 
         /// <inheritdoc />

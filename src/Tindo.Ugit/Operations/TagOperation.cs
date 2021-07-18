@@ -19,15 +19,19 @@
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
         public TagOperation(IDataProvider dataProvider)
+            : this(dataProvider, NullLogger<TagOperation>.Instance)
         {
-            this.dataProvider = dataProvider;
-            this.logger = NullLogger<TagOperation>.Instance;
         }
 
-        public TagOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
-        : this(dataProvider)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TagOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">The data provider.</param>
+        /// <param name="logger">The logger.</param>
+        public TagOperation(IDataProvider dataProvider, ILogger<TagOperation> logger)
         {
-            this.logger = loggerFactory.CreateLogger<TagOperation>();
+            this.dataProvider = dataProvider;
+            this.logger = logger;
         }
 
         /// <inheritdoc/>

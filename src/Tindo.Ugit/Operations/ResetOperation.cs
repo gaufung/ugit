@@ -18,15 +18,19 @@ namespace Tindo.Ugit
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
         public ResetOperation(IDataProvider dataProvider)
+            : this(dataProvider, NullLogger<ResetOperation>.Instance)
         {
-            this.dataProvider = dataProvider;
-            this.logger = NullLogger<ResetOperation>.Instance;
         }
 
-        public ResetOperation(IDataProvider dataProvider, ILoggerFactory loggerFactory)
-            : this(dataProvider)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ResetOperation"/> class.
+        /// </summary>
+        /// <param name="dataProvider">The data provider.</param>
+        /// <param name="logger">The logger.</param>
+        public ResetOperation(IDataProvider dataProvider, ILogger<ResetOperation> logger)
         {
-            this.logger = loggerFactory.CreateLogger<ResetOperation>();
+            this.dataProvider = dataProvider;
+            this.logger = logger;
         }
 
         /// <inheritdoc/>
