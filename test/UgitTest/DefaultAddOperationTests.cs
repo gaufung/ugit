@@ -8,7 +8,6 @@ using System.Collections.Generic;
 namespace Tindo.Ugit
 {
     [TestClass]
-    [Ignore]
     public class DefaultAddOpeartionTests
     {
         private Mock<IDataProvider> dataProvider;
@@ -19,8 +18,9 @@ namespace Tindo.Ugit
         [TestInitialize]
         public void Init()
         {
-            dataProvider = new Mock<IDataProvider>();
-            fileOperator = new Mock<IFileOperator>();
+            dataProvider = new Mock<IDataProvider>(MockBehavior.Strict);
+            fileOperator = new Mock<IFileOperator>(MockBehavior.Strict);
+            dataProvider.Setup(d => d.FileOperator).Returns(fileOperator.Object);
             addOperation = new AddOperation(dataProvider.Object);
         }
 
@@ -46,6 +46,7 @@ namespace Tindo.Ugit
                Path.Join(".", "sub", "foo.txt") 
             });
             this.dataProvider.Setup(d => d.WriteObject(It.IsAny<byte[]>(), "blob")).Returns("bar-oid");
+            this.dataProvider.SetupSet(d => d.Index = It.IsAny<Tree>()).Verifiable();
             addOperation.Add(fileNames);
             this.dataProvider.VerifyAll();
         }
