@@ -5,8 +5,7 @@ using Tindo.Ugit;
 namespace Tindo.Ugit
 {
     [TestClass]
-    [Ignore]
-    public class DefaultResetOperationTests
+    public class ResetOperationTests
     {
         private Mock<IDataProvider> dataProvider;
 

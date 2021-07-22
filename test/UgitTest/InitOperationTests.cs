@@ -1,16 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
     [TestClass]
-    [Ignore]
-    public class DefaultInitOperationTests
+    public class InitOperationTests
     {
         private Mock<IDataProvider> dataProviderMock;
 

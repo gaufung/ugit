@@ -8,8 +8,7 @@ using Tindo.Ugit;
 namespace Tindo.Ugit
 {
     [TestClass]
-    [Ignore]
-    public class DefaultTagOperationTests
+    public class TagOperationTests
     {
         private Mock<IDataProvider> dataProviderMock;
 

@@ -8,8 +8,7 @@ using Tindo.Ugit;
 namespace Tindo.Ugit
 {
     [TestClass]
-    [Ignore]
-    public class DefaultTreeOperationTests
+    public class TreeOperationTests
     {
         private Mock<IDataProvider> dataProvider;
 
@@ -21,6 +20,8 @@ namespace Tindo.Ugit
         public void Init()
         {
             dataProvider = new Mock<IDataProvider>();
+            fileOperator = new Mock<IFileOperator>();
+            dataProvider.Setup(p => p.FileOperator).Returns(fileOperator.Object);
             treeOpeartion = new TreeOperation(dataProvider.Object);
         }
 

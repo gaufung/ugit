@@ -1,15 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
 using System.IO;
 using System.Linq;
-using Tindo.Ugit;
 
 namespace Tindo.Ugit
 {
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
-    [Ignore]
-    public class DefaultBranchOperationTests
+    [TestClass]
+    public class BranchOperationTests
     {
         private Mock<IDataProvider> dataProvider;
 

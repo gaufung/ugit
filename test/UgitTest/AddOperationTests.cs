@@ -1,14 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Tindo.Ugit;
-using System.IO;
 using System;
-using System.Collections.Generic;
+using System.IO;
 
 namespace Tindo.Ugit
 {
     [TestClass]
-    public class DefaultAddOpeartionTests
+    public class AddOpeartionTests
     {
         private Mock<IDataProvider> dataProvider;
         private Mock<IFileOperator> fileOperator;

@@ -8,8 +8,7 @@ using Tindo.Ugit;
 namespace Tindo.Ugit
 {
     [TestClass]
-    [Ignore]
-    public class DefaultMergeOperationTests
+    public class MergeOperationTests
     {
         private Mock<ICommitOperation> commitOperation;
 
@@ -108,7 +107,7 @@ namespace Tindo.Ugit
                     { "foo.txt", "foo-oid"},
                 });
             this.diff.Setup(d => d.MergeTree(It.IsAny<Tree>(),
-                It.IsAny<Tree>())).Returns<IDictionary<string, string>, IDictionary<string, string>>((tree1, tree2) =>
+                It.IsAny<Tree>())).Returns<Tree, Tree>((tree1, tree2) =>
                 {
                     if(tree1.Count==2 && 
                         tree1.ContainsKey("foo.txt") &&

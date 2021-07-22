@@ -1,16 +1,14 @@
 namespace Tindo.Ugit
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using Ugit;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
 
     [TestClass]
-    [Ignore]
-    public class DefaultRemoteOperationTests
+    public class RemoteOperationTests
     {
         private Mock<IDataProvider> localDataProviderMock = new();
         private Mock<ICommitOperation> localCommitOperationMock = new();
@@ -23,6 +21,8 @@ namespace Tindo.Ugit
         [TestInitialize]
         public void Init()
         {
+            localDataProviderMock.Setup(p => p.FileOperator).Returns(localFileOperator.Object);
+            remoteDataProviderMock.Setup(p => p.FileOperator).Returns(remoteFileOperator.Object);
             remoteOpetaion = new RemoteOperation(
                 localDataProviderMock.Object,
                 localCommitOperationMock.Object,

@@ -7,8 +7,7 @@ using Tindo.Ugit;
 namespace Tindo.Ugit
 {
     [TestClass]
-    [Ignore]
-    public class DefaultCommitOperationTests
+    public class CommitOperationTests
     {
         private Mock<IDataProvider> dataProvider;
         private Mock<ITreeOperation> treeOperation;
