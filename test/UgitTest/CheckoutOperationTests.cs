@@ -9,8 +9,7 @@ using Tindo.Ugit;
 namespace Tindo.Ugit
 {
     [TestClass]
-    [Ignore]
-    public class DefaultCheckoutOperationTests
+    public class CheckoutOperationTests
     {
 
         private Mock<IDataProvider> dataProvider;
