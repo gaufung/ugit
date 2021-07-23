@@ -63,7 +63,7 @@ namespace Tindo.Ugit.CLI
 
         static Command CreateArgsCommand()
         {
-            var initCmd = new Command("init", "initialize ugit repo");
+            var initCmd = new Command("init", "Create an empty ugit repository or reinitialize an existing one");
             initCmd.Handler = CommandHandler.Create(Init);
 
             var hashObjectCmd = new Command("hash-object", "hash a file object")
@@ -84,78 +84,78 @@ namespace Tindo.Ugit.CLI
             };
             readTreeCmd.Handler = CommandHandler.Create<string>(ReadTree);
 
-            var commitCmd = new Command("commit")
+            var commitCmd = new Command("commit", "Record changes to the repository")
             {
                 new Option<string>(new string[]{"-m", "--message"}, "message")
             };
             commitCmd.Handler = CommandHandler.Create<string>(Commit);
 
-            var logCmd = new Command("log")
+            var logCmd = new Command("log", "Show commit logs")
             {
                 new Argument<string>("oid", () => "@"),
             };
             logCmd.Handler = CommandHandler.Create<string>(Log);
 
-            var checkoutCmd = new Command("checkout")
+            var checkoutCmd = new Command("checkout", "Check out the specific commit")
             {
                 new Argument<string>("commit")
             };
             checkoutCmd.Handler = CommandHandler.Create<string>(Checkout);
 
-            var tagCmd = new Command("tag")
+            var tagCmd = new Command("tag", "Create, list, delete or verify a tag object signed with GPG")
             {
                 new Argument<string>("name", ()=>string.Empty),
                 new Argument<string>("oid", () => "@")
             };
             tagCmd.Handler = CommandHandler.Create<string, string>(TagOp);
 
-            var branchCmd = new Command("branch")
+            var branchCmd = new Command("branch", "List, create, or delete branches")
             {
                 new Argument<string>("name", () => string.Empty),
                 new Argument<string>("oid", () => "@")
             };
             branchCmd.Handler = CommandHandler.Create<string, string>(Branch);
 
-            var statusCmd = new Command("status");
+            var statusCmd = new Command("status", "Show the current work tree status");
             statusCmd.Handler = CommandHandler.Create(Status);
 
-            var resetCmd = new Command("reset")
+            var resetCmd = new Command("reset", "Reset current HEAD to the specified state")
             {
                 new Argument<string>("commit")
             };
             resetCmd.Handler = CommandHandler.Create<string>(Reset);
 
-            var showCmd = new Command("show")
+            var showCmd = new Command("show", "Show the working tree status")
             {
                 new Argument<string>("oid", () => "@")
             };
             showCmd.Handler = CommandHandler.Create<string>(Show);
             
-            var diffCmd = new Command("diff")
+            var diffCmd = new Command("diff", "Show changes between commits, commit and working tree, etc")
             {
                 new Argument<string>("commit", () => "@")
             };
             diffCmd.Handler = CommandHandler.Create<string>(Different);
             
-            var mergeCmd = new Command("merge")
+            var mergeCmd = new Command("merge", "Join two or more development histories together")
             {
                 new Argument<string>("commit", () => "@")
             };
             mergeCmd.Handler = CommandHandler.Create<string>(Merge);
 
-            var addCmd = new Command("add")
+            var addCmd = new Command("add", "Add file contents to the index")
             {
                 new Argument<IEnumerable<string>>("files"),
             };
             addCmd.Handler = CommandHandler.Create<IEnumerable<string>>(Add);
 
-            var fetchCmd = new Command("fetch")
+            var fetchCmd = new Command("fetch", "Download objects and refs from another repository")
             {
                 new Argument<string>("remote")
             };
             fetchCmd.Handler = CommandHandler.Create<string>(Fetch);
 
-            var pushCmd = new Command("push")
+            var pushCmd = new Command("push", "Update remote refs along with associated objects")
             {
                 new Argument<string>("remote"),
                 new Argument<string>("branch")
