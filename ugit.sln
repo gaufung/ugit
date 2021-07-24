@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tindo.UgitTest", "test\Ugit
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tindo.Ugit.CLI", "src\Tindo.Ugit.CLI\Tindo.Ugit.CLI.csproj", "{B86AD629-C875-4F86-B1FD-D7315523C8E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tindo.Ugit.CLI", "src\Tindo.Ugit.CLI\Tindo.Ugit.CLI.csproj", "{B86AD629-C875-4F86-B1FD-D7315523C8E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tindo.Ugit.Server", "src\Tindo.Ugit.Server\Tindo.Ugit.Server.csproj", "{11CE6ADF-4B2A-432D-90A7-DEFDBC7CB36E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,10 @@ Global
 		{B86AD629-C875-4F86-B1FD-D7315523C8E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B86AD629-C875-4F86-B1FD-D7315523C8E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B86AD629-C875-4F86-B1FD-D7315523C8E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11CE6ADF-4B2A-432D-90A7-DEFDBC7CB36E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11CE6ADF-4B2A-432D-90A7-DEFDBC7CB36E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11CE6ADF-4B2A-432D-90A7-DEFDBC7CB36E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11CE6ADF-4B2A-432D-90A7-DEFDBC7CB36E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{315B5BAC-5E10-4B41-9EB7-DFFB0D4EE699} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
 		{A11729C8-0335-4C6D-8B74-A2385FB153BF} = {8034D253-E7CB-4CE6-87E7-7AED4E12BD7F}
 		{B86AD629-C875-4F86-B1FD-D7315523C8E5} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
+		{11CE6ADF-4B2A-432D-90A7-DEFDBC7CB36E} = {C93DBDB7-8B82-4657-A3A4-85EA792C4E4B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9BD04BF7-1070-4A04-AE94-1164C8722646}
