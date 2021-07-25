@@ -28,6 +28,11 @@
         Tree Index { get; set; }
 
         /// <summary>
+        /// Gets or sets the config.
+        /// </summary>
+        Config Config { get; set; }
+
+        /// <summary>
         /// Initialize the git directory.
         /// </summary>
         void Init();
