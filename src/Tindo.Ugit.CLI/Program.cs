@@ -5,9 +5,11 @@ using System.IO.Abstractions;
 using Tindo.Ugit;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tindo.Ugit.CLI
 {
+    [ExcludeFromCodeCoverage]
     class Program
     {
         private static readonly IDataProvider DataProvider;
@@ -161,7 +163,15 @@ namespace Tindo.Ugit.CLI
                 new Argument<string>("branch")
             };
             pushCmd.Handler = CommandHandler.Create<string,string>(Push);
-            
+
+
+            var remoteCmd = new Command("remote", "Add or update the remote repository")
+            {
+                new Argument<string>("name"),
+                new Argument<string>("url")
+            };
+            remoteCmd.Handler = CommandHandler.Create<string, string>(Remote);
+
             var rootCommand = new RootCommand
             {
                 initCmd,
@@ -181,6 +191,7 @@ namespace Tindo.Ugit.CLI
                 addCmd,
                 fetchCmd,
                 pushCmd,
+                remoteCmd,
             };
 
             return rootCommand;
@@ -380,7 +391,6 @@ namespace Tindo.Ugit.CLI
             }
         }
         
-
         static void Log(string oid)
         {
             oid = OidConverter(oid);
@@ -423,7 +433,13 @@ namespace Tindo.Ugit.CLI
                 BranchOperation.Create(name, startPoint);
                 Console.WriteLine($"Branch {name} create at {startPoint.Substring(0, 10)}");
             }
+        }
 
+        private static void Remote(string name, string url)
+        {
+            var config = DataProvider.Config;
+            config.Remote = new Remote { Name = name, Url = url };
+            DataProvider.Config = config;
         }
     }
 }

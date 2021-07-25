@@ -49,7 +49,7 @@
         public string GitDir => ".ugit";
 
         /// <inheritdoc/>
-        public string GitDirFullPath =>
+        public virtual string GitDirFullPath =>
             Path.Join(this.repoPath, this.GitDir);
 
         /// <inheritdoc/>
@@ -72,6 +72,33 @@
             set
             {
                 string path = Path.Join(this.GitDirFullPath, Constants.Index);
+                var data = JsonSerializer.SerializeToUtf8Bytes(value);
+                if (this.fileOperator.Exists(path))
+                {
+                    this.fileOperator.Delete(path);
+                }
+
+                this.fileOperator.Write(path, data);
+            }
+        }
+
+        /// <inheritdoc/>
+        public Config Config
+        {
+            get
+            {
+                string path = Path.Join(this.GitDirFullPath, Constants.Config);
+                if (this.fileOperator.TryRead(path, out var data))
+                {
+                    return JsonSerializer.Deserialize<Config>(data);
+                }
+
+                return new Config();
+            }
+
+            set
+            {
+                string path = Path.Join(this.GitDirFullPath, Constants.Config);
                 var data = JsonSerializer.SerializeToUtf8Bytes(value);
                 if (this.fileOperator.Exists(path))
                 {
