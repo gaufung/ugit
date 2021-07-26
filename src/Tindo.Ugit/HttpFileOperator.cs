@@ -10,7 +10,7 @@
     /// </summary>
     public class HttpFileOperator : IFileOperator
     {
-        private readonly string remoteUrl;
+        private readonly string remotePath;
 
         private readonly HttpClient client;
 
@@ -18,8 +18,8 @@
 
         public HttpFileOperator(string remoteUrl, IHttpClientFactory httpClientFactory, ILogger<HttpFileOperator> logger)
         {
-            this.remoteUrl = remoteUrl;
-            this.client = httpClientFactory.CreateClient(this.remoteUrl);
+            this.remotePath = remoteUrl + "/api/";
+            this.client = httpClientFactory.CreateClient(remoteUrl);
             this.logger = logger;
         }
 
@@ -47,7 +47,16 @@
 
         public byte[] Read(string path)
         {
-            throw new NotImplementedException();
+            string url = $"{this.remotePath}/{path}";
+            HttpRequestMessage requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri(url),
+                Method = HttpMethod.Get,
+            };
+
+            var response = this.client.SendAsync(requestMessage).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            return response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult().Encode();
         }
 
         public bool TryRead(string path, out byte[] bytes)

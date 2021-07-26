@@ -1,20 +1,31 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Tindo.Ugit
 {
+    /// <summary>
+    /// HttpDataProvider 
+    /// </summary>
     internal class HttpDataProvider : IDataProvider
     {
-        public string GitDirFullPath => throw new NotImplementedException();
+        private ILogger<HttpDataProvider> _logger;
+
+        public HttpDataProvider(IFileOperator fileOperator, ILogger<HttpDataProvider> logger)
+        {
+            FileOperator = fileOperator;
+            _logger = logger;
+        }
+
+        public string GitDirFullPath => string.Empty;
 
         public string GitDir => throw new NotImplementedException();
 
-        public IFileOperator FileOperator => throw new NotImplementedException();
+        public IFileOperator FileOperator { get; private set; }
 
         public Tree Index { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public Config Config { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void DeleteRef(string @ref, bool deref = true)
@@ -24,12 +35,16 @@ namespace Tindo.Ugit
 
         public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
         {
-            throw new NotImplementedException();
+            string path = string.IsNullOrWhiteSpace(prefix) ?
+                $"refs?deref={deref}" : $"refs?deref={deref}&prefix={prefix}";
+            byte[] data = this.FileOperator.Read(path);
+            return JsonSerializer.Deserialize<List<(string, RefValue)>>(data);
         }
 
         public byte[] GetObject(string oid, string expected = "blob")
         {
-            throw new NotImplementedException();
+            string path = $"objects/{oid}?expected={expected}";
+            return this.FileOperator.Read(path);
         }
 
         public string GetOid(string name)
