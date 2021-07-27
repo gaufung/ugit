@@ -48,6 +48,7 @@
         public byte[] Read(string path)
         {
             string url = $"{this.remotePath}/{path}";
+            this.logger.LogInformation($"Get: {url}");
             HttpRequestMessage requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(url),
@@ -55,7 +56,6 @@
             };
 
             var response = this.client.SendAsync(requestMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-
             return response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult().Encode();
         }
 
