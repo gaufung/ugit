@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO.Abstractions;
 
 namespace Tindo.Ugit.Server
 {
@@ -26,6 +27,7 @@ namespace Tindo.Ugit.Server
             services.AddControllersWithViews();
             services.AddOptions()
                 .Configure<UgitServerOptions>(Configuration.GetSection("UgitServer"));
+            services.AddSingleton<IFileSystem, FileSystem>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
