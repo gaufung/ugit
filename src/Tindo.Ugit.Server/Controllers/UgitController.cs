@@ -8,7 +8,6 @@ using System.Text.Json;
 
 namespace Tindo.Ugit.Server.Controllers
 {
-    [Route("api")]
     public class UgitController : Controller
     {
         private readonly ILogger<UgitController> _logger;

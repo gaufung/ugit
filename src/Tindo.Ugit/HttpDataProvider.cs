@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text.Json;
-
-namespace Tindo.Ugit
+﻿namespace Tindo.Ugit
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text.Json;
+    using Microsoft.Extensions.Logging;
+
     /// <summary>
-    /// HttpDataProvider 
+    /// HttpDataProvider.
     /// </summary>
     internal class HttpDataProvider : IDataProvider
     {
@@ -33,12 +34,20 @@ namespace Tindo.Ugit
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Get all refs from the remote server.
+        /// </summary>
+        /// <param name="prefix">the prefix.</param>
+        /// <param name="deref">dereference.</param>
+        /// <returns>The values.</returns>
         public IEnumerable<(string, RefValue)> GetAllRefs(string prefix = "", bool deref = true)
         {
+            prefix = Uri.EscapeDataString(prefix);
             string path = string.IsNullOrWhiteSpace(prefix) ?
                 $"refs?deref={deref}" : $"refs?deref={deref}&prefix={prefix}";
             byte[] data = this.FileOperator.Read(path);
-            return JsonSerializer.Deserialize<List<(string, RefValue)>>(data);
+            return JsonSerializer.Deserialize<Dictionary<string, RefValue>>(data)
+                .Select(kvp => (kvp.Key, kvp.Value));
         }
 
         public byte[] GetObject(string oid, string expected = "blob")

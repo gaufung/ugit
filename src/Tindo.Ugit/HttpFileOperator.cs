@@ -18,7 +18,7 @@
 
         public HttpFileOperator(string remoteUrl, IHttpClientFactory httpClientFactory, ILogger<HttpFileOperator> logger)
         {
-            this.remotePath = remoteUrl + "/api/";
+            this.remotePath = remoteUrl;
             this.client = httpClientFactory.CreateClient(remoteUrl);
             this.logger = logger;
         }

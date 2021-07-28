@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Abstractions;
-using Tindo.Ugit;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.IO.Abstractions;
+using System.Net.Http;
 
 namespace Tindo.Ugit.CLI
 {
@@ -40,6 +42,10 @@ namespace Tindo.Ugit.CLI
 
         private static readonly Func<string, string> OidConverter;
 
+        private static readonly ILoggerFactory LoggerFactory;
+
+        private static readonly IHttpClientFactory HttpClientFactory;
+
         static Program()
         {
             FileSystem = new FileSystem();
@@ -56,6 +62,14 @@ namespace Tindo.Ugit.CLI
             CheckoutOperation = new CheckoutOperation(DataProvider, TreeOperation, CommitOperation, BranchOperation);
             AddOperation = new AddOperation(DataProvider);
             OidConverter = DataProvider.GetOid;
+            var sp = new ServiceCollection()
+                .AddHttpClient()
+                .AddLogging(builder => builder.AddConsole())
+                .BuildServiceProvider();
+            LoggerFactory = sp.GetRequiredService<ILoggerFactory>();
+            HttpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+
+            
         }
 
         private static int Main(string[] args)
@@ -213,7 +227,18 @@ namespace Tindo.Ugit.CLI
 
         private static void Fetch(string remote)
         {
-            IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), remote);
+            Config config = DataProvider.Config;
+            IDataProvider remoteDataProvider;
+            if (config.Remote != null && config.Remote.Name.Equals(remote, StringComparison.OrdinalIgnoreCase))
+            {
+                remoteDataProvider = new HttpDataProvider(
+                    new HttpFileOperator(config.Remote.Url, HttpClientFactory, LoggerFactory.CreateLogger<HttpFileOperator>()),
+                    LoggerFactory.CreateLogger<HttpDataProvider>());
+            }
+            else
+            {
+                remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), remote);
+            }
             ICommitOperation remoteCommitOperation = new CommitOperation(remoteDataProvider, new TreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new RemoteOperation(
