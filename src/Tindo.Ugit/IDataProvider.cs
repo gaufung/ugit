@@ -104,5 +104,19 @@
         /// <param name="oid">object Id.</param>
         /// <returns>True if existing.</returns>
         bool ObjectExist(string oid);
+
+        /// <summary>
+        /// Read object by the oid.
+        /// </summary>
+        /// <param name="oid">The object id.</param>
+        /// <returns>the object content.</returns>
+        byte[] ReadObject(string oid);
+
+        /// <summary>
+        /// Write the object direct.
+        /// </summary>
+        /// <param name="oid">The object id.</param>
+        /// <param name="data">The data to write.</param>
+        void WriteObject(string oid, byte[] data);
     }
 }

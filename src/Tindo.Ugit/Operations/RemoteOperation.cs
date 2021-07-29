@@ -112,10 +112,8 @@
                 return;
             }
 
-            string localPath = Path.Join(this.localDataProvider.GitDirFullPath, Constants.Objects, oid);
-            string remotePath = Path.Join(this.remoteDataProvider.GitDirFullPath, Constants.Objects, oid);
-            byte[] bytes = this.remoteFileOperator.Read(remotePath);
-            this.localFileOperator.Write(localPath, bytes);
+            byte[] bytes = this.remoteDataProvider.ReadObject(oid);
+            this.localDataProvider.WriteObject(oid, bytes);
         }
 
         private void PushObject(string oid)

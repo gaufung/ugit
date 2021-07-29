@@ -52,7 +52,7 @@
 
         public byte[] GetObject(string oid, string expected = "blob")
         {
-            string path = $"objects/{oid}?expected={expected}";
+            string path = string.IsNullOrEmpty(expected) ? $"objects/{oid}" : $"objects/{oid}?expected={expected}";
             return this.FileOperator.Read(path);
         }
 
@@ -81,6 +81,12 @@
             throw new NotImplementedException();
         }
 
+        public byte[] ReadObject(string oid)
+        {
+            string path = $"objects/{oid}";
+            return this.FileOperator.Read(path);
+        }
+
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
             throw new NotImplementedException();
@@ -89,6 +95,12 @@
         public string WriteObject(byte[] data, string type = "blob")
         {
             throw new NotImplementedException();
+        }
+
+        public void WriteObject(string oid, byte[] data)
+        {
+            string path = $"objects/{oid}";
+            this.FileOperator.Write(path, data);
         }
     }
 }

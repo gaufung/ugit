@@ -108,7 +108,6 @@
             {
                 this.Delete(path);
             }
-
             this.fileSystem.File.WriteAllBytes(path, bytes);
         }
 

@@ -254,6 +254,20 @@
             return this.fileOperator.Exists(Path.Join(this.GitDirFullPath, "objects", oid));
         }
 
+        /// <inheritdoc/>
+        public byte[] ReadObject(string oid)
+        {
+            string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
+            return this.fileOperator.Read(filePath);
+        }
+
+        /// <inheritdoc/>
+        public void WriteObject(string oid, byte[] data)
+        {
+            string filePath = Path.Join(this.GitDirFullPath, Constants.Objects, oid);
+            this.fileOperator.Write(filePath, data);
+        }
+
         private (string, RefValue) GetRefInternal(string @ref, bool deref)
         {
             var refPath = Path.Join(this.GitDirFullPath, @ref);

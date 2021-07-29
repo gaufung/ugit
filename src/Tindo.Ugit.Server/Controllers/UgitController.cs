@@ -40,11 +40,11 @@ namespace Tindo.Ugit.Server.Controllers
         }
 
         [HttpGet("{repo}/objects/{oid}")]
-        public IActionResult GetObject(string repo, string oid, [FromQuery]string expected)
+        public IActionResult GetObject(string repo, string oid, [FromQuery]string expected="")
         {
             string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
             IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);
-            var data = dataProvider.GetObject(oid, expected);
+            var data = string.IsNullOrWhiteSpace(expected) ? dataProvider.ReadObject(oid) : dataProvider.GetObject(oid, expected);
             return new FileContentResult(data, "application/octet-stream");
         }
     }
