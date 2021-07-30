@@ -118,10 +118,8 @@
 
         private void PushObject(string oid)
         {
-            string localPath = Path.Join(this.localDataProvider.GitDirFullPath, Constants.Objects, oid);
-            string remotePath = Path.Join(this.remoteDataProvider.GitDirFullPath, Constants.Objects, oid);
-            byte[] bytes = this.localFileOperator.Read(localPath);
-            this.remoteFileOperator.Write(remotePath, bytes);
+            byte[] bytes = this.localDataProvider.ReadObject(oid);
+            this.remoteDataProvider.WriteObject(oid, bytes);
         }
 
         private bool IsAncestorOf(string commit, string maybeAncestor)

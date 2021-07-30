@@ -39,6 +39,16 @@ namespace Tindo.Ugit.Server.Controllers
             return new FileContentResult(data, "application/octet-stream");
         }
 
+        [HttpPost("{repo}/ref/{refName}")]
+        public IActionResult UpdateRef(string repo, string refName, [FromBody] byte[] body, [FromQuery]bool deref=true)
+        {
+            string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
+            IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);
+            RefValue refValue = JsonSerializer.Deserialize<RefValue>(body);
+            dataProvider.UpdateRef(refName, refValue, deref);
+            return Ok();
+        }
+
         [HttpGet("{repo}/objects/{oid}")]
         public IActionResult GetObject(string repo, string oid, [FromQuery]string expected="")
         {
@@ -46,6 +56,15 @@ namespace Tindo.Ugit.Server.Controllers
             IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);
             var data = string.IsNullOrWhiteSpace(expected) ? dataProvider.ReadObject(oid) : dataProvider.GetObject(oid, expected);
             return new FileContentResult(data, "application/octet-stream");
+        }
+
+        [HttpPost("{repo}/objects{oid}")]
+        public IActionResult WriteObject(string repo, string oid, [FromBody]byte[] body)
+        {
+            string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
+            IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);
+            dataProvider.WriteObject(oid, body);
+            return Ok();
         }
     }
 }

@@ -89,7 +89,9 @@
 
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
-            throw new NotImplementedException();
+            string path = $"ref/{@ref}?deref={deref}";
+            byte[] data = JsonSerializer.SerializeToUtf8Bytes(value);
+            this.FileOperator.Write(path, data);
         }
 
         public string WriteObject(byte[] data, string type = "blob")

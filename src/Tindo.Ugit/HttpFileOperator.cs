@@ -55,8 +55,8 @@
                 Method = HttpMethod.Get,
             };
 
-            var response = this.client.SendAsync(requestMessage).ConfigureAwait(false).GetAwaiter().GetResult();
-            return response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult().Encode();
+            var response = this.client.SendAsync(requestMessage).Result;
+            return response.Content.ReadAsStringAsync().Result.Encode();
         }
 
         public bool TryRead(string path, out byte[] bytes)
@@ -71,7 +71,15 @@
 
         public void Write(string path, byte[] bytes)
         {
-            throw new NotImplementedException();
+            string url = $"{this.remotePath}/path";
+            HttpRequestMessage requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri(url),
+                Method = HttpMethod.Post,
+                Content = new ByteArrayContent(bytes),
+            };
+
+            this.client.SendAsync(requestMessage).ConfigureAwait(false).GetAwaiter().GetResult();
         }
     }
 }

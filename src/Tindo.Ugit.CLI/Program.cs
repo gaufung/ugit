@@ -213,7 +213,18 @@ namespace Tindo.Ugit.CLI
 
         private static void Push(string remote, string branch)
         {
-            IDataProvider remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), remote);
+            Config config = DataProvider.Config;
+            IDataProvider remoteDataProvider;
+            if (config.Remote!=null && config.Remote.Name.Equals(remote, StringComparison.OrdinalIgnoreCase))
+            {
+                remoteDataProvider = new HttpDataProvider(
+                    new HttpFileOperator(config.Remote.Url, HttpClientFactory, LoggerFactory.CreateLogger<HttpFileOperator>()),
+                    LoggerFactory.CreateLogger<HttpDataProvider>());
+            }
+            else
+            {
+                remoteDataProvider = new LocalDataProvider(new PhysicalFileOperator(new FileSystem()), remote);
+            }
             ICommitOperation remoteCommitOperation = new CommitOperation(remoteDataProvider, new TreeOperation(remoteDataProvider));
 
             IRemoteOperation remoteOperation = new RemoteOperation(
