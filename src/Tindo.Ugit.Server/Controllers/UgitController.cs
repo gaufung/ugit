@@ -5,6 +5,8 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text.Json;
+using System;
+using System.Threading.Tasks;
 
 namespace Tindo.Ugit.Server.Controllers
 {
@@ -40,10 +42,13 @@ namespace Tindo.Ugit.Server.Controllers
         }
 
         [HttpPost("{repo}/ref/{refName}")]
-        public IActionResult UpdateRef(string repo, string refName, [FromBody] byte[] body, [FromQuery]bool deref=true)
+        public async Task<IActionResult> UpdateRef(string repo, string refName, [FromQuery]bool deref=true)
         {
             string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
             IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);
+            using var ms = new MemoryStream();
+            await this.Request.Body.CopyToAsync(ms);
+            byte[] body = ms.ToArray();
             RefValue refValue = JsonSerializer.Deserialize<RefValue>(body);
             dataProvider.UpdateRef(refName, refValue, deref);
             return Ok();
@@ -58,12 +63,15 @@ namespace Tindo.Ugit.Server.Controllers
             return new FileContentResult(data, "application/octet-stream");
         }
 
-        [HttpPost("{repo}/objects{oid}")]
-        public IActionResult WriteObject(string repo, string oid, [FromBody]byte[] body)
+        [HttpPost("{repo}/objects/{oid}")]
+        public async Task<IActionResult>  WriteObject(string repo, string oid)
         {
             string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
             IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);
-            dataProvider.WriteObject(oid, body);
+            using var ms = new MemoryStream();
+            await this.Request.Body.CopyToAsync(ms);
+            byte[] data = ms.ToArray();
+            dataProvider.WriteObject(oid, data);
             return Ok();
         }
     }

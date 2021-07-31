@@ -89,6 +89,7 @@
 
         public void UpdateRef(string @ref, RefValue value, bool deref = true)
         {
+            @ref = Uri.EscapeDataString(@ref);
             string path = $"ref/{@ref}?deref={deref}";
             byte[] data = JsonSerializer.SerializeToUtf8Bytes(value);
             this.FileOperator.Write(path, data);

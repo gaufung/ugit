@@ -56,7 +56,7 @@
             };
 
             var response = this.client.SendAsync(requestMessage).Result;
-            return response.Content.ReadAsStringAsync().Result.Encode();
+            return response.Content.ReadAsByteArrayAsync().Result;
         }
 
         public bool TryRead(string path, out byte[] bytes)
@@ -71,7 +71,7 @@
 
         public void Write(string path, byte[] bytes)
         {
-            string url = $"{this.remotePath}/path";
+            string url = $"{this.remotePath}/{path}";
             HttpRequestMessage requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(url),
