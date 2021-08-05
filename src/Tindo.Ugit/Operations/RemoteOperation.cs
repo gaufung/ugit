@@ -17,8 +17,6 @@
         private readonly ICommitOperation localCommitOperation;
         private readonly IDataProvider remoteDataProvider;
         private readonly ICommitOperation remoteCommitOperation;
-        private readonly IFileOperator localFileOperator;
-        private readonly IFileOperator remoteFileOperator;
 
         private readonly ILogger<RemoteOperation> logger;
 
@@ -57,8 +55,6 @@
             this.localCommitOperation = localCommitOperation;
             this.remoteDataProvider = remoteDataProvider;
             this.remoteCommitOperation = remoteCommitOperation;
-            this.localFileOperator = this.localDataProvider.FileOperator;
-            this.remoteFileOperator = this.remoteDataProvider.FileOperator;
             this.logger = logger;
         }
 
