@@ -68,8 +68,6 @@ namespace Tindo.Ugit.CLI
                 .BuildServiceProvider();
             LoggerFactory = sp.GetRequiredService<ILoggerFactory>();
             HttpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-
-            
         }
 
         private static int Main(string[] args)
@@ -79,112 +77,134 @@ namespace Tindo.Ugit.CLI
 
         static Command CreateArgsCommand()
         {
-            var initCmd = new Command("init", "Create an empty ugit repository or reinitialize an existing one");
-            initCmd.Handler = CommandHandler.Create(Init);
+            var initCmd = new Command("init", "Create an empty ugit repository or reinitialize an existing one")
+            {
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
+            };
+            initCmd.Handler = CommandHandler.Create<bool>(Init);
 
             var hashObjectCmd = new Command("hash-object", "hash a file object")
             {
-                new Argument<string>("file")
+                new Argument<string>("file"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            hashObjectCmd.Handler = CommandHandler.Create<string>(HashObject);
+            hashObjectCmd.Handler = CommandHandler.Create<string, bool>(HashObject);
 
             var catFileCmd = new Command("cat-file", "look up a file by object id")
             {
-                new Argument<string>("object")
+                new Argument<string>("object"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            catFileCmd.Handler = CommandHandler.Create<string>(CatFile);
+            catFileCmd.Handler = CommandHandler.Create<string, bool>(CatFile);
 
             var readTreeCmd = new Command("read-tree", "read out tree")
             {
-                new Argument<string>("tree")
+                new Argument<string>("tree"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            readTreeCmd.Handler = CommandHandler.Create<string>(ReadTree);
+            readTreeCmd.Handler = CommandHandler.Create<string, bool>(ReadTree);
 
             var commitCmd = new Command("commit", "Record changes to the repository")
             {
-                new Option<string>(new string[]{"-m", "--message"}, "message")
+                new Option<string>(new string[]{"-m", "--message"}, "message"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            commitCmd.Handler = CommandHandler.Create<string>(Commit);
+            commitCmd.Handler = CommandHandler.Create<string, bool>(Commit);
 
             var logCmd = new Command("log", "Show commit logs")
             {
                 new Argument<string>("oid", () => "@"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            logCmd.Handler = CommandHandler.Create<string>(Log);
+            logCmd.Handler = CommandHandler.Create<string, bool>(Log);
 
             var checkoutCmd = new Command("checkout", "Check out the specific commit")
             {
-                new Argument<string>("commit")
+                new Argument<string>("commit"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            checkoutCmd.Handler = CommandHandler.Create<string>(Checkout);
+            checkoutCmd.Handler = CommandHandler.Create<string, bool>(Checkout);
 
             var tagCmd = new Command("tag", "Create, list, delete or verify a tag object signed with GPG")
             {
                 new Argument<string>("name", ()=>string.Empty),
-                new Argument<string>("oid", () => "@")
+                new Argument<string>("oid", () => "@"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            tagCmd.Handler = CommandHandler.Create<string, string>(TagOp);
+            tagCmd.Handler = CommandHandler.Create<string, string, bool>(TagOp);
 
             var branchCmd = new Command("branch", "List, create, or delete branches")
             {
                 new Argument<string>("name", () => string.Empty),
-                new Argument<string>("oid", () => "@")
+                new Argument<string>("oid", () => "@"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            branchCmd.Handler = CommandHandler.Create<string, string>(Branch);
+            branchCmd.Handler = CommandHandler.Create<string, string, bool>(Branch);
 
-            var statusCmd = new Command("status", "Show the current work tree status");
-            statusCmd.Handler = CommandHandler.Create(Status);
+            var statusCmd = new Command("status", "Show the current work tree status")
+            {
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
+            };
+            statusCmd.Handler = CommandHandler.Create<bool>(Status);
 
             var resetCmd = new Command("reset", "Reset current HEAD to the specified state")
             {
-                new Argument<string>("commit")
+                new Argument<string>("commit"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            resetCmd.Handler = CommandHandler.Create<string>(Reset);
+            resetCmd.Handler = CommandHandler.Create<string, bool>(Reset);
 
             var showCmd = new Command("show", "Show the working tree status")
             {
-                new Argument<string>("oid", () => "@")
+                new Argument<string>("oid", () => "@"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            showCmd.Handler = CommandHandler.Create<string>(Show);
+            showCmd.Handler = CommandHandler.Create<string, bool>(Show);
             
             var diffCmd = new Command("diff", "Show changes between commits, commit and working tree, etc")
             {
-                new Argument<string>("commit", () => "@")
+                new Argument<string>("commit", () => "@"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            diffCmd.Handler = CommandHandler.Create<string>(Different);
+            diffCmd.Handler = CommandHandler.Create<string, bool>(Different);
             
             var mergeCmd = new Command("merge", "Join two or more development histories together")
             {
-                new Argument<string>("commit", () => "@")
+                new Argument<string>("commit", () => "@"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            mergeCmd.Handler = CommandHandler.Create<string>(Merge);
+            mergeCmd.Handler = CommandHandler.Create<string, bool>(Merge);
 
             var addCmd = new Command("add", "Add file contents to the index")
             {
                 new Argument<IEnumerable<string>>("files"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            addCmd.Handler = CommandHandler.Create<IEnumerable<string>>(Add);
+            addCmd.Handler = CommandHandler.Create<IEnumerable<string>, bool>(Add);
 
             var fetchCmd = new Command("fetch", "Download objects and refs from another repository")
             {
-                new Argument<string>("remote")
+                new Argument<string>("remote"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            fetchCmd.Handler = CommandHandler.Create<string>(Fetch);
+            fetchCmd.Handler = CommandHandler.Create<string, bool>(Fetch);
 
             var pushCmd = new Command("push", "Update remote refs along with associated objects")
             {
                 new Argument<string>("remote"),
-                new Argument<string>("branch")
+                new Argument<string>("branch"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            pushCmd.Handler = CommandHandler.Create<string,string>(Push);
+            pushCmd.Handler = CommandHandler.Create<string,string, bool>(Push);
 
 
             var remoteCmd = new Command("remote", "Add or update the remote repository")
             {
                 new Argument<string>("name"),
-                new Argument<string>("url")
+                new Argument<string>("url"),
+                new Option(new[] { "--verbose", "-v" }, "verbose"),
             };
-            remoteCmd.Handler = CommandHandler.Create<string, string>(Remote);
+            remoteCmd.Handler = CommandHandler.Create<string, string, bool>(Remote);
 
             var rootCommand = new RootCommand
             {
@@ -211,7 +231,7 @@ namespace Tindo.Ugit.CLI
             return rootCommand;
         }
 
-        private static void Push(string remote, string branch)
+        private static void Push(string remote, string branch, bool verbose)
         {
             Config config = DataProvider.Config;
             IDataProvider remoteDataProvider;
@@ -236,7 +256,7 @@ namespace Tindo.Ugit.CLI
             remoteOperation.Push(refName);
         }
 
-        private static void Fetch(string remote)
+        private static void Fetch(string remote,bool verbose)
         {
             Config config = DataProvider.Config;
             IDataProvider remoteDataProvider;
@@ -261,18 +281,18 @@ namespace Tindo.Ugit.CLI
         }
 
        
-        private static void Add(IEnumerable<string> files)
+        private static void Add(IEnumerable<string> files, bool verbose)
         {
             AddOperation.Add(files);
         }
 
-        private static void Merge(string commit)
+        private static void Merge(string commit, bool verbose)
         {
             commit = OidConverter(commit);
             MergeOperation.Merge(commit);
         }
         
-        private static void Different(string commit)
+        private static void Different(string commit, bool verbose)
         {
             commit = OidConverter(commit);
             var tree = CommitOperation.GetCommit(commit).Tree;
@@ -280,7 +300,7 @@ namespace Tindo.Ugit.CLI
             Console.WriteLine(result);
         }
 
-        private static void Show(string oid)
+        private static void Show(string oid, bool verbose)
         {
             oid = OidConverter(oid);
             if (string.IsNullOrEmpty(oid))
@@ -309,13 +329,13 @@ namespace Tindo.Ugit.CLI
             Console.WriteLine(string.Empty);
         }
 
-        private static void Reset(string commit)
+        private static void Reset(string commit, bool verbose)
         {
             string oid = OidConverter(commit);
             ResetOperation.Reset(oid);
         }
         
-        private static void Status()
+        private static void Status(bool verbose)
         {
             string head = OidConverter("@");
             string branch = BranchOperation.Current;
@@ -365,7 +385,7 @@ namespace Tindo.Ugit.CLI
             Console.ResetColor();
         }
 
-        static void TagOp(string name, string oid)
+        static void TagOp(string name, string oid, bool verbose)
         {
             
             if (string.IsNullOrWhiteSpace(name))
@@ -382,26 +402,26 @@ namespace Tindo.Ugit.CLI
             }
         }
         
-        private static void Checkout(string commit)
+        private static void Checkout(string commit, bool verbose)
         {
             CheckoutOperation.Checkout(commit);
 
         }
         
 
-        private static void Init()
+        private static void Init(bool verbose)
         {
             InitOperation.Init();
             Console.WriteLine($"Initialized empty ugit repository in {DataProvider.GitDirFullPath}");
         }
 
-        private static void HashObject(string file)
+        private static void HashObject(string file, bool verbose)
         {
             byte[] data = FileSystem.File.ReadAllBytes(file);
             Console.WriteLine(DataProvider.WriteObject(data));
         }
 
-        private static void CatFile(string oid)
+        private static void CatFile(string oid, bool verbose)
         {
             byte[] data = DataProvider.GetObject(OidConverter(oid));
             if (data.Length > 0)
@@ -410,12 +430,12 @@ namespace Tindo.Ugit.CLI
             }
         }
 
-        private static void ReadTree(string tree)
+        private static void ReadTree(string tree, bool verbose)
         {
             TreeOperation.ReadTree(OidConverter(tree));
         }
 
-        private static void Commit(string message)
+        private static void Commit(string message, bool verbose)
         {
             try
             {
@@ -427,7 +447,7 @@ namespace Tindo.Ugit.CLI
             }
         }
         
-        static void Log(string oid)
+        static void Log(string oid, bool verbose)
         {
             oid = OidConverter(oid);
 
@@ -451,7 +471,7 @@ namespace Tindo.Ugit.CLI
             }
         }
         
-        private static void Branch(string name, string oid)
+        private static void Branch(string name, string oid, bool verbose)
         {
             string startPoint = OidConverter(oid);
 
@@ -471,7 +491,7 @@ namespace Tindo.Ugit.CLI
             }
         }
 
-        private static void Remote(string name, string url)
+        private static void Remote(string name, string url, bool verbose)
         {
             var config = DataProvider.Config;
             config.Remote = new Remote { Name = name, Url = url };
