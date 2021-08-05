@@ -21,8 +21,6 @@ namespace Tindo.Ugit
         [TestInitialize]
         public void Init()
         {
-            localDataProviderMock.Setup(p => p.FileOperator).Returns(localFileOperator.Object);
-            remoteDataProviderMock.Setup(p => p.FileOperator).Returns(remoteFileOperator.Object);
             remoteOpetaion = new RemoteOperation(
                 localDataProviderMock.Object,
                 localCommitOperationMock.Object,
