@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Tindo.Ugit
 {
@@ -8,13 +10,13 @@ namespace Tindo.Ugit
     {
         private Mock<IDataProvider> dataProviderMock;
 
-        private DefaultInitOperation initOperation;
+        private InitOperation initOperation;
 
         [TestInitialize]
         public void Init()
         {
             dataProviderMock = new Mock<IDataProvider>();
-            initOperation = new DefaultInitOperation(dataProviderMock.Object);
+            initOperation = new InitOperation(dataProviderMock.Object, NullLogger<InitOperation>.Instance);
         }
 
         [TestMethod]
