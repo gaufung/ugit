@@ -269,7 +269,8 @@ namespace Tindo.Ugit.CLI
                 DataProvider,
                 CommitOperation,
                 remoteDataProvider,
-                remoteCommitOperation);
+                remoteCommitOperation,
+                loggerFactory.CreateLogger<RemoteOperation>());
             string refName = Path.Join("refs", "heads", branch);
             remoteOperation.Push(refName);
         }
@@ -296,7 +297,8 @@ namespace Tindo.Ugit.CLI
                 DataProvider,
                 CommitOperation,
                 remoteDataProvider,
-                remoteCommitOperation);
+                remoteCommitOperation,
+                loggerFactory.CreateLogger<RemoteOperation>());
             remoteOperation.Fetch();
         }
 

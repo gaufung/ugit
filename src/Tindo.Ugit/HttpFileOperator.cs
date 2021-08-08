@@ -8,7 +8,7 @@
     /// <summary>
     /// Http File Operator.
     /// </summary>
-    public class HttpFileOperator : IFileOperator
+    internal class HttpFileOperator : IFileOperator
     {
         private readonly string remotePath;
 
@@ -23,32 +23,38 @@
             this.logger = logger;
         }
 
+        /// <inheritdoc/>
         public string CurrentDirectory => throw new NotImplementedException();
 
+        /// <inheritdoc/>
         public void CreateDirectory(string directory, bool force = true)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public void Delete(string path, bool isFile = true)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public void EmptyCurrentDirectory(Func<string, bool> ignore)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public bool Exists(string path, bool isFile = true)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public byte[] Read(string path)
         {
             string url = $"{this.remotePath}/{path}";
-            this.logger.LogInformation($"Get: {url}");
+            this.logger.LogInformation($"Read byte from {url}");
             HttpRequestMessage requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(url),
@@ -59,19 +65,23 @@
             return response.Content.ReadAsByteArrayAsync().Result;
         }
 
+        /// <inheritdoc/>
         public bool TryRead(string path, out byte[] bytes)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public IEnumerable<string> Walk(string path)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public void Write(string path, byte[] bytes)
         {
             string url = $"{this.remotePath}/{path}";
+            this.logger.LogInformation($"Write bytes to {url}");
             HttpRequestMessage requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(url),

@@ -9,9 +9,6 @@
     {
         private readonly IFileSystem fileSystem;
 
-        /// <inheritdoc/>
-        public string CurrentDirectory => this.fileSystem.Directory.GetCurrentDirectory();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PhysicalFileOperator"/> class.
         /// </summary>
@@ -20,6 +17,9 @@
         {
             this.fileSystem = fileSystem;
         }
+
+        /// <inheritdoc/>
+        public string CurrentDirectory => this.fileSystem.Directory.GetCurrentDirectory();
 
         /// <inheritdoc/>
         public void Delete(string path, bool isFile = true)

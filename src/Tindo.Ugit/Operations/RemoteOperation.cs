@@ -86,6 +86,7 @@
             string localRef = this.localDataProvider.GetRef(refName).Value;
             if (!string.IsNullOrEmpty(remoteRef) && !this.IsAncestorOf(localRef, remoteRef))
             {
+                this.logger.LogWarning("Could not push");
                 throw new UgitException("Could not push");
             }
 

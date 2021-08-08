@@ -20,7 +20,7 @@
         /// Initializes a new instance of the <see cref="AddOperation"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider.</param>
-        public AddOperation(IDataProvider dataProvider) 
+        public AddOperation(IDataProvider dataProvider)
             : this(dataProvider, NullLogger<AddOperation>.Instance)
         {
         }
@@ -68,6 +68,7 @@
         {
             if (!this.dataProvider.IsIgnore(fileName))
             {
+                this.logger.LogInformation($"Adding {fileName} to stage index.");
                 var normalFileName = Path.GetRelativePath(".", fileName);
                 byte[] data = this.fileOperator.Read(normalFileName);
                 string oid = this.dataProvider.WriteObject(data);

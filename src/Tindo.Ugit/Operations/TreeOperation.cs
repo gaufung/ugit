@@ -1,6 +1,5 @@
 ﻿namespace Tindo.Ugit
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -68,7 +67,8 @@
                 }
                 else
                 {
-                    throw new ArgumentException($"Unknown type {type} of object {oid}");
+                    this.logger.LogError($"Unknown type {type} of object {oid}");
+                    throw new UgitException($"Unknown type {type} of object {oid}");
                 }
             }
 
@@ -151,6 +151,7 @@
             return this.dataProvider.Index;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<(string, string, string)> IterTreeEntry(string oid)
         {
             if (string.IsNullOrWhiteSpace(oid))

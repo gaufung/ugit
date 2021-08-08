@@ -72,11 +72,7 @@
         /// <inheritdoc/>
         public Commit GetCommit(string oid)
         {
-#if NET5_0
             List<string> parents = new ();
-#else
-            List<string> parents = new List<string>();
-#endif
             var commit = this.dataProvider.GetObject(oid, Constants.Commit).Decode();
             string[] lines = commit.Split("\n");
             string tree = null;
@@ -138,6 +134,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<string> GetObjectHistory(IEnumerable<string> oids)
         {
             HashSet<string> visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -150,7 +147,7 @@
                 {
                     if (type == Constants.Tree)
                     {
-                        foreach(var val in IterObjectInTree(subOid))
+                        foreach (var val in IterObjectInTree(subOid))
                         {
                             yield return val;
                         }
@@ -214,6 +211,7 @@
 
             if (isSame)
             {
+                this.logger.LogError("nothing to commit (create/copy files and use \"ugit add\" to track.");
                 throw new UgitException("nothing to commit (create/copy files and use \"ugit add\" to track.");
             }
         }

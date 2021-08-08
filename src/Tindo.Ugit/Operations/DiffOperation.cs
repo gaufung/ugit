@@ -83,6 +83,7 @@
             this.fileOperator.Write(fromFile, this.dataProvider.GetObject(fromOid));
             string toFile = Path.GetTempFileName();
             this.fileOperator.Write(toFile, this.dataProvider.GetObject(toOid));
+            this.logger.LogInformation($"Executing proxy: diff --unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
             var (_, output, _) = this.diffProxy.Execute(
                 "diff",
                 $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
@@ -136,6 +137,7 @@
             string otherFile = Path.GetTempFileName();
             this.fileOperator.Write(otherFile, this.dataProvider.GetObject(otherOid));
             string arguments = string.Join(" ", new string[] { "-DHEAD", headFile, otherFile });
+            this.logger.LogInformation($"Executing proxy: diff {arguments}");
             var (_, output, _) = this.diffProxy.Execute("diff", arguments);
             return output;
         }

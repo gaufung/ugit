@@ -31,7 +31,7 @@ namespace Tindo.Ugit.Server.Controllers
         }
 
         [HttpGet("{repo}/refs")]
-        public IActionResult GetRefs(string repo, [FromQuery]string prefix = "", [FromQuery]bool deref=true)
+        public async Task<IActionResult> GetRefs(string repo, [FromQuery]string prefix = "", [FromQuery]bool deref=true)
         {
             string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
             IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);
@@ -55,7 +55,7 @@ namespace Tindo.Ugit.Server.Controllers
         }
 
         [HttpGet("{repo}/objects/{oid}")]
-        public IActionResult GetObject(string repo, string oid, [FromQuery]string expected="")
+        public async Task<IActionResult> GetObject(string repo, string oid, [FromQuery]string expected="")
         {
             string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
             IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);

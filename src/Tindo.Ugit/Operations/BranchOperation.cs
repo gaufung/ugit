@@ -60,6 +60,7 @@
                 var head = HEAD.Value;
                 if (!head.StartsWith(Path.Join(Constants.Refs, Constants.Heads)))
                 {
+                    this.logger.LogError("Branch ref should start with refs/heads");
                     throw new UgitException("Branch ref should start with refs/heads");
                 }
 
