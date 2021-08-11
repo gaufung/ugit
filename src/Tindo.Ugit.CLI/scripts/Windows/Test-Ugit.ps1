@@ -8,6 +8,7 @@ $env:Path += ";$executeDirectory"
 Set-Location "test"
 
 ugit init
+ugit author gaufung gaufung@outlook.com
 ugit status
 
 Copy-Item "../../data/hello.txt" ./

@@ -3,7 +3,7 @@ namespace Tindo.Ugit
     /// <summary>
     /// Constrant variables definitions.
     /// </summary>
-    public static class Constants
+    internal static class Constants
     {
         public static readonly string Commit = "commit";
 
@@ -32,5 +32,9 @@ namespace Tindo.Ugit
         public static readonly string Master = "master";
 
         public static readonly string Config = "config";
+
+        public static readonly string Author = "author";
+
+        public static readonly string Unknown = "unknown";
     }
 }

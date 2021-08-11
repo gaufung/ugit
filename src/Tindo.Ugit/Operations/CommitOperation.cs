@@ -62,6 +62,15 @@
                 this.dataProvider.DeleteRef(Constants.MergeHEAD, false);
             }
 
+            if (this.dataProvider.Config != null && this.dataProvider.Config.Author != null)
+            {
+                commit += $"author: {this.dataProvider.Config.Author}\n";
+            }
+            else
+            {
+                commit += $"author: unknown\n";
+            }
+
             commit += "\n";
             commit += $"{message}\n";
             string oid = this.dataProvider.WriteObject(commit.Encode(), Constants.Commit);
@@ -77,6 +86,7 @@
             string[] lines = commit.Split("\n");
             string tree = null;
             int index;
+            Author author = null;
             for (index = 0; index < lines.Length; index++)
             {
                 string line = lines[index];
@@ -85,7 +95,7 @@
                     break;
                 }
 
-                string[] tokens = line.Split(' ');
+                string[] tokens = line.Split(new char[] { ' ', ':' });
                 if (tokens[0].Equals(Constants.Tree))
                 {
                     tree = tokens[1];
@@ -95,6 +105,11 @@
                 {
                     parents.Add(tokens[1]);
                 }
+
+                if (tokens[0].Equals(Constants.Author))
+                {
+                    Author.TryParse(tokens[1], out author);
+                }
             }
 
             string message = string.Join("\n", lines.TakeLast(lines.Length - index - 1));
@@ -103,6 +118,7 @@
                 Tree = tree,
                 Parents = parents,
                 Message = message,
+                Author = author,
             };
         }
 

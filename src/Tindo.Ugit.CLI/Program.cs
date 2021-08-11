@@ -192,6 +192,14 @@ namespace Tindo.Ugit.CLI
             };
             remoteCmd.Handler = CommandHandler.Create<string, string, bool>(Remote);
 
+            var authorCmd = new Command("author", "Add or update the author")
+            {
+                new Argument<string>("name"),
+                new Argument<string>("email"),
+                new Option(new[] { "--verbose", "-v" }, "verbose")
+            };
+            authorCmd.Handler = CommandHandler.Create<string, string, bool>(Author);
+
             var rootCommand = new RootCommand
             {
                 initCmd,
@@ -212,6 +220,7 @@ namespace Tindo.Ugit.CLI
                 fetchCmd,
                 pushCmd,
                 remoteCmd,
+                authorCmd,
             };
 
             return rootCommand;
@@ -529,7 +538,15 @@ namespace Tindo.Ugit.CLI
         {
             ILoggerFactory loggerFactory = CreateLoggerFactory(verbose);
             var config = DataProvider.Config;
-            config.Remote = new Remote { Name = name, Url = url };
+            config.Remote = new Remote(name, url);
+            DataProvider.Config = config;
+        }
+
+        private static void Author(string name, string email, bool verbose)
+        {
+            ILoggerFactory loggerFactory = CreateLoggerFactory(verbose);
+            var config = DataProvider.Config;
+            config.Author = new Author(name, email);
             DataProvider.Config = config;
         }
     }

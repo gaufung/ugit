@@ -1,9 +1,4 @@
 ﻿namespace Tindo.Ugit
 {
-    internal class Remote
-    {
-        public string Name { get; set; }
-
-        public string Url { get; set; }
-    }
+    internal record Remote(string Name, string Url);
 }
