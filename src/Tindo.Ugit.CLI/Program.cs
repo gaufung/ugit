@@ -359,7 +359,15 @@ namespace Tindo.Ugit.CLI
         private static void PrintCommit(string oid, Commit commit, IEnumerable<string> @ref = null)
         {
             string refStr = @ref != null ? $"({string.Join(',', @ref)})" : string.Empty;
-            Console.WriteLine($"commit {oid}{refStr}\n");
+            Console.WriteLine($"commit {oid}{refStr}");
+            if (commit.Author != null)
+            {
+                Console.WriteLine($"author {commit.Author}\n");
+            }
+            else
+            {
+                Console.WriteLine($"author unknown\n");
+            }
             Console.WriteLine($"{commit.Message}     ");
             Console.WriteLine(string.Empty);
         }

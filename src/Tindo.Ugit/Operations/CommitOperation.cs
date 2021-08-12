@@ -64,11 +64,11 @@
 
             if (this.dataProvider.Config != null && this.dataProvider.Config.Author != null)
             {
-                commit += $"author: {this.dataProvider.Config.Author}\n";
+                commit += $"author {this.dataProvider.Config.Author}\n";
             }
             else
             {
-                commit += $"author: unknown\n";
+                commit += $"author unknown\n";
             }
 
             commit += "\n";
@@ -108,7 +108,7 @@
 
                 if (tokens[0].Equals(Constants.Author))
                 {
-                    Author.TryParse(tokens[1], out author);
+                    Author.TryParse(string.Join(' ', tokens.TakeLast(tokens.Length - 1)), out author);
                 }
             }
 
