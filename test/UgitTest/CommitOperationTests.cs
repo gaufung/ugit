@@ -23,7 +23,6 @@ namespace Tindo.Ugit
         }
 
         [TestMethod]
-        [Ignore]
         public void CreateCommitTest()
         {
             this.treeOperation.Setup(t => t.WriteTree()).Returns("tree-oid");
@@ -31,6 +30,7 @@ namespace Tindo.Ugit
             this.dataProvider.Setup(d => d.GetObject("master-first-oid", "commit")).Returns(string.Join("\n", new[]
             {
                 "tree master-tree-oid",
+                "author unknown",
                 "",
                 "this is message."
 
@@ -46,7 +46,7 @@ namespace Tindo.Ugit
             });
             this.dataProvider.Setup(d => d.GetRef("MERGE_HEAD", true)).Returns(RefValue.Create(false, "merge-head-oid"));
             this.dataProvider.Setup(d => d.DeleteRef("MERGE_HEAD", false));
-            string commit = "tree tree-oid\nparent master-first-oid\nparent merge-head-oid\n\nhello foo\n";
+            string commit = "tree tree-oid\nparent master-first-oid\nparent merge-head-oid\nauthor unknown\n\nhello foo\n";
             this.dataProvider.Setup(d => d.WriteObject(It.Is<byte[]>(i => i.Length == commit.Encode().Length), "commit")).Returns("commit-oid");
             dataProvider.Setup(d => d.UpdateRef("HEAD", It.Is<RefValue>(i => !i.Symbolic && i.Value == "commit-oid"), true));
             string actual = commitOperation.CreateCommit("hello foo");
