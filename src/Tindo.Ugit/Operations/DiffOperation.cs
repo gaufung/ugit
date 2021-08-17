@@ -49,11 +49,7 @@
         /// <inheritdoc />
         public IEnumerable<(string, IEnumerable<string>)> CompareTrees(params Tree[] trees)
         {
-#if NET5_0
             Dictionary<string, string[]> entries = new ();
-#else
-            Dictionary<string, string[]> entries = new Dictionary<string, string[]>();
-#endif
             for (int i = 0; i < trees.Length; i++)
             {
                 Tree tree = trees[i];
@@ -84,9 +80,15 @@
             string toFile = Path.GetTempFileName();
             this.fileOperator.Write(toFile, this.dataProvider.GetObject(toOid));
             this.logger.LogInformation($"Executing proxy: diff --unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
-            var (_, output, _) = this.diffProxy.Execute(
+            var (code, output, error) = this.diffProxy.Execute(
                 "diff",
                 $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
+            if (code != 0)
+            {
+                this.logger.LogError(error);
+                throw new UgitException("failed to execute proxy command");
+            }
+
             return output;
         }
 
@@ -138,7 +140,13 @@
             this.fileOperator.Write(otherFile, this.dataProvider.GetObject(otherOid));
             string arguments = string.Join(" ", new string[] { "-DHEAD", headFile, otherFile });
             this.logger.LogInformation($"Executing proxy: diff {arguments}");
-            var (_, output, _) = this.diffProxy.Execute("diff", arguments);
+            var (code, output, error) = this.diffProxy.Execute("diff", arguments);
+            if (code != 0)
+            {
+                this.logger.LogError(error);
+                throw new UgitException("failed to execute proxy command");
+            }
+
             return output;
         }
 

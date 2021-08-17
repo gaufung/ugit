@@ -37,8 +37,8 @@
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalDataProvider"/> class.
-        /// <param name="fileOperator">The file operator.</param>
         /// </summary>
+        /// <param name="fileOperator">The file operator.</param>
         internal LocalDataProvider(IFileOperator fileOperator)
             : this(fileOperator, string.Empty)
         {

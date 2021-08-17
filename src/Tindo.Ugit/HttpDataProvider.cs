@@ -15,8 +15,8 @@
 
         public HttpDataProvider(IFileOperator fileOperator, ILogger<HttpDataProvider> logger)
         {
-            FileOperator = fileOperator;
-            _logger = logger;
+            this.FileOperator = fileOperator;
+            this._logger = logger;
         }
 
         public string GitDirFullPath => string.Empty;

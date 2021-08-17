@@ -58,7 +58,20 @@ namespace Tindo.Ugit.CLI
 
         private static int Main(string[] args)
         {
-            return CreateArgsCommand().Invoke(args);
+            try
+            {
+                return CreateArgsCommand().Invoke(args);
+            }
+            catch(UgitException)
+            {
+                // swalle it
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return 1;
+            }
+            return 0;
         }
 
         static Command CreateArgsCommand()

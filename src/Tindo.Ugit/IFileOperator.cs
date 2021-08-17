@@ -36,7 +36,6 @@
         /// <returns>byte array that file contains.</returns>
         bool TryRead(string path, out byte[] bytes);
 
-
         /// <summary>
         /// Read the bytes from file path. Throw <see cref="UgitException"/> if doesn't exist.
         /// </summary>
