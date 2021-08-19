@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="1.15.2" />
+    <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.15.2" />
   </ItemGroup>
 
   <ItemGroup>
