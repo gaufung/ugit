@@ -50,7 +50,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     name: Deploy-Server
+    runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
       - name: Deploy in Azure VM
         uses: matheusvanzan/sshpass-action@v2
         with:
