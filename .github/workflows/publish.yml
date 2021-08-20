@@ -48,10 +48,21 @@ jobs:
           files: "ugit-*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish-Server
-        shell: bash
+      - name: Deploy-Server
+        uses: matheusvanzan/sshpass-action@v2
+        with:
+          host: ${{ secrets.UGITHUB_HOST }}
+          user: ${{ secrets.UGITHUB_NAME }}
+          pass: ${{ secrets.UGITHUB_PASSWORD }}
         run: |
-          artifcate-name="ugit-server-linux-64"
-          dotnet publish src/Tindo.Ugit.Server/Tindo.Ugit.Server.csproj --framework net5.0 --runtime linux-64 -c Release -o "$artifcate-name"
-          tar czvf "${artifcate-name}.tar.gz" "$artifcate-name"
+          sudo kill $(ps aux | grep 'Tindo.Ugit.Server.dll' | awk '{print $2}')
+          cd /var/local
+          sudo rm -rf ugit/
+          sudo git clone https://github.com/gaufung/ugit.git
+          sudo dotnet publish ugit/src/Tindo.Ugit.Server/Tindo.Ugit.Server.csproj --framework net5.0 --runtime linux-x64 -c Release -o ugit/artifact
+          export ASPNETCORE_ENVIRONMENT=Production
+          cd ugit/artifact
+          nohup dotnet Tindo.Ugit.Server.dll &
+        env:
+          VM_SECRET: ${{ secrets.ugithub  }}
 
