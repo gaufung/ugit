@@ -48,7 +48,10 @@ jobs:
           files: "ugit-*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy-Server
+  deploy:
+    name: Deploy-Server
+    steps:
+      - name: Deploy in Azure VM
         uses: matheusvanzan/sshpass-action@v2
         with:
           host: ${{ secrets.UGITHUB_HOST }}
