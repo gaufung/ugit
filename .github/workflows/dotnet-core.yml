@@ -32,11 +32,3 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ./test/UgitTest/TestResults/coverage.info
-    - name: deploy in Azure VM
-      uses: matheusvanzan/sshpass-action@v2
-      with:
-        host: ${{ secrets.UGITHUB_HOST }}
-        user: ${{ secrets.UGITHUB_NAME }}
-        pass: ${{ secrets.UGITHUB_PASSWORD }}
-      run: |
-        echo "hello"
