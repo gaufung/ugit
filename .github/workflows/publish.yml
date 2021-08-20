@@ -1,9 +1,9 @@
+name: Publish
+
 on:
   push:
     tags:
       - 'v*'
-
-name: Publish
 
 jobs:
   deploy:
@@ -26,6 +26,4 @@ jobs:
         export ASPNETCORE_ENVIRONMENT=Production
         cd ugit/artifact
         nohup dotnet Tindo.Ugit.Server.dll &
-        env:
-      VM_SECRET: ${{ secrets.ugithub  }}
 
