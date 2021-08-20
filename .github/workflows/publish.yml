@@ -35,18 +35,23 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="ugit-$tag-${{ matrix.target }}"
-          dotnet publish src/Ugit/Ugit.csproj --framework net5.0 --runtime "${{ matrix.target }}" -c Release -o "$release_name" -p:PublishSingleFile=true --self-contained true
+          dotnet publish src/Tindo.Ugit.CLI/Tindo.Ugit.CLI.csproj --framework net5.0 --runtime "${{ matrix.target }}" -c Release -o "$release_name" -p:PublishSingleFile=true --self-contained true
           if [ "${{ matrix.taget }}" == "win-x64" ]; then
             7z a -tzip "${release_name}.zip" "./${release_name}/*"
           else  
             tar czvf "${release_name}.tar.gz" "$release_name"
           fi
-
           rm -r "$release_name"
-      - name: Publish
+      - name: Publish-CLI
         uses: softprops/action-gh-release@v1
         with:
           files: "ugit-*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish-Server
+        shell: bash
+        run: |
+          artifcate-name="ugit-server-linux-64"
+          dotnet publish src/Tindo.Ugit.Server/Tindo.Ugit.Server.csproj --framework net5.0 --runtime linux-64 -c Release -o "$artifcate-name"
+          tar czvf "${artifcate-name}.tar.gz" "$artifcate-name"
 

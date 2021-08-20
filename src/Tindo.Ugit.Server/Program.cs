@@ -20,7 +20,15 @@ namespace Tindo.Ugit.Server
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>()
+                              .UseKestrel((context, options) =>
+                              {
+                                  if (context.HostingEnvironment.IsProduction())
+                                  {
+                                      options.Listen(System.Net.IPAddress.Any, 44321, options => { options.UseHttps(); });
+                                  }
+                                  
+                              });
                 });
     }
 }
