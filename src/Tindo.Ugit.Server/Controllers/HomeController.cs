@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Tindo.Ugit.Server.Models;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.FileProviders;
 
 namespace Tindo.Ugit.Server.Controllers
 {
@@ -9,13 +11,18 @@ namespace Tindo.Ugit.Server.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly string RepositoryDirectory;
+
+        public HomeController(IOptions<UgitServerOptions> serverOption, ILogger<HomeController> logger)
         {
+            RepositoryDirectory = serverOption.Value.RepositoryDirectory;
             _logger = logger;
         }
 
         public IActionResult Index()
         {
+            IFileProvider dataProvider = new PhysicalFileProvider(RepositoryDirectory);
+
             return View();
         }
 
