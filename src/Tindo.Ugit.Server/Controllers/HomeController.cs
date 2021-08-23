@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Tindo.Ugit.Server.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.FileProviders;
+using System.Linq;
 
 namespace Tindo.Ugit.Server.Controllers
 {
@@ -23,7 +24,12 @@ namespace Tindo.Ugit.Server.Controllers
         {
             IFileProvider dataProvider = new PhysicalFileProvider(RepositoryDirectory);
 
-            return View();
+            var repos = dataProvider.GetDirectoryContents("")
+                        .Where(f => f.IsDirectory)
+                        .Select(f => new RepositoryModel { Name = f.Name })
+                        .ToArray();
+
+            return View(repos);
         }
 
         public IActionResult Privacy()

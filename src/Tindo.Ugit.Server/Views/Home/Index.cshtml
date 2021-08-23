@@ -2,6 +2,29 @@
     ViewData["Title"] = "Home Page";
 }
 
+@model IEnumerable<RepositoryModel>
+
 <div class="text-center">
     <h1 class="display-4">Welcome to UgitHub.</h1>
+    <br />
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Descrption</th>
+                <th scope="col">Language</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (RepositoryModel repo in Model)
+            {
+                <tr>
+                    <td>@repo.Name</td>
+                    <td>@repo.Description</td>
+                    <td>@repo.Language</td>
+                </tr>
+            }
+        </tbody>
+       
+    </table>
 </div>
