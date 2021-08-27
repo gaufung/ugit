@@ -40,27 +40,29 @@ namespace Tindo.Ugit.Server.Controllers
         }
 
         [HttpGet]
-        [HttpPost]
         public IActionResult Create()
         {
-            if (HttpContext.Request.Method.Equals("GET", System.StringComparison.OrdinalIgnoreCase))
-            {
-                return View();
-            }
-            else
-            {
-                var name = HttpContext.Request.Form["RepoName"];
-                string folderPath = Path.Join(RepositoryDirectory, name);
-                if (_fileSystem.Directory.Exists(folderPath))
-                {
-                    _fileSystem.Directory.Delete(folderPath, true);
-                }
+            return View();
+        }
 
-                IDataProvider dataProvider = new LocalDataProvider(new PhysicalFileOperator(_fileSystem), folderPath);
-                dataProvider.Init();
-
-                return Redirect("/home");
+        [HttpPost]
+        public IActionResult Create(RepositoryModel repo)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(repo);
             }
+
+            string folderPath = Path.Join(RepositoryDirectory, repo.Name);
+            if (_fileSystem.Directory.Exists(folderPath))
+            {
+                _fileSystem.Directory.Delete(folderPath, true);
+            }
+
+            IDataProvider dataProvider = new LocalDataProvider(new PhysicalFileOperator(_fileSystem), folderPath);
+            dataProvider.Init();
+
+            return Redirect("/home");
         }
 
         public IActionResult Privacy()

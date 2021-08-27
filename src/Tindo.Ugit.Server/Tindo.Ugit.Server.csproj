@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Tindo.Ugit\Tindo.Ugit.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Validations\" />
+  </ItemGroup>
+
 </Project>
