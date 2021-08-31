@@ -1,13 +1,13 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Tindo.Ugit.Server.Models;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.FileProviders;
-using System.Linq;
-using System.IO.Abstractions;
+using System;
+using System.Diagnostics;
 using System.IO;
-using Tindo.Ugit;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Threading.Tasks;
+using Tindo.Ugit.Server.Models;
 
 namespace Tindo.Ugit.Server.Controllers
 {
@@ -19,22 +19,22 @@ namespace Tindo.Ugit.Server.Controllers
 
         private readonly IFileSystem _fileSystem;
 
-        public HomeController(IOptions<UgitServerOptions> serverOption, IFileSystem fileSystem, ILogger<HomeController> logger)
+        private readonly UgitDatabaseContext _dbContext;
+
+        public HomeController(IOptions<UgitServerOptions> serverOption, IFileSystem fileSystem, 
+            UgitDatabaseContext dbContext, ILogger<HomeController> logger)
         {
             RepositoryDirectory = serverOption.Value.RepositoryDirectory;
             _logger = logger;
             _fileSystem = fileSystem;
+            _dbContext = dbContext;
         }
 
         public IActionResult Index()
         {
-            IFileProvider dataProvider = new PhysicalFileProvider(RepositoryDirectory);
-
-            var repos = dataProvider.GetDirectoryContents("")
-                        .Where(f => f.IsDirectory)
-                        .OrderByDescending(f => f.LastModified)
-                        .Select(f => new RepositoryModel { Name = f.Name })
-                        .ToArray();
+            var repos = _dbContext.Repositories
+                .OrderByDescending(f => f.LastModified)
+                .ToArray();
 
             return View(repos);
         }
@@ -46,7 +46,7 @@ namespace Tindo.Ugit.Server.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(RepositoryModel repo)
+        public async Task<IActionResult> Create(Repository repo)
         {
             if (!ModelState.IsValid)
             {
@@ -61,6 +61,16 @@ namespace Tindo.Ugit.Server.Controllers
 
             IDataProvider dataProvider = new LocalDataProvider(new PhysicalFileOperator(_fileSystem), folderPath);
             dataProvider.Init();
+
+            Repository repostiory = new Repository
+            {
+                Name = repo.Name,
+                Description = repo.Description,
+                LastModified = DateTime.UtcNow,
+            };
+
+            this._dbContext.Repositories.Add(repostiory);
+            await this._dbContext.SaveChangesAsync();
 
             return Redirect("/home");
         }

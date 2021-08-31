@@ -2,7 +2,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-@model IEnumerable<RepositoryModel>
+@model IEnumerable<Repository>
 
 <div class="text-center">
     <h1 class="display-4">Welcome to UgitHub.</h1>
@@ -18,16 +18,16 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Descrption</th>
-                <th scope="col">Language</th>
+                <th scope="col">Last Modified Time</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (RepositoryModel repo in Model)
+            @foreach (Repository repo in Model)
             {
                 <tr>
                     <td>@repo.Name</td>
                     <td>@repo.Description</td>
-                    <td>@repo.Language</td>
+                    <td>@repo.LastModified.ToShortDateString()</td>
                 </tr>
             }
         </tbody>

@@ -39,6 +39,7 @@ namespace Tindo.Ugit.Server
             services.AddOptions()
                 .Configure<UgitServerOptions>(Configuration.GetSection("UgitServer"));
             services.AddSingleton<IFileSystem, FileSystem>();
+            services.AddSingleton(new UgitDatabaseContext(Configuration.GetSection("Sqlite")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +55,9 @@ namespace Tindo.Ugit.Server
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            var db = new UgitDatabaseContext(Configuration.GetSection("Sqlite"));
+            db.Database.EnsureCreated();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
