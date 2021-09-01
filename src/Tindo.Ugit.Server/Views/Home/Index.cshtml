@@ -13,18 +13,18 @@
         </a>
     </div>
     <br />
-    <table class="table">
+    <table class='table table-bordered table-condensed table-striped table-hover'>
         <thead>
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Descrption</th>
-                <th scope="col">Last Modified Time</th>
+                <th scope="col">Last Modified</th>
             </tr>
         </thead>
         <tbody>
             @foreach (Repository repo in Model)
             {
-                <tr>
+                <tr class="table-row" data-href="/repo/@repo.Id">
                     <td>@repo.Name</td>
                     <td>@repo.Description</td>
                     <td>@repo.LastModified.ToShortDateString()</td>
