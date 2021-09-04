@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics;
@@ -14,6 +15,7 @@ namespace Tindo.Ugit.Server.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+
 
         private readonly string RepositoryDirectory;
 
@@ -60,7 +62,8 @@ namespace Tindo.Ugit.Server.Controllers
             }
 
             IDataProvider dataProvider = new LocalDataProvider(new PhysicalFileOperator(_fileSystem), folderPath);
-            dataProvider.Init();
+            IInitOperation operation = new InitOperation(dataProvider, NullLogger<InitOperation>.Instance);
+            operation.Init();
 
             Repository repostiory = new Repository
             {

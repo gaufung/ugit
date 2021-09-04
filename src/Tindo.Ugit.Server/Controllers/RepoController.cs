@@ -5,7 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.FileProviders;
 using System.IO.Abstractions;
+using Tindo.Ugit.Server.Models;
+using System.IO;
 
 namespace Tindo.Ugit.Server.Controllers
 {
@@ -35,13 +38,18 @@ namespace Tindo.Ugit.Server.Controllers
         [HttpGet("{id}")]
         public IActionResult Index(int id)
         {
-            return View();
+            IFileProvider fileProvider = new PhysicalFileProvider(_serverOption.RepositoryDirectory, Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
+            string repoName = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id).Name;
+            IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(repoName);
+            return View(new RepositoryDetail() { DirectoryContent = directoryContent, Path = repoName });
         }
 
-        [HttpGet("{id}/tree/{directory?}")]
+        [HttpGet("{id}/tree/{**directory}")]
         public IActionResult Get(int id, string directory)
         {
-            return View("Index");
+            IFileProvider fileProvider = new PhysicalFileProvider(Path.Join(_serverOption.RepositoryDirectory), Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
+            IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(directory);
+            return View("Index", new RepositoryDetail() { DirectoryContent = directoryContent, Path = directory });
         }
     }
 }

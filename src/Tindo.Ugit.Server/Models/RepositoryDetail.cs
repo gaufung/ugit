@@ -9,5 +9,7 @@ namespace Tindo.Ugit.Server.Models
     public class RepositoryDetail : Repository
     {
         public IDirectoryContents DirectoryContent { get; set; }
+
+        public string Path { get; set; }
     }
 }
