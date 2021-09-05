@@ -39,9 +39,9 @@ namespace Tindo.Ugit.Server.Controllers
         public IActionResult Index(int id)
         {
             IFileProvider fileProvider = new PhysicalFileProvider(_serverOption.RepositoryDirectory, Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
-            string repoName = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id).Name;
-            IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(repoName);
-            return View(new RepositoryDetail() { DirectoryContent = directoryContent, Path = repoName });
+            var  repo = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id);
+            IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(repo.Name);
+            return View(new RepositoryDetail() { DirectoryContent = directoryContent, Path = repo.Name, Id = repo.Id });
         }
 
         [HttpGet("{id}/tree/{**directory}")]
@@ -49,7 +49,20 @@ namespace Tindo.Ugit.Server.Controllers
         {
             IFileProvider fileProvider = new PhysicalFileProvider(Path.Join(_serverOption.RepositoryDirectory), Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
             IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(directory);
-            return View("Index", new RepositoryDetail() { DirectoryContent = directoryContent, Path = directory });
+            return View("Index", new RepositoryDetail() { DirectoryContent = directoryContent, Path = directory, Id = id });
+        }
+
+
+        [HttpGet("{id}/delete")]
+        public IActionResult Delete(int id)
+        {
+            var repo = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id);
+            string repoName = repo.Name;
+            string repoPhysicalFolder = Path.Join(_serverOption.RepositoryDirectory, repoName);
+            this._fileOperator.Delete(repoName, false);
+            _ugitDatabaseContext.Repositories.Remove(repo);
+            _ugitDatabaseContext.SaveChanges();
+            return Redirect("/");
         }
     }
 }

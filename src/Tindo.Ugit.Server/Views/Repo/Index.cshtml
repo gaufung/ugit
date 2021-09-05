@@ -27,7 +27,7 @@
             @foreach (var file in Model.DirectoryContent.Where(f => !f.IsDirectory))
             {
                 <div class="row align-items-start">
-                    <div class="col">
+                    <div class="col align-self-start">
                         <a>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-code" viewBox="0 0 16 16">
                                 <path d="M6.646 5.646a.5.5 0 1 1 .708.708L5.707 8l1.647 1.646a.5.5 0 0 1-.708.708l-2-2a.5.5 0 0 1 0-.708l2-2zm2.708 0a.5.5 0 1 0-.708.708L10.293 8 8.646 9.646a.5.5 0 0 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2z" />
@@ -44,6 +44,10 @@
         </span>
     </div>
     <div>
-
+        <div class="form-group">
+            <a href="@Model.Id/delete">
+                <input type="button" class="btn btn-success btn-lg float-right" value="Delete" />
+            </a>
+        </div>
     </div>
 </div>
