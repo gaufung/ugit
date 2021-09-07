@@ -41,15 +41,16 @@ namespace Tindo.Ugit.Server.Controllers
             IFileProvider fileProvider = new PhysicalFileProvider(_serverOption.RepositoryDirectory, Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
             var  repo = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id);
             IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(repo.Name);
-            return View(new RepositoryDetail() { DirectoryContent = directoryContent, Path = repo.Name, Id = repo.Id });
+            return View(new RepositoryDetail() { DirectoryContent = directoryContent, Path = repo.Name, Id = repo.Id, Name=repo.Name });
         }
 
         [HttpGet("{id}/tree/{**directory}")]
         public IActionResult Get(int id, string directory)
         {
             IFileProvider fileProvider = new PhysicalFileProvider(Path.Join(_serverOption.RepositoryDirectory), Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
+            var repo = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id);
             IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(directory);
-            return View("Index", new RepositoryDetail() { DirectoryContent = directoryContent, Path = directory, Id = id });
+            return View("Index", new RepositoryDetail() { DirectoryContent = directoryContent, Path = directory, Id = id, Name = repo.Name});
         }
 
 

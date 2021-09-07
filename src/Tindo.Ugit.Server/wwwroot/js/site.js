@@ -8,3 +8,19 @@ $(document).ready(function ($) {
         window.document.location = $(this).data("href");
     });
 });
+
+
+function setClipboard(text) {
+    var type = "text/plain";
+    var blob = new Blob([text], { type });
+    var data = [new ClipboardItem({ [type]: blob })];
+
+    navigator.clipboard.write(data).then(
+        function () {
+            /* success */
+        },
+        function () {
+            /* failure */
+        }
+    );
+}
