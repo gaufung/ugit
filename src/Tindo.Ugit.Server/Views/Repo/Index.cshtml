@@ -6,6 +6,7 @@
 
 <div class="text-center">
     <div class="container-sm">
+        <span class="label label-info left">@Model.Path</span>
         <span class="border">
             @foreach (var file in Model.DirectoryContent.Where(f => f.IsDirectory))
             {
