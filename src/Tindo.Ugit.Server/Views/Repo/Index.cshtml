@@ -5,7 +5,7 @@
 @model RepositoryDetail
 
 <div class="text-center">
-    <div class="container-sm">
+    <div class="container border p-3 my-3">
         <span class="label label-info left">@Model.Path</span>
         <span class="border">
             @foreach (var file in Model.DirectoryContent.Where(f => f.IsDirectory))
