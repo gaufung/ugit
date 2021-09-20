@@ -55,6 +55,7 @@ namespace Tindo.Ugit.Server.Controllers
 
 
         [HttpGet("{id}/delete")]
+        [HttpPost("{id}/delete")]
         public IActionResult Delete(int id)
         {
             var repo = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id);
