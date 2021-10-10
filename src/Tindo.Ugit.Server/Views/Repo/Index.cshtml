@@ -22,37 +22,29 @@
                 }
             </ul>
         </div>
-        <span class="border">
-            @foreach (var file in Model.DirectoryContent.Where(f => f.IsDirectory))
+        <div class="border">
+            <ul class="list-group">
+                @foreach(var file in Model.DirectoryContent.Where(f => f.IsDirectory))
+                {
+                    <li class="list-group-item">
+                            <a href="/repo/@Model.Id/tree/@Model.Path/@file.Name" class="float-left">
+                                <i class="fas fa-folder"></i>
+                                @file.Name
+                            </a>
+                    </li>
+                }
+                @foreach(var file in Model.DirectoryContent.Where(f => !f.IsDirectory))
             {
-                <div class="row">
-                    <div class="col align-self-start">
-                        <a href="/repo/@Model.Id/tree/@Model.Path/@file.Name">
-                            <i class="fas fa-folder"></i>
-                            @file.Name
-                        </a>
-                    </div>
-                    <div class="col">
-                        @file.LastModified.DateTime.ToShortDateString()
-                    </div>
-                </div>
+            <li class="list-group-item">
+                <a class="float-left">
+                    <i class="fas fa-file"></i>
+                    @file.Name
+                </a>
+            </li>
             }
-
-            @foreach (var file in Model.DirectoryContent.Where(f => !f.IsDirectory))
-            {
-                <div class="row align-items-start">
-                    <div class="col align-self-start">
-                        <a>
-                            <i class="fas fa-file"></i>
-                            @file.Name
-                        </a>
-                    </div>
-                    <div class="col">
-                        @file.LastModified.DateTime.ToShortDateString()
-                    </div>
-                </div>
-            }
-        </span>
+            </ul>
+        </div>
+        
     </div>
     <div>
 
@@ -70,5 +62,4 @@
             </a>
         </div>
         </div>
-    </div>
 </div>
