@@ -35,9 +35,14 @@
         }
 
         /// <inheritdoc/>
-        public void EmptyCurrentDirectory(Func<string, bool> ignore)
+        public void CleanDirectory(string directory, Func<string, bool> ignore)
         {
-            foreach (var filePath in this.fileSystem.Directory.EnumerateFiles("."))
+            if (string.IsNullOrWhiteSpace(directory))
+            {
+                directory = ".";
+            }
+
+            foreach (var filePath in this.fileSystem.Directory.EnumerateFiles(directory))
             {
                 if (ignore(filePath))
                 {
@@ -47,14 +52,14 @@
                 this.Delete(filePath);
             }
 
-            foreach (var directory in this.fileSystem.Directory.EnumerateDirectories("."))
+            foreach (var dir in this.fileSystem.Directory.EnumerateDirectories(directory))
             {
-                if (ignore(directory))
+                if (ignore(dir))
                 {
                     continue;
                 }
 
-                this.Delete(directory, false);
+                this.Delete(dir, false);
             }
         }
 

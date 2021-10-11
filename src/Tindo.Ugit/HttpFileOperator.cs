@@ -39,7 +39,7 @@
         }
 
         /// <inheritdoc/>
-        public void EmptyCurrentDirectory(Func<string, bool> ignore)
+        public void CleanDirectory(string directory, Func<string, bool> ignore)
         {
             throw new NotImplementedException();
         }

@@ -56,7 +56,7 @@ namespace Tindo.Ugit
         [TestMethod]
         public void CheckoutIndexTest()
         {
-            fileOperator.Setup(d => d.EmptyCurrentDirectory(this.dataProvider.Object.IsIgnore));
+            fileOperator.Setup(d => d.CleanDirectory(null, this.dataProvider.Object.IsIgnore));
             dataProvider.Setup(d => d.GetObject("foo-oid", "blob")).Returns("Hello Foo".Encode());
             dataProvider.Setup(d => d.GetObject("bar-oid", "blob")).Returns("Hello bar".Encode());
             fileOperator.Setup(d => d.Write("foo.txt", It.IsAny<byte[]>()));
@@ -91,7 +91,7 @@ namespace Tindo.Ugit
 
             var tree = treeOpeartion.GetTree("foo-oid", "");
 
-            fileOperator.Setup(d => d.EmptyCurrentDirectory(this.dataProvider.Object.IsIgnore));
+            fileOperator.Setup(d => d.CleanDirectory(null, this.dataProvider.Object.IsIgnore));
             dataProvider.Setup(d => d.GetObject("a-oid", "blob")).Returns("Hello a".Encode());
             dataProvider.Setup(d => d.GetObject("b-oid", "blob")).Returns("Hello b".Encode());
             dataProvider.Setup(d => d.GetObject("c-oid", "blob")).Returns("Hello c".Encode());

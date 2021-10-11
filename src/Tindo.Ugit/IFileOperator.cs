@@ -58,10 +58,11 @@
         IEnumerable<string> Walk(string path);
 
         /// <summary>
-        /// Empty current directory.
+        /// clean directory.
         /// </summary>
+        /// <param name="directory">The directory to clean.</param>
         /// <param name="ignore">which file to ignore.</param>
-        void EmptyCurrentDirectory(Func<string, bool> ignore);
+        void CleanDirectory(string directory, Func<string, bool> ignore);
 
         /// <summary>
         /// Create a directory.

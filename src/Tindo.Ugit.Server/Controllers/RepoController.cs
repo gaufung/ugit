@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.FileProviders;
-using System.IO.Abstractions;
-using Tindo.Ugit.Server.Models;
 using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
+using Tindo.Ugit.Server.Models;
 
 namespace Tindo.Ugit.Server.Controllers
 {
@@ -16,6 +13,8 @@ namespace Tindo.Ugit.Server.Controllers
     public class RepoController : Controller
     {
         private readonly ILogger _logger;
+
+        private readonly ILoggerFactory _loggerFactory;
 
         private UgitServerOptions _serverOption;
 
@@ -25,23 +24,46 @@ namespace Tindo.Ugit.Server.Controllers
 
         public RepoController(
             IOptions<UgitServerOptions> serverOption,
-            IFileSystem fileSystem, 
-            UgitDatabaseContext databaseContext, 
-            ILogger<RepoController> logger)
+            IFileSystem fileSystem,
+            UgitDatabaseContext databaseContext,
+            ILoggerFactory loggerFactory)
         {
             _serverOption = serverOption.Value;
             _fileOperator = new PhysicalFileOperator(fileSystem);
             _ugitDatabaseContext = databaseContext;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
         }
 
         [HttpGet("{id}")]
         public IActionResult Index(int id)
         {
             IFileProvider fileProvider = new PhysicalFileProvider(_serverOption.RepositoryDirectory, Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
-            var  repo = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id);
+            var repo = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id);
+            if (repo == null)
+            {
+                return NotFound($"Repository with Id {id} couldn't been found");
+            }
+
+            CheckoutMasterBranch(repo.Name);
             IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(repo.Name);
-            return View(new RepositoryDetail() { DirectoryContent = directoryContent, Path = repo.Name, Id = repo.Id, Name=repo.Name });
+            return View(new RepositoryDetail() { DirectoryContent = directoryContent, Path = repo.Name, Id = repo.Id, Name = repo.Name });
+        }
+
+        private void CheckoutMasterBranch(string repoName)
+        {
+            var dataProvider = new LocalDataProvider(_fileOperator, Path.Join(_serverOption.RepositoryDirectory, repoName));
+            var treeOperation = new TreeOperation(dataProvider, _loggerFactory.CreateLogger<TreeOperation>());
+            var commitOperation = new CommitOperation(dataProvider, treeOperation, _loggerFactory.CreateLogger<CommitOperation>());
+            var branchOperation = new BranchOperation(dataProvider, _loggerFactory.CreateLogger<BranchOperation>());
+            var checkoutOperation = new CheckoutOperation(dataProvider, treeOperation, commitOperation, branchOperation, _loggerFactory.CreateLogger<CheckoutOperation>());
+            try
+            {
+                checkoutOperation.Checkout("master");
+            }
+            catch(UgitException)
+            {
+
+            }
         }
 
         [HttpGet("{id}/tree/{**directory}")]
@@ -50,7 +72,7 @@ namespace Tindo.Ugit.Server.Controllers
             IFileProvider fileProvider = new PhysicalFileProvider(Path.Join(_serverOption.RepositoryDirectory), Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
             var repo = _ugitDatabaseContext.Repositories.FirstOrDefault(r => r.Id == id);
             IDirectoryContents directoryContent = fileProvider.GetDirectoryContents(directory);
-            return View("Index", new RepositoryDetail() { DirectoryContent = directoryContent, Path = directory, Id = id, Name = repo.Name});
+            return View("Index", new RepositoryDetail() { DirectoryContent = directoryContent, Path = directory, Id = id, Name = repo.Name });
         }
 
 

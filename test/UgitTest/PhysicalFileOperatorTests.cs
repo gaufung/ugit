@@ -61,7 +61,7 @@
             directoryMock.Setup(d => d.Exists("foo/")).Returns(true);
             directoryMock.Setup(d => d.Delete("foo/", true));
             
-            fileOperator.EmptyCurrentDirectory((path)=>path.StartsWith(".ugit"));
+            fileOperator.CleanDirectory(".", (path)=>path.StartsWith(".ugit"));
             
             fileMock.VerifyAll();
             directoryMock.VerifyAll();

@@ -41,7 +41,7 @@
         /// <inheritdoc/>
         public void CheckoutIndex(Tree index)
         {
-            this.fileOperator.EmptyCurrentDirectory(this.dataProvider.IsIgnore);
+            this.fileOperator.CleanDirectory(this.dataProvider.GitDirFullPath, this.dataProvider.IsIgnore);
             foreach (var entry in index)
             {
                 string path = entry.Key;
