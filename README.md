@@ -101,7 +101,7 @@ v1.0
 
 ## Push/Pull remote server
 
-- Start the `Tindo.Ugit.Server` and configure the `RepositoryDirectory
+- Start the `Tindo.Ugit.Server` and configure the `RepositoryDirectory`
 
 ```json
 {
@@ -110,16 +110,26 @@ v1.0
   }
 }
 ```
-- Initilzie the Ugit reposistory in the Server 
 
-```
-> Invoke-RestMethod -Uri "https://localhost:5001/repo1/create" -Method POST 
-```
+![](./images/homepage.png)
+
+- Initilzie the Ugit reposistory in the server 
+
+![](./images/createRepo.png)
+
+
+- Browse repository
+
+![](./images/repoDetail.png)
+
+- Clone repository
+
+![](./images/clone.png)
 
 - Configure remote
 
 ```
-> ugit remote origin "https://localhost:5001/repo1"
+> ugit remote origin "http://localhost:5000/TestRepo"
 ```
 
 - Push and fetch origin 
@@ -127,9 +137,13 @@ v1.0
 ```
 > ugit fetch origin 
 > ugit merge remote/master
+> "hello ugit" >> world.txt
+>> ugit add world.txt
+>> ugit commit -m "second commit"
 > ugit push origin master
 ```
 
+![](./images/Push.png)
 
 # Tutorial
 - [1 Introudction](https://fenga.medium.com/implement-git-by-yourself-3-command-parameters-a8a7279f95d6)
