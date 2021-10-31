@@ -7,6 +7,7 @@ using System.CommandLine.Invocation;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
+using System.Net;
 using System.Net.Http;
 
 namespace Tindo.Ugit.CLI

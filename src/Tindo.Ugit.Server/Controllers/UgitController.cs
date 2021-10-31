@@ -7,9 +7,11 @@ using System.Linq;
 using System.Text.Json;
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Tindo.Ugit.Server.Controllers
 {
+    [AllowAnonymous]
     public class UgitController : Controller
     {
         private readonly ILogger<UgitController> _logger;
