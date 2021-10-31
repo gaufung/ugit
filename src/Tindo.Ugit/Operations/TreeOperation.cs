@@ -41,10 +41,10 @@
         /// <inheritdoc/>
         public void CheckoutIndex(Tree index)
         {
-            this.fileOperator.CleanDirectory(this.dataProvider.GitDirFullPath, this.dataProvider.IsIgnore);
+            this.fileOperator.CleanDirectory(this.dataProvider.RepoPath, this.dataProvider.IsIgnore);
             foreach (var entry in index)
             {
-                string path = entry.Key;
+                string path = Path.Join(this.dataProvider.RepoPath, entry.Key);
                 string oid = entry.Value;
                 this.fileOperator.Write(path, this.dataProvider.GetObject(oid, Constants.Blob));
             }

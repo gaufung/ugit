@@ -49,6 +49,9 @@
         public string GitDir => ".ugit";
 
         /// <inheritdoc/>
+        public string RepoPath => this.repoPath;
+
+        /// <inheritdoc/>
         public virtual string GitDirFullPath =>
             Path.Join(this.repoPath, this.GitDir);
 

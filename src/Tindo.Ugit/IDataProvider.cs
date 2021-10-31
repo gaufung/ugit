@@ -18,6 +18,11 @@
         string GitDir { get; }
 
         /// <summary>
+        /// Gets the repository directory name.
+        /// </summary>
+        string RepoPath { get; }
+
+        /// <summary>
         /// Gets the FileOperator.
         /// </summary>
         IFileOperator FileOperator { get; }

@@ -29,6 +29,8 @@
 
         public Config Config { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public string RepoPath => throw new NotImplementedException();
+
         public void DeleteRef(string @ref, bool deref = true)
         {
             throw new NotImplementedException();
