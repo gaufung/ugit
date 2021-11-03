@@ -24,25 +24,18 @@ namespace Tindo.Ugit.Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            if (Configuration.GetSection("Auth").GetValue<bool>("On"))
-            {
-                services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                     .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"));
-                services.AddControllersWithViews(options =>
-                {
-                    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
-                        .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
-
-                });
-                services.AddRazorPages()
-                .AddMicrosoftIdentityUI();
-            }
-            else
+            services.AddControllersWithViews(options =>
             {
-                services.AddRazorPages();
-            }
-            
+                var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+
+            });
+            services.AddRazorPages()
+            .AddMicrosoftIdentityUI();
+
             services.AddOptions()
                 .Configure<UgitServerOptions>(Configuration.GetSection("UgitServer"));
             services.AddSingleton<IFileSystem, FileSystem>();
@@ -70,11 +63,8 @@ namespace Tindo.Ugit.Server
 
             app.UseRouting();
 
-            if (Configuration.GetSection("Auth").GetValue<bool>("On"))
-            {
-                app.UseAuthentication();
-                app.UseAuthorization();
-            }
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

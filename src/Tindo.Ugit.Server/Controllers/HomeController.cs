@@ -14,7 +14,7 @@ namespace Tindo.Ugit.Server.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private ILoggerFactory _loggerFactory;
 
 
         private readonly string RepositoryDirectory;
@@ -24,10 +24,10 @@ namespace Tindo.Ugit.Server.Controllers
         private readonly UgitDatabaseContext _dbContext;
 
         public HomeController(IOptions<UgitServerOptions> serverOption, IFileSystem fileSystem, 
-            UgitDatabaseContext dbContext, ILogger<HomeController> logger)
+            UgitDatabaseContext dbContext, ILoggerFactory loggerFactory)
         {
             RepositoryDirectory = serverOption.Value.RepositoryDirectory;
-            _logger = logger;
+            _loggerFactory = loggerFactory;
             _fileSystem = fileSystem;
             _dbContext = dbContext;
         }
@@ -62,7 +62,7 @@ namespace Tindo.Ugit.Server.Controllers
             }
 
             IDataProvider dataProvider = new LocalDataProvider(new PhysicalFileOperator(_fileSystem), folderPath);
-            IInitOperation operation = new InitOperation(dataProvider, NullLogger<InitOperation>.Instance);
+            IInitOperation operation = new InitOperation(dataProvider, _loggerFactory.CreateLogger<InitOperation>());
             operation.Init();
 
             Repository repostiory = new Repository

@@ -11,11 +11,8 @@ using Tindo.Ugit.Server.Models;
 namespace Tindo.Ugit.Server.Controllers
 {
     [Route("repo")]
-    [AllowAnonymous]
     public class RepoController : Controller
     {
-        private readonly ILogger _logger;
-
         private readonly ILoggerFactory _loggerFactory;
 
         private UgitServerOptions _serverOption;
