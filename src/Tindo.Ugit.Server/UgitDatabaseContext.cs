@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+
 using Tindo.Ugit.Server.Models;
 
 namespace Tindo.Ugit.Server

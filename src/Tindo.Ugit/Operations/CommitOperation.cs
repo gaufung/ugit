@@ -201,11 +201,11 @@
             }
 
             Tree indexTree = this.treeOperation.GetIndexTree();
-            bool isSame = true;
+            bool unchanged = true;
 
             if (headTree.Count != indexTree.Count)
             {
-                isSame = false;
+                unchanged = false;
             }
             else
             {
@@ -213,22 +213,22 @@
                 {
                     if (!indexTree.ContainsKey(headTreeEntry.Key))
                     {
-                        isSame = false;
+                        unchanged = false;
                         break;
                     }
 
                     if (indexTree[headTreeEntry.Key] != headTree[headTreeEntry.Key])
                     {
-                        isSame = false;
+                        unchanged = false;
                         break;
                     }
                 }
             }
 
-            if (isSame)
+            if (unchanged)
             {
-                this.logger.LogError("nothing to commit (create/copy files and use \"ugit add\" to track.");
-                throw new UgitException("nothing to commit (create/copy files and use \"ugit add\" to track.");
+                this.logger.LogError("nothing to commit (create/copy files and use \"ugit add\" to track.)");
+                throw new UgitException("nothing to commit (create/copy files and use \"ugit add\" to track.)");
             }
         }
     }

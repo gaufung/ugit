@@ -1,6 +1,7 @@
 ﻿namespace Tindo.Ugit
 {
     using System.IO;
+
     using Microsoft.Extensions.Logging;
 
     /// <summary>

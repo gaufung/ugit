@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
 
@@ -67,10 +68,12 @@
             {
                 this.treeOperation.ReadTree(otherCommit.Tree, true);
                 this.dataProvider.UpdateRef("HEAD", RefValue.Create(false, other));
+                this.logger.LogInformation("Fast-forward, no need to commit");
                 Console.WriteLine("Fast-forwad, no need to commit");
                 return;
             }
 
+            this.logger.LogInformation("merge in working tree, need to commit.");
             this.dataProvider.UpdateRef("MERGE_HEAD", RefValue.Create(false, other));
             this.ReadTreeMerged(headCommit.Tree, otherCommit.Tree, true);
             Console.WriteLine("Merged in working tree\nPlease commit");

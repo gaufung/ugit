@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.IO;
+﻿using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text.Json;
-using System;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Tindo.Ugit.Server.Controllers
 {
@@ -33,13 +33,13 @@ namespace Tindo.Ugit.Server.Controllers
         }
 
         [HttpGet("{repo}/refs")]
-        public async Task<IActionResult> GetRefs(string repo, [FromQuery]string prefix = "", [FromQuery]bool deref=true)
+        public IActionResult GetRefs(string repo, [FromQuery] string prefix = "", [FromQuery] bool deref = true)
         {
             string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
             IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);
-            var refs = dataProvider.GetAllRefs(prefix, deref).ToDictionary(kv=>kv.Item1, kv=>kv.Item2);
+            var refs = dataProvider.GetAllRefs(prefix, deref).ToDictionary(kv => kv.Item1, kv => kv.Item2);
             var content = JsonSerializer.Serialize(refs);
-            var data = JsonSerializer.SerializeToUtf8Bytes(refs) ;
+            var data = JsonSerializer.SerializeToUtf8Bytes(refs);
             return new FileContentResult(data, "application/octet-stream");
         }
 
@@ -57,7 +57,7 @@ namespace Tindo.Ugit.Server.Controllers
         }
 
         [HttpGet("{repo}/objects/{oid}")]
-        public async Task<IActionResult> GetObject(string repo, string oid, [FromQuery]string expected="")
+        public IActionResult GetObject(string repo, string oid, [FromQuery] string expected = "")
         {
             string repoPath = Path.Join(_serverOption.RepositoryDirectory, repo);
             IDataProvider dataProvider = new LocalDataProvider(this._fileOperator, repoPath);

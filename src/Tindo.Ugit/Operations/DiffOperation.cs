@@ -79,7 +79,7 @@
             this.fileOperator.Write(fromFile, this.dataProvider.GetObject(fromOid));
             string toFile = Path.GetTempFileName();
             this.fileOperator.Write(toFile, this.dataProvider.GetObject(toOid));
-            this.logger.LogInformation($"Executing proxy: diff --unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
+            this.logger.LogInformation($"Executing proxy command: diff --unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
             var (code, output, error) = this.diffProxy.Execute(
                 "diff",
                 $"--unified --show-c-function --label a/{path} {fromFile} --label b/{path} {toFile}");
@@ -139,11 +139,11 @@
             string otherFile = Path.GetTempFileName();
             this.fileOperator.Write(otherFile, this.dataProvider.GetObject(otherOid));
             string arguments = string.Join(" ", new string[] { "-DHEAD", headFile, otherFile });
-            this.logger.LogInformation($"Executing proxy: diff {arguments}");
+            this.logger.LogInformation($"Executing proxy command: diff {arguments}");
             var (code, output, error) = this.diffProxy.Execute("diff", arguments);
             if (code != 0)
             {
-                this.logger.LogError(error);
+                this.logger.LogError($"Failed to execute proxy command: {error}");
                 throw new UgitException("failed to execute proxy command");
             }
 

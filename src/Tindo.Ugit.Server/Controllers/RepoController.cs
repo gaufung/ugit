@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
+
 using Tindo.Ugit.Server.Models;
 
 namespace Tindo.Ugit.Server.Controllers
@@ -13,6 +14,8 @@ namespace Tindo.Ugit.Server.Controllers
     [Route("repo")]
     public class RepoController : Controller
     {
+        private readonly ILogger<RepoController> _logger;
+
         private readonly ILoggerFactory _loggerFactory;
 
         private UgitServerOptions _serverOption;
@@ -31,6 +34,7 @@ namespace Tindo.Ugit.Server.Controllers
             _fileOperator = new PhysicalFileOperator(fileSystem);
             _ugitDatabaseContext = databaseContext;
             _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<RepoController>();
         }
 
         [HttpGet("{id}")]
@@ -59,9 +63,9 @@ namespace Tindo.Ugit.Server.Controllers
             {
                 checkoutOperation.Checkout("master");
             }
-            catch(UgitException)
+            catch(UgitException e)
             {
-
+                _logger.LogError($"Failed to create checkotu master branch {e.Message}");
             }
         }
 

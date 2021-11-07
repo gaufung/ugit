@@ -18,16 +18,18 @@
 - ugit push/fetch
 - ...
 
+Besides the local offline command, it also supports remote repository work mode, like GitHub. 
+
 # Prequirements 
-- .Net 5.0
+- Dotnet 5
 - diff command
-  - diff.exe (Windows)
-  - diff (*nix)
+    - diff.exe (Windows)
+    - diff (*nix)
 
 # Component 
 - Tindo.Ugit: `Ugit` core library. 
 - Tindo.Ugit.CLI: `Ugit` client tool
-- Tindo.Ugit.Server: `Ugit` server client.
+- Tindo.Ugit.Server: `Ugit` server.
 
 # Features
 
@@ -105,9 +107,9 @@ v1.0
 
 ```json
 {
-  "UgitServer": {
-    "RepositoryDirectory": "C:\\Users\\gaufung\\ugitServerRepos"
-  }
+    "UgitServer": {
+        "RepositoryDirectory": "C:\\Users\\gaufung\\ugitServerRepos"
+    }
 }
 ```
 
@@ -149,4 +151,10 @@ v1.0
 - [1 Introudction](https://fenga.medium.com/implement-git-by-yourself-3-command-parameters-a8a7279f95d6)
 - [2 Data provider](https://fenga.medium.com/implement-git-by-yourself-2-data-provider-86c9fc07be0a)
 - [3 Command Parameters](https://fenga.medium.com/implement-git-by-yourself-3-command-parameters-a8a7279f95d6)
-- ...
+
+# Feature Roadmap
+To be honest, as a side project, `Ugit` has reached its goal at the beginning. The repo will be treated as inactive status. However it still has a to-do list in the air:
+- Full Linux support
+- Database support
+- One-click deployment to public cloud 
+- Web API authentication. 
