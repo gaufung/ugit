@@ -21,7 +21,7 @@
 Besides the local offline command, it also supports remote repository work mode, like GitHub. 
 
 # Prequirements 
-- Dotnet 5
+- Dotnet 5/6
 - diff command
     - diff.exe (Windows)
     - diff (*nix)

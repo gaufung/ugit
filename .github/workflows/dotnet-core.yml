@@ -16,13 +16,13 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
     - name: Install dependencies
       run: dotnet restore
     - name: Build & Function Test
       run: |
         dotnet build --configuration Release --no-restore
-        cd /home/runner/work/ugit/ugit/src/Tindo.Ugit.CLI/bin/Release/net5.0/scripts/Linux
+        cd /home/runner/work/ugit/ugit/src/Tindo.Ugit.CLI/bin/Release/net6.0/scripts/Linux
         bash ./test_ugit.sh
     - name: Gernerate coverage report
       run: |

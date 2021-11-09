@@ -29,13 +29,13 @@ jobs:
       - name: Setup donet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.x
+          dotnet-version: 6.0.x
       - name: Build
         shell: bash
         run: |
           tag=$(git describe --tags --abbrev=0)
           ugit-cli_name="ugit-cli-$tag-${{ matrix.target }}"
-          dotnet publish src/Tindo.Ugit.CLI/Tindo.Ugit.CLI.csproj --framework net5.0 --runtime "${{ matrix.target }}" -c Release -o "$ugit-cli_name" -p:PublishSingleFile=true --self-contained true
+          dotnet publish src/Tindo.Ugit.CLI/Tindo.Ugit.CLI.csproj --framework net6.0 --runtime "${{ matrix.target }}" -c Release -o "$ugit-cli_name" -p:PublishSingleFile=true --self-contained true
           if [ "${{ matrix.taget }}" == "win-x64" ]; then
             7z a -tzip "${ugit-cli_name}.zip" "./${ugit-cli_name}/*"
           else  
@@ -43,7 +43,7 @@ jobs:
           fi
           rm -r "$ugit-cli_name"
           ugit-server_name="ugit-server-$tag-${{ matrix.target }}"
-          dotnet publish src/Tindo.Ugit.Server/Tindo.Ugit.Server.csproj --framework net5.0 --runtime "${{ matrix.target }}" -c Release -o "$ugit-server_name" -p:PublishSingleFile=true
+          dotnet publish src/Tindo.Ugit.Server/Tindo.Ugit.Server.csproj --framework net6.0 --runtime "${{ matrix.target }}" -c Release -o "$ugit-server_name" -p:PublishSingleFile=true
           if [ "${{ matrix.taget }}" == "win-x64" ]; then
             7z a -tzip "${ugit-server_name}.zip" "./${ugit-server_name}/*"
           else  

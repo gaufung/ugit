@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net5.0</TargetFrameworks>
+    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
     <AssemblyName>Tindo.Ugit</AssemblyName>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <ApplicationIcon />
